@@ -1,0 +1,96 @@
+/* Draggable Items CSS */
+
+.draggable-item {
+    cursor: grab;
+    user-select: none;
+    touch-action: none; /* Prevent scrolling while dragging on touch devices */
+    position: relative;
+    z-index: 1;
+    transition: transform var(--transition-fast) ease, 
+                box-shadow var(--transition-fast) ease,
+                opacity var(--transition-fast) ease;
+  }
+  
+  .draggable-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .draggable-item.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .draggable-item.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  
+  /* Drop zone styles */
+  .drop-zone {
+    position: relative;
+    border: 2px dashed var(--background-light);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    min-height: 80px;
+    transition: all var(--transition-fast) ease;
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .drop-zone.active {
+    border-color: var(--primary-color);
+    background-color: rgba(255, 87, 34, 0.05);
+  }
+  
+  .drop-zone.valid {
+    border-color: var(--accent-color);
+    background-color: rgba(76, 175, 80, 0.1);
+  }
+  
+  .drop-zone.invalid {
+    border-color: #F44336;
+    background-color: rgba(244, 67, 54, 0.1);
+  }
+  
+  /* Visual feedback for items being dragged over a drop zone */
+  @keyframes pulse-border {
+    0% { border-color: var(--primary-color); }
+    50% { border-color: rgba(255, 87, 34, 0.5); }
+    100% { border-color: var(--primary-color); }
+  }
+  
+  .drop-zone.active {
+    animation: pulse-border 1s infinite;
+  }
+  
+  /* Drop placeholder - shows where item will be dropped */
+  .drop-placeholder {
+    border: 2px dashed var(--primary-color);
+    background-color: rgba(255, 87, 34, 0.1);
+    border-radius: var(--border-radius-md);
+    margin: var(--spacing-xs);
+  }
+  
+  /* Transitions for items being dropped */
+  .dropped-item-enter {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  
+  .dropped-item-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .dropped-item-exit {
+    opacity: 1;
+  }
+  
+  .dropped-item-exit-active {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 300ms, transform 300ms;
+  }

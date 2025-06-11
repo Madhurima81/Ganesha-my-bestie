@@ -1,0 +1,133 @@
+/* Improved InteractiveTooltips.css for better touch device support */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes float {
+    0% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+    100% { transform: translateX(-50%) translateY(0); }
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  }
+  
+  /* Enhanced tooltip styles for better visibility */
+  .child-friendly-tooltip {
+    position: absolute;
+    top: -60px; /* Moved slightly closer to element */
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 150px;
+    padding: 12px 20px;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s, float 2s infinite ease-in-out;
+    pointer-events: none; /* Allow touch events to pass through */
+    /* Ensure tooltip stays visible long enough on touch */
+    transition: opacity 0.5s ease;
+  }
+  
+  /* Zone-specific styles with gradients for better visibility */
+  .pond-zone-tooltip {
+    background: linear-gradient(to bottom, #38bdf8, #0284c7);
+    color: white;
+    border: 2px solid white;
+  }
+  
+  .golden-zone-tooltip {
+    background: linear-gradient(to bottom, #fbbf24, #d97706);
+    color: white;
+    border: 2px solid #fffbeb;
+  }
+  
+  .mountain-zone-tooltip {
+    background: linear-gradient(to bottom, #b45309, #7c2d12);
+    color: white;
+    border: 2px solid #fffbeb;
+  }
+  
+  /* Arrow pointer adjusted for larger tooltips */
+  .child-friendly-tooltip:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -12px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top-width: 12px;
+    border-top-style: solid;
+  }
+  
+  .pond-zone-tooltip:after {
+    border-top-color: #0284c7;
+  }
+  
+  .golden-zone-tooltip:after {
+    border-top-color: #d97706;
+  }
+  
+  .mountain-zone-tooltip:after {
+    border-top-color: #7c2d12;
+  }
+  
+  /* Interactive Element Glow */
+  .interactive-element.new {
+    animation: pulse 2s infinite;
+    position: relative;
+  }
+  
+  .interactive-element.new:before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    z-index: -1;
+    background: rgba(255, 255, 255, 0);
+    animation: pulse 2s infinite;
+  }
+  
+  /* Touch state styling */
+  .interactive-element.touch-holding {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
+  
+  /* Mobile-friendly improvements */
+  @media (max-width: 768px) {
+    .child-friendly-tooltip {
+      font-size: 20px;
+      min-width: 180px;
+      padding: 15px 25px;
+      white-space: normal; /* Allow wrapping on small screens */
+      max-width: 80vw; /* Prevent overflow */
+      /* Show longer on mobile */
+      animation-duration: 0.3s, 3s;
+    }
+    
+    .interactive-element.new {
+      animation: pulse 1.5s infinite;
+    }
+    
+    /* Make touch targets larger on mobile */
+    .interactive-element {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }

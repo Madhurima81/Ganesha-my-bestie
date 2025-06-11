@@ -1,0 +1,316 @@
+/* GameWelcomeScreen.css - MOBILE-FIRST REFACTOR */
+
+/* FORCE EVERYTHING TO FULL VIEWPORT - NO EXCEPTIONS */
+/* These styles apply to ALL screen sizes by default, ensuring full viewport coverage */
+.interactive-welcome-screen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-image: url('/images/welcome-background.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  overflow: hidden !important;
+  user-select: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 9999 !important;
+  box-sizing: border-box !important;
+}
+
+/* FORCE PARENT CONTAINERS TO FULL SIZE */
+/* Applies to all screen sizes */
+.interactive-welcome-screen::before {
+  content: '';
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: inherit !important;
+  z-index: -1 !important;
+}
+
+/* NEW ADVENTURE SIGN - MOBILE-FIRST RESPONSIVE */
+/* Default styles for smallest screens (e.g., <= 480px) */
+.new-adventure-sign {
+  position: absolute !important;
+  top: 35% !important; /* Adjusted for smaller screens */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 15 !important;
+  animation: signSway 4s ease-in-out infinite;
+  cursor: pointer !important;
+}
+
+.clickable-sign {
+  cursor: pointer !important;
+}
+
+/* Default image size for smallest screens */
+.new-adventure-sign img {
+  width: min(180px, 70vw) !important; /* Adjusted for smaller screens */
+  height: auto !important;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3)) !important;
+  transition: transform 0.3s ease !important;
+  display: block !important;
+}
+
+.new-adventure-sign:hover img {
+  transform: scale(1.05) rotate(2deg) !important;
+}
+
+/* DRAGGABLE CHARACTERS - MOBILE-FIRST SIZING AND POSITIONING */
+/* Default styles for smallest screens (e.g., <= 480px) */
+.draggable-ganesha-character {
+  width: min(150px, 40vw) !important; /* Adjusted for smaller screens */
+  height: auto !important;
+  position: absolute !important;
+  right: 2vw !important;   /* POSITION ADDED */
+  bottom: 2vh !important;  /* POSITION ADDED */
+  z-index: 10 !important;
+}
+
+.draggable-mooshika-character {
+  width: min(50px, 18vw) !important; /* Adjusted for smaller screens */
+  height: auto !important;
+  position: absolute !important;
+  left: 2vw !important;    /* POSITION ADDED */
+  bottom: 2vh !important;   /* POSITION ADDED */
+  z-index: 10 !important;
+}
+
+.draggable-ganesha-character img,
+.draggable-mooshika-character img {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  animation: characterBreathing 3s ease-in-out infinite;
+}
+
+.draggable-ganesha-character:hover img,
+.draggable-mooshika-character:hover img {
+  animation: characterBreathing 1.5s ease-in-out infinite;
+  transform: scale(1.1) !important;
+}
+
+@keyframes characterBreathing {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* HINT MESSAGE - MOBILE-FIRST RESPONSIVE */
+/* Default styles for smallest screens (e.g., <= 480px) */
+.interaction-hint {
+  position: absolute !important;
+  top: 65% !important; /* Adjusted for smaller screens */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  text-align: center !important;
+  z-index: 5 !important;
+  animation: hintFloat 3s ease-in-out infinite;
+  width: 98vw !important; /* Adjusted for smaller screens */
+  max-width: 400px !important; /* Keeps max-width for very large screens */
+}
+
+/* Default paragraph styles for smallest screens */
+.interaction-hint p {
+  font-size: min(14px, 3.5vw) !important; /* Adjusted for smallest screens */
+  color: #FFD700 !important;
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(255, 215, 0, 0.5) !important;
+  background: rgba(139, 69, 19, 0.9) !important;
+  padding: min(8px, 2vw) min(15px, 4vw) !important; /* Adjusted for smallest screens */
+  border-radius: 25px !important;
+  border: 2px solid #FFD700 !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3) !important;
+  margin: 0 !important;
+  backdrop-filter: blur(5px);
+  display: block !important;
+}
+
+/* SPARKLE EFFECTS - Applies to all screen sizes */
+.drag-sparkles {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  overflow: visible !important;
+  z-index: 10 !important;
+}
+
+.sparkle {
+  position: absolute !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  animation: sparkleFloat 1.5s ease-out infinite;
+  animation-delay: var(--delay);
+  top: var(--y);
+  left: var(--x);
+}
+
+.ganesha-sparkles .sparkle {
+  background: radial-gradient(circle, #FFD700 0%, #FFA500 100%) !important;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.8) !important;
+}
+
+.mooshika-sparkles .sparkle {
+  background: radial-gradient(circle, #FF69B4 0%, #FF1493 100%) !important;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8) !important;
+}
+
+@keyframes sparkleFloat {
+  0% { 
+    opacity: 1; 
+    transform: translateY(0) scale(0.5); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-20px) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-40px) scale(0.3); 
+  }
+}
+
+/* ANIMATIONS - Applies to all screen sizes */
+@keyframes signSway {
+  0%, 100% { transform: translateX(-50%) rotate(-1deg) !important; }
+  50% { transform: translateX(-50%) rotate(1deg) !important; }
+}
+
+@keyframes hintFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0px) !important; }
+  50% { transform: translateX(-50%) translateY(-8px) !important; }
+}
+
+/* PROGRESS SCREEN - KEEP EXISTING STYLES - Already responsive with min() and vw */
+.game-welcome-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.game-welcome-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 30px !important;
+  padding: min(40px, 5vw) !important;
+  max-width: min(600px, 90vw) !important;
+  width: 90vw !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+  animation: welcomeSlideIn 0.5s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes welcomeSlideIn {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* TABLET AND LARGER MOBILE SCREENS (e.g., 481px to 768px) */
+@media (min-width: 481px) {
+  .new-adventure-sign { 
+    top: 40% !important; /* Original 768px value */
+  }
+  
+  .new-adventure-sign img { 
+    width: min(220px, 60vw) !important; /* Original 768px value */
+  }
+  
+  .interaction-hint { 
+    top: 70% !important; /* Original 768px value */
+    width: 95vw !important; /* Original 768px value */
+  }
+  
+  .interaction-hint p { 
+    font-size: min(16px, 4vw) !important; /* Original 768px value */
+    padding: min(10px, 2.5vw) min(18px, 4.5vw) !important; /* Original 768px value */
+  }
+  
+  .draggable-ganesha-character { 
+    width: min(180px, 35vw) !important; /* Original 768px value */
+    right: 3vw !important; /* Adjusted position */
+    bottom: 3vh !important; /* Adjusted position */
+  }
+  
+  .draggable-mooshika-character { 
+    width: min(60px, 15vw) !important; /* Original 768px value */
+    left: 3vw !important; /* Adjusted position */
+    bottom: 3vh !important; /* Adjusted position */
+  }
+}
+
+/* DESKTOP AND LARGE TABLET SCREENS (e.g., 769px and up) */
+@media (min-width: 769px) {
+  .new-adventure-sign {
+    top: 45% !important; /* Original desktop value */
+  }
+  
+  .new-adventure-sign img {
+    width: min(280px, 60vw) !important; /* Original desktop value */
+  }
+  
+  .interaction-hint {
+    top: 75% !important; /* Original desktop value */
+    width: 90vw !important; /* Original desktop value */
+  }
+  
+  .interaction-hint p {
+    font-size: min(20px, 4vw) !important; /* Original desktop value */
+    padding: min(12px, 3vw) min(25px, 6vw) !important; /* Original desktop value */
+  }
+  
+  .draggable-ganesha-character {
+    width: min(220px, 30vw) !important; /* Original desktop value */
+    right: 5vw !important; /* Adjusted position */
+    bottom: 5vh !important; /* Adjusted position */
+  }
+  
+  .draggable-mooshika-character {
+    width: min(80px, 15vw) !important; /* Original desktop value */
+    left: 5vw !important; /* Adjusted position */
+    bottom: 5vh !important; /* Adjusted position */
+  }
+}
+
+/* FORCE PARENT CONTAINERS TO COOPERATE - Applies to all screen sizes */
+body:has(.interactive-welcome-screen),
+html:has(.interactive-welcome-screen),
+#root:has(.interactive-welcome-screen),
+.App:has(.interactive-welcome-screen) {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}

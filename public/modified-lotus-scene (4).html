@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotus Pond Scene</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        .scene-container {
+            position: relative;
+            flex: 1;
+            background: linear-gradient(to bottom, #7ec0ee 0%, #97d4ff 40%, #68add8 100%);
+            overflow: hidden;
+        }
+        
+        /* You can replace background gradient with an image */
+        /* Main scene styling */
+        .scene-container {
+            position: relative;
+            flex: 1;
+            background-image: url('images/backgrounds/forest_edge_bg.png');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        
+        /* Pond - adjust size and position to match screenshot */
+        .pond {
+            position: absolute;
+            bottom: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25%;
+            height: 10%;
+            background: url('images/backgrounds/lotus_pond_bg.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 1;
+        }
+        
+        /* Lotus image sizing - increase size */
+        .lotus img {
+            height: 40px; /* Increased from 25px */
+            width: auto;
+        }
+        
+        .tree {
+            position: absolute;
+            font-size: 8vh;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* Style for tree images */
+        .tree img {
+            height: 15vh;
+            width: auto;
+        }
+        
+        .tree:nth-child(1) {
+            bottom: 12%;
+            left: 10%;
+        }
+        
+        .tree:nth-child(2) {
+            bottom: 15%;
+            right: 12%;
+        }
+        
+        .tree:nth-child(3) {
+            bottom: 14%;
+            left: 25%;
+        }
+        
+        .tree:nth-child(4) {
+            bottom: 13%;
+            right: 24%;
+        }
+        
+        .lotus {
+            cursor: pointer;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            z-index: 100;
+            position: absolute;
+        }
+        
+        /* Style for lotus images */
+        .lotus img {
+            height: 6vh;
+            width: auto;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        
+        .lotus:hover img, .lotus:active img {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        
+        .lotus:nth-child(1) {
+            bottom: 30%;
+            left: 40%;
+        }
+        
+        .lotus:nth-child(2) {
+            bottom: 35%;
+            right: 35%;
+        }
+        
+        .lotus:nth-child(3) {
+            bottom: 40%;
+            left: 25%;
+        }
+        
+        .lotus:nth-child(4) {
+            bottom: 25%;
+            right: 25%;
+        }
+        
+        .lotus:nth-child(5) {
+            bottom: 32%;
+            left: 50%;
+        }
+        
+        .golden-lotus {
+            position: absolute;
+            bottom: 32%;
+            left: 55%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            filter: brightness(0.7);
+            opacity: 0.7;
+        }
+        
+        /* Style for golden lotus image */
+        .golden-lotus img {
+            height: 6vh;
+            width: auto;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        
+        .golden-lotus.active {
+            filter: brightness(1.5) hue-rotate(15deg);
+            animation: glow 2s infinite alternate;
+            opacity: 1;
+        }
+        
+        .golden-lotus.active img {
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                filter: brightness(1.2) hue-rotate(15deg);
+                box-shadow: 0 0 5px yellow, 0 0 10px gold;
+            }
+            to {
+                filter: brightness(1.5) hue-rotate(25deg);
+                box-shadow: 0 0 10px yellow, 0 0 20px gold, 0 0 30px orange;
+            }
+        }
+        
+        .elephant {
+            position: absolute;
+            bottom: 15%;
+            right: -10%;
+            transition: right 1.5s ease-in-out;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        /* Style for elephant image */
+        .elephant img {
+            height: 10vh;
+            width: auto;
+        }
+        
+        .elephant.visible {
+            right: 10%;
+            opacity: 1;
+        }
+        
+        .trunk {
+            position: absolute;
+            bottom: 18%;
+            right: 15%;
+            transform: rotate(-45deg);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        
+        /* Style for trunk/water spray image */
+        .trunk img {
+            height: 6vh;
+            width: auto;
+        }
+        
+        .trunk.active {
+            opacity: 1;
+            animation: spray 2s infinite alternate;
+        }
+        
+        @keyframes spray {
+            0% {
+                transform: rotate(-45deg);
+            }
+            50% {
+                transform: rotate(-25deg);
+            }
+            100% {
+                transform: rotate(-45deg);
+            }
+        }
+        
+        .water-drop {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        /* Style for water drop image */
+        .water-drop img {
+            height: 2vh;
+            width: auto;
+        }
+        
+        .water-drop.active {
+            opacity: 1;
+            animation: fall 1s forwards;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-100px, 100px);
+                opacity: 0;
+            }
+        }
+        
+        .ui-container {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .counter {
+            background-color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .counter img {
+            margin-right: 8px;
+            height: 20px;
+            width: auto;
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255,255,255,0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            max-width: 80%;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene-container">
+        <!-- Background Elements -->
+        <div class="grass"></div>
+        <div class="pond"></div>
+        
+        <!-- Trees aren't needed since they're part of the background -->
+        <!-- Lotus Flowers - increase size -->
+        <div class="lotus" id="lotus1" style="position: absolute; bottom: 38%; left: 45%; z-index: 5;">
+            <img src="images/items/lotus_bud_small.png" alt="Lotus Bud" style="height: 40px; width: auto;">
+        </div>
+        <div class="lotus" id="lotus2" style="position: absolute; bottom: 40%; left: 48%; z-index: 5;">
+            <img src="images/items/lotus_bud_small.png" alt="Lotus Bud" style="height: 40px; width: auto;">
+        </div>
+        <div class="lotus" id="lotus3" style="position: absolute; bottom: 37%; left: 51%; z-index: 5;">
+            <img src="images/items/lotus_bud_small.png" alt="Lotus Bud" style="height: 40px; width: auto;">
+        </div>
+        <div class="lotus" id="lotus4" style="position: absolute; bottom: 38%; left: 54%; z-index: 5;">
+            <img src="images/items/lotus_bud_small.png" alt="Lotus Bud" style="height: 40px; width: auto;">
+        </div>
+        <div class="lotus" id="lotus5" style="position: absolute; bottom: 35%; left: 57%; z-index: 5;">
+            <img src="images/items/lotus_bud_small.png" alt="Lotus Bud" style="height: 40px; width: auto;">
+        </div>
+        
+        <!-- Golden Lotus (Hidden initially) -->
+        <div class="golden-lotus" id="golden-lotus">
+            <img src="images/items/golden_lotus_bud.png" alt="Golden Lotus">
+        </div>
+        
+        <!-- Elephant (Hidden initially) -->
+        <div class="elephant" id="elephant">
+            <img src="images/characters/elephant_hidden.png" alt="Elephant">
+        </div>
+        
+        <!-- Elephant Trunk for Water -->
+        <div class="trunk">
+            <img src="images/characters/elephant_trunk_spraying.png" alt="Water Spray">
+        </div>
+        
+        <!-- UI Elements -->
+        <div class="ui-container">
+            <div class="counter" id="lotus-counter">
+                <img src="images/ui/bud_counter.png" alt="Bud Counter" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+                Lotus Buds Nurtured: 0/5
+            </div>
+            <div class="counter" id="water-counter">
+                <img src="images/ui/water_counter.png" alt="Water Counter" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+                Magic Water: 0%
+            </div>
+        </div>
+        
+        <div class="instructions" id="game-instructions">
+            Tap the lotus buds to help them grow!
+        </div>
+    </div>
+
+    <script>
+        // Wait for DOM to be fully loaded
+        // Add page navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get page navigation buttons
+            const prevButton = document.querySelector('.page-prev');
+            const nextButton = document.querySelector('.page-next');
+            
+            // Add click event listeners
+            if (prevButton) {
+                prevButton.addEventListener('click', function() {
+                    alert('Previous page navigation will be implemented in the React version.');
+                });
+            }
+            
+            if (nextButton) {
+                nextButton.addEventListener('click', function() {
+                    alert('Next page navigation will be implemented in the React version.');
+                });
+            }
+            // Game state
+            let gameState = {
+                lotusNurtured: 0,
+                lotusStage: {}, // Track stage for each lotus (0=bud, 1=partial, 2=full)
+                goldenLotusActive: false,
+                elephantVisible: false,
+                trunkActive: false,
+                waterPercent: 0
+            };
+            
+            // DOM references
+            const lotusCounter = document.getElementById('lotus-counter');
+            const waterCounter = document.getElementById('water-counter');
+            const instructions = document.getElementById('game-instructions');
+            const goldenLotus = document.getElementById('golden-lotus');
+            const elephant = document.getElementById('elephant');
+            const trunk = document.querySelector('.trunk');
+            
+            // Nurture regular lotus with multiple stages
+            function nurtureLotus(element) {
+                const lotusId = element.id;
+                
+                // Initialize stage if not already set
+                if (typeof gameState.lotusStage[lotusId] === 'undefined') {
+                    gameState.lotusStage[lotusId] = 0;
+                }
+                
+                const lotusImg = element.querySelector('img');
+                
+                // Advance to next stage
+                if (gameState.lotusStage[lotusId] === 0) {
+                    // Stage 1: From small bud to partial bloom
+                    lotusImg.src = 'images/items/lotus_bloom_partial.png';
+                    lotusImg.style.height = '40px';
+                    lotusImg.style.width = 'auto';
+                    gameState.lotusStage[lotusId] = 1;
+                    
+                    // Add visual feedback
+                    element.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                    }, 300);
+                    
+                } else if (gameState.lotusStage[lotusId] === 1) {
+                    // Stage 2: From partial bloom to full bloom
+                    lotusImg.src = 'images/items/lotus_bloom_full.png';
+                    lotusImg.style.height = '40px';
+                    lotusImg.style.width = 'auto';
+                    gameState.lotusStage[lotusId] = 2;
+                    gameState.lotusNurtured++;
+                    lotusCounter.textContent = `Lotus Buds Nurtured: ${gameState.lotusNurtured}/5`;
+                    
+                    // Add visual feedback
+                    element.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                    }, 300);
+                    
+                    // Check if all lotuses are fully nurtured
+                    if (gameState.lotusNurtured >= 5) {
+                        instructions.textContent = 'All lotus flowers bloomed! Now find the golden lotus...';
+                        goldenLotus.style.filter = 'brightness(1)';
+                        goldenLotus.style.opacity = '1';
+                    }
+                }
+            }
+            
+            // Activate golden lotus
+            function activateGoldenLotus() {
+                if (gameState.lotusNurtured >= 5 && !gameState.goldenLotusActive) {
+                    gameState.goldenLotusActive = true;
+                    goldenLotus.classList.add('active');
+                    
+                    // Update golden lotus image
+                    const goldenLotusImg = goldenLotus.querySelector('img');
+                    goldenLotusImg.src = 'images/items/golden_lotus_partial.png';
+                    goldenLotusImg.style.height = '25px';
+                    goldenLotusImg.style.width = 'auto';
+                    
+                    instructions.textContent = 'The golden lotus needs magical water! Find an elephant to help...';
+                    
+                    // Show the elephant
+                    setTimeout(() => {
+                        elephant.classList.add('visible');
+                    }, 1000);
+                }
+            }
+            
+            // Show elephant
+            function showElephant() {
+                if (gameState.goldenLotusActive && !gameState.trunkActive) {
+                    gameState.elephantVisible = true;
+                    
+                    // Update elephant image 
+                    const elephantImg = elephant.querySelector('img');
+                    elephantImg.src = 'images/characters/elephant_full.png';
+                    elephantImg.style.height = '60px';
+                    elephantImg.style.width = 'auto';
+                    
+                    instructions.textContent = 'Tap the elephant to use its trunk for magical water!';
+                    
+                    // No need to manually set position, using the .visible class
+                    elephant.classList.add('visible');
+                    
+                    // Prepare trunk for activation
+                    elephant.onclick = activateTrunk;
+                }
+            }
+            
+            // Activate trunk to spray water
+            function activateTrunk() {
+                if (!gameState.trunkActive) {
+                    gameState.trunkActive = true;
+                    trunk.classList.add('active');
+                    
+                    // Change trunk image to spraying
+                    const trunkImg = trunk.querySelector('img');
+                    trunkImg.src = 'images/characters/elephant_trunk_spraying.png';
+                    trunkImg.style.height = '30px';
+                    trunkImg.style.width = 'auto';
+                    
+                    // Position the trunk properly
+                    trunk.style.right = '35%';
+                    trunk.style.bottom = '38%';
+                    trunk.style.opacity = '1';
+                    
+                    instructions.textContent = "The elephant is spraying magical water on the golden lotus!";
+                    
+                    // Start water animation
+                    sprayWater();
+                }
+            }
+            
+            // Spray water animation
+            function sprayWater() {
+                const waterInterval = setInterval(() => {
+                    // Create water drop
+                    const waterDrop = document.createElement('div');
+                    waterDrop.className = 'water-drop active';
+                    
+                    const waterImg = document.createElement('img');
+                    waterImg.src = 'images/items/magic_water_source.png';
+                    waterImg.alt = 'Water Drop';
+                    waterImg.style.height = '15px';
+                    waterImg.style.width = 'auto';
+                    waterDrop.appendChild(waterImg);
+                    
+                    // Position water drop to start from trunk
+                    waterDrop.style.right = '35%';
+                    waterDrop.style.bottom = '38%';
+                    document.querySelector('.scene-container').appendChild(waterDrop);
+                    
+                    // Remove water drop after animation
+                    setTimeout(() => {
+                        waterDrop.remove();
+                    }, 1500);
+                    
+                    // Update water counter
+                    gameState.waterPercent += 10;
+                    if (gameState.waterPercent > 100) gameState.waterPercent = 100;
+                    waterCounter.textContent = `Magic Water: ${gameState.waterPercent}%`;
+                    
+                    // Complete the game when water reaches 100%
+                    if (gameState.waterPercent >= 100) {
+                        clearInterval(waterInterval);
+                        completeScene();
+                    }
+                }, 1000);
+            }
+            
+            // Complete the scene
+            function completeScene() {
+                goldenLotus.style.transform = 'scale(1.2)';
+                
+                // Change the golden lotus image to a fully bloomed version
+                const goldenLotusImg = goldenLotus.querySelector('img');
+                goldenLotusImg.src = 'images/items/golden_lotus_full.png';
+                goldenLotusImg.style.height = '30px';
+                goldenLotusImg.style.width = 'auto';
+                
+                instructions.textContent = "The golden lotus is fully bloomed! You have completed this scene!";
+                instructions.style.backgroundColor = 'rgba(255, 215, 0, 0.8)';
+                
+                // Add completion animation
+                document.querySelector('.pond').style.boxShadow = '0 0 30px gold';
+            }
+            
+            // Get initial references to lotus elements
+            const lotus1 = document.getElementById('lotus1');
+            const lotus2 = document.getElementById('lotus2');
+            const lotus3 = document.getElementById('lotus3');
+            const lotus4 = document.getElementById('lotus4');
+            const lotus5 = document.getElementById('lotus5');
+            
+            // Add direct click handlers to each lotus
+            lotus1.addEventListener('click', function() { 
+                console.log("Lotus 1 clicked!");
+                nurtureLotus(this); 
+            });
+            
+            lotus2.addEventListener('click', function() { 
+                console.log("Lotus 2 clicked!");
+                nurtureLotus(this); 
+            });
+            
+            lotus3.addEventListener('click', function() { 
+                console.log("Lotus 3 clicked!");
+                nurtureLotus(this); 
+            });
+            
+            lotus4.addEventListener('click', function() { 
+                console.log("Lotus 4 clicked!");
+                nurtureLotus(this); 
+            });
+            
+            lotus5.addEventListener('click', function() { 
+                console.log("Lotus 5 clicked!");
+                nurtureLotus(this); 
+            });
+            
+            // Add direct click handler for golden lotus
+            goldenLotus.addEventListener('click', function() {
+                console.log("Golden lotus clicked!");
+                activateGoldenLotus();
+            });
+            
+            // Add elephant click event
+            elephant.addEventListener('click', function() {
+                console.log("Elephant clicked!");
+                showElephant();
+                if (gameState.elephantVisible) {
+                    // Update elephant image when visible
+                    const elephantImg = elephant.querySelector('img');
+                    elephantImg.src = 'images/characters/elephant_full.png';
+                    activateTrunk();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+/* HamburgerNav.css - Fixed and more compact */
+
+/* Hamburger Button */
+.hamburger-button {
+  position: fixed;
+  top: 70px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #8bc34a;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.hamburger-button:hover {
+  background: #ffffff;
+  transform: scale(1.05);
+}
+
+/* Hamburger lines */
+.hamburger-line {
+  width: 18px;
+  height: 2.5px;
+  background: #5d4037;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Animate to X when open */
+.hamburger-button.open .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-button.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-button.open .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -5px);
+}
+
+/* Menu overlay */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Side menu - Much thinner and shorter */
+.side-menu {
+  position: fixed;
+  top: 50px; /* Start lower */
+  left: 0;
+  bottom: auto; /* Not full height */
+  width: 180px; /* Much thinner */
+  background: linear-gradient(to bottom, #f5f7e6, #e8edd5);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 0 12px 12px 0; /* Rounded right corners */
+  padding: 40px 0 15px 0; /* Less padding */
+  animation: slideIn 0.3s ease;
+}
+
+/* Close button - properly positioned */
+.menu-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 2px solid #8bc34a;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #5d4037;
+  font-weight: bold;
+}
+
+.menu-close:hover {
+  background: rgba(139, 195, 74, 0.1);
+}
+
+/* Menu items - Compact */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 15px; /* Much less padding */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px; /* Smaller font */
+  color: #5d4037;
+  font-weight: 500;
+  position: relative;
+}
+
+.menu-item:hover {
+  background: rgba(139, 195, 74, 0.1);
+  padding-left: 20px;
+}
+
+.menu-icon {
+  font-size: 18px; /* Smaller icons */
+  width: 24px;
+  text-align: center;
+}
+
+.menu-label {
+  flex: 1;
+  text-align: left;
+}
+
+.menu-badge {
+  background: #ffc107;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
+}
+
+.menu-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 8px 15px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .side-menu {
+    width: 160px;
+    top: 40px;
+  }
+  
+  .menu-item {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .menu-icon {
+    font-size: 16px;
+  }
+}
+
+/* Remove any duplicate close icons */
+.menu-item.home .menu-icon::before {
+  content: none !important;
+}

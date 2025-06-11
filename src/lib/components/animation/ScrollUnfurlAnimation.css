@@ -1,0 +1,250 @@
+/* ScrollUnfurlAnimation.css */
+
+.scroll-animation-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  pointer-events: none; /* Allow clicks to pass through the container */
+}
+
+/* Scroll styling */
+.scroll {
+  position: relative;
+  width: 80%;
+  max-width: 600px;
+  min-height: 300px;
+  background-color: #f9f3e5; /* Scroll paper color */
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 30px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: auto; /* Re-enable click events on the scroll */
+  transform-origin: center;
+}
+
+/* Animation variants */
+.scroll.unfurl {
+  transform-origin: center top;
+}
+
+.scroll.unfurl.entering {
+  animation: unfurl 1s ease-out forwards;
+}
+
+.scroll.pop.entering {
+  animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Unfurl animation */
+@keyframes unfurl {
+  0% {
+    transform: scaleY(0.1) translateY(-100px);
+    opacity: 0;
+  }
+  50% {
+    transform: scaleY(0.5) translateY(-50px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Pop in animation */
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Content styling */
+.scroll-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Image styling */
+.scroll-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+}
+
+.scroll-image {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Character styling */
+.scroll-characters {
+  position: absolute;
+  width: 100%;
+  bottom: -20px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.scroll-character {
+  position: absolute;
+  z-index: 10;
+}
+
+.scroll-character.ganesha {
+  right: -60px;
+  bottom: -20px;
+}
+
+.scroll-character.mooshika {
+  left: -60px;
+  bottom: -10px;
+}
+
+.character-image {
+  width: 120px;
+  height: 120px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.character-image.ganesha {
+  background-image: url('../assets/characters/ganesha-small.png');
+}
+
+.character-image.mooshika {
+  background-image: url('../assets/characters/mooshika-small.png');
+  transform: scaleX(-1); /* Flip horizontally */
+}
+
+/* Button styling */
+.scroll-button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+.scroll-button.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.scroll-button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation overlay */
+.scroll-animation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .scroll {
+    width: 90%;
+    padding: 20px;
+  }
+  
+  .character-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .scroll-character.ganesha {
+    right: -40px;
+  }
+  
+  .scroll-character.mooshika {
+    left: -40px;
+  }
+  
+  .scroll-image {
+    max-height: 45vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll {
+    width: 95%;
+    padding: 15px;
+    min-height: 250px;
+  }
+  
+  .character-image {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .scroll-character.ganesha {
+    right: -30px;
+    bottom: -10px;
+  }
+  
+  .scroll-character.mooshika {
+    left: -30px;
+    bottom: -5px;
+  }
+  
+  .scroll-image {
+    max-height: 35vh;
+  }
+  
+  .scroll-button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}

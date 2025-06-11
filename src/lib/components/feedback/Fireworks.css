@@ -1,0 +1,246 @@
+/* Fireworks.css */
+
+.fireworks-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.firework-burst {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+}
+
+/* Launch trail animation */
+.launch-trail {
+  position: absolute;
+  width: 3px;
+  height: 100px;
+  bottom: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: launch 1s ease-out forwards;
+}
+
+@keyframes launch {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-150px);
+  }
+}
+
+/* Explosion container */
+.explosion {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: explode 0.3s ease-out forwards;
+}
+
+@keyframes explode {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Individual particles */
+.particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+  animation: particleMove 1.5s ease-out forwards;
+}
+
+.particle-inner {
+  width: var(--size);
+  height: var(--size);
+  background-color: var(--color);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color);
+  animation: particleFade 1.5s ease-out forwards;
+}
+
+.particle-trail {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to left, transparent, var(--color));
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  transform-origin: left center;
+  animation: trailFade 1.5s ease-out forwards;
+}
+
+@keyframes particleMove {
+  0% {
+    transform: translate(-50%, -50%) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateX(var(--velocity));
+    opacity: 0;
+  }
+}
+
+@keyframes particleFade {
+  0% {
+    transform: scale(1);
+    filter: brightness(1.5);
+  }
+  50% {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(0.5);
+    filter: brightness(0.8);
+  }
+}
+
+@keyframes trailFade {
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 30px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 50px;
+    opacity: 0;
+  }
+}
+
+/* Center flash effect */
+.center-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: flash 0.5s ease-out forwards;
+  filter: blur(10px);
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* Floating sparkles */
+.sparkle-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.floating-sparkle {
+  position: absolute;
+  font-size: 20px;
+  opacity: 0;
+  animation: floatSparkle 3s ease-in-out infinite;
+}
+
+@keyframes floatSparkle {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .particle-inner {
+    width: calc(var(--size) * 0.8);
+    height: calc(var(--size) * 0.8);
+  }
+  
+  .launch-trail {
+    width: 2px;
+    height: 80px;
+  }
+  
+  .center-flash {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .particle-inner {
+    filter: brightness(1.3);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .particle,
+  .launch-trail,
+  .explosion,
+  .center-flash,
+  .floating-sparkle {
+    animation: none;
+    opacity: 1;
+  }
+}

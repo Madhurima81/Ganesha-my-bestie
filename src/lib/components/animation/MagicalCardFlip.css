@@ -1,0 +1,238 @@
+/* lib/components/animation/MagicalCardFlip.css */
+.magical-card-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.magical-card-container {
+  perspective: 1500px;
+  transition: opacity var(--animation-duration, 1.5s) ease;
+}
+
+/* Animation stages */
+.magical-card-container.stage-hidden {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.magical-card-container.stage-appear {
+  opacity: 1;
+  animation: card-appear var(--animation-duration, 1.5s) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.magical-card-container.stage-complete {
+  opacity: 1;
+}
+
+@keyframes card-appear {
+  0% {
+    transform: scale(0.7) translateY(50px);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Card styling */
+.magical-card {
+  width: var(--card-width, 300px);
+  height: var(--card-height, 400px);
+  position: relative;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+}
+
+.magical-card.flipped {
+  transform: rotateY(180deg);
+}
+
+/* Card faces */
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-front {
+  background: var(--front-color, #6b4ce6);
+  color: white;
+  background-image: radial-gradient(circle at 50% 40%, 
+    rgba(255, 255, 255, 0.2) 0%, 
+    rgba(255, 255, 255, 0) 60%);
+}
+
+.card-back {
+  background: var(--back-color, #ffd700);
+  transform: rotateY(180deg);
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+  background-image: radial-gradient(circle at 50% 40%, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    rgba(255, 255, 255, 0) 70%);
+}
+
+/* Front card content */
+.card-question-mark {
+  font-size: 100px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-subtitle {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+/* Back card content */
+.card-back-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.card-image {
+  width: 60%;
+  max-height: 40%;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+.card-back-image {
+  margin-top: 20px;
+}
+
+.card-title {
+  font-size: 22px;
+  margin: 10px 0;
+  color: #333;
+}
+
+.card-stars {
+  display: flex;
+  gap: 5px;
+  margin: 10px 0;
+}
+
+.card-star {
+  font-size: 25px;
+  animation: star-bounce 0.5s ease forwards;
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Animate stars to appear sequentially */
+.card-star:nth-child(1) { animation-delay: 0.1s; }
+.card-star:nth-child(2) { animation-delay: 0.3s; }
+.card-star:nth-child(3) { animation-delay: 0.5s; }
+.card-star:nth-child(4) { animation-delay: 0.7s; }
+.card-star:nth-child(5) { animation-delay: 0.9s; }
+
+@keyframes star-bounce {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.card-continue-button {
+  padding: 10px 25px;
+  background: white;
+  border: none;
+  border-radius: 20px;
+  color: #333;
+  font-weight: bold;
+  margin-top: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-continue-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.card-continue-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Magic particles effect */
+.magic-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: var(--size, 5px);
+  height: var(--size, 5px);
+  background: var(--color, gold);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+}
+
+.magical-card.flipped .particle {
+  animation: particle-float var(--duration, 2s) ease-out var(--delay, 0s) forwards;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x-pos, 0), var(--y-pos, 0)) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .magical-card {
+    width: calc(var(--card-width, 300px) * 0.8);
+    height: calc(var(--card-height, 400px) * 0.8);
+  }
+  
+  .card-question-mark {
+    font-size: 80px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,191 @@
+/* GlowEffects.css - Complete solution for glows on all elements */
+
+/* Direct glow styles for each element type */
+.lotus-element {
+    position: relative;
+  }
+  
+  .lotus-element::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, 
+                               rgba(255, 158, 189, 0.3) 0%, 
+                               rgba(255, 158, 189, 0.1) 65%, 
+                               transparent 100%);
+    z-index: -1;
+    animation: lotusPulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes lotusPulse {
+    0%, 100% {
+      box-shadow: 0 0 30px 10px rgba(255, 158, 189, 0.5);
+      opacity: 0.7;
+    }
+    50% {
+      box-shadow: 0 0 40px 20px rgba(255, 158, 189, 0.7);
+      opacity: 1;
+    }
+  }
+  
+  /* Golden lotus glow */
+  .golden-element {
+    position: relative;
+  }
+  
+  .golden-element::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, 
+                               rgba(255, 215, 0, 0.3) 0%, 
+                               rgba(255, 215, 0, 0.1) 65%, 
+                               transparent 100%);
+    z-index: -1;
+    animation: goldenPulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes goldenPulse {
+    0%, 100% {
+      box-shadow: 0 0 30px 10px rgba(255, 215, 0, 0.5);
+      opacity: 0.7;
+    }
+    50% {
+      box-shadow: 0 0 40px 20px rgba(255, 215, 0, 0.7);
+      opacity: 1;
+    }
+  }
+  
+  /* Elephant glow */
+  .elephant-element {
+    position: relative;
+  }
+  
+  .elephant-element::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 30%; /* More oval shape */
+    background: radial-gradient(ellipse at center, 
+                               rgba(100, 180, 255, 0.3) 0%, 
+                               rgba(100, 180, 255, 0.1) 65%, 
+                               transparent 100%);
+    z-index: -1;
+    animation: elephantPulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes elephantPulse {
+    0%, 100% {
+      box-shadow: 0 0 30px 10px rgba(100, 180, 255, 0.4);
+      opacity: 0.7;
+    }
+    50% {
+      box-shadow: 0 0 40px 20px rgba(100, 180, 255, 0.6);
+      opacity: 1;
+    }
+  }
+  
+  /* Hide glow for interacted elements */
+  .no-glow::before {
+    display: none !important;
+  }
+  
+  /* Tooltips styling */
+  .child-friendly-tooltip {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 120px;
+    padding: 10px 16px;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s, float 2s infinite ease-in-out;
+    pointer-events: none;
+  }
+  
+  /* Zone-specific styles */
+  .lotus-tooltip {
+    background: linear-gradient(to bottom, #f472b6, #db2777);
+    color: white;
+    border: 2px solid white;
+  }
+  
+  .golden-tooltip {
+    background: linear-gradient(to bottom, #fbbf24, #d97706);
+    color: white;
+    border: 2px solid #fffbeb;
+  }
+  
+  .elephant-tooltip {
+    background: linear-gradient(to bottom, #60a5fa, #3b82f6);
+    color: white;
+    border: 2px solid white;
+  }
+  
+  /* Arrow for tooltips */
+  .child-friendly-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -10px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top-width: 10px;
+    border-top-style: solid;
+  }
+  
+  .lotus-tooltip::after {
+    border-top-color: #db2777;
+  }
+  
+  .golden-tooltip::after {
+    border-top-color: #d97706;
+  }
+  
+  .elephant-tooltip::after {
+    border-top-color: #3b82f6;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes float {
+    0% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+    100% { transform: translateX(-50%) translateY(0); }
+  }
+  
+  /* Mobile-friendly adjustments */
+  @media (max-width: 768px) {
+    .child-friendly-tooltip {
+      font-size: 18px;
+      min-width: 150px;
+      padding: 12px 20px;
+    }
+  }

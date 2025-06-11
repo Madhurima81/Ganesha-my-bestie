@@ -1,0 +1,313 @@
+/* lib/components/animation/SymbolSceneIntegration.css */
+.symbol-scene-integration-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1000;
+  /* This should NOT affect the pond scene underneath */
+}
+
+/* Background that gradually appears */
+.integration-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8); /* Darker background, no gradient */
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+.integration-background.stage-floating,
+.integration-background.stage-complete {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Main symbol that grows from source */
+.integrated-symbol {
+  position: absolute;
+  left: 50% !important;            /* ✅ Always center horizontally */
+  top: 55% !important;             /* ✅ Always center vertically */
+  transform: translate(-50%, -50%) scale(0);
+  transform: translate(-50%, -50%) scale(0);
+  width: 200px; /* Bigger size */
+  height: 200px; /* Bigger size */
+  pointer-events: none;
+  z-index: 1001;
+  cursor: pointer; /* Add cursor for click indication */
+}
+
+
+/* Animation stages for symbol */
+.integrated-symbol.stage-emerging {
+  animation: emerge-from-source 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.integrated-symbol.stage-growing {
+  transform: translate(-50%, -50%) scale(var(--symbol-scale, 1.5));
+  filter: drop-shadow(0 0 20px var(--glow-color, #ffd700));
+}
+
+.integrated-symbol.stage-floating {
+  transform: translate(-50%, -50%) scale(var(--symbol-scale, 1.5));
+  animation: gentle-float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px var(--glow-color, #ffd700));
+}
+
+.integrated-symbol.stage-complete {
+  transform: translate(-50%, -50%) scale(var(--symbol-scale, 1.5));
+  animation: gentle-float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px var(--glow-color, #ffd700));
+    pointer-events: auto;
+
+}
+
+/* Symbol emergence animation */
+@keyframes emerge-from-source {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.5) rotate(180deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+/* Gentle floating motion */
+@keyframes gentle-float {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(var(--symbol-scale, 1.5)) translateY(0); 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(var(--symbol-scale, 1.5)) translateY(-15px); 
+  }
+}
+
+.symbol-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(1.2);
+}
+
+/* Magical particles */
+.symbol-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--glow-color, #ffd700);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+}
+
+.integrated-symbol.stage-floating .particle,
+.integrated-symbol.stage-complete .particle {
+  animation: particle-dance var(--duration, 2s) ease-out var(--delay, 0s) infinite;
+}
+
+@keyframes particle-dance {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateX(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateX(var(--distance, 50px));
+    opacity: 0;
+  }
+}
+
+/* Ripple effects from source */
+.source-ripples {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--glow-color, #ffd700);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.integrated-symbol.stage-emerging .ripple {
+  animation: ripple-expand 1s ease-out var(--ripple-delay, 0s) forwards;
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+/* Information panel */
+.symbol-info-panel {
+  /*position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 25px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);*/
+    display: none; /* Hide completely */
+
+}
+
+.symbol-info-panel.stage-complete {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.symbol-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.description-visual {
+  margin-bottom: 20px;
+}
+
+.description-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #555;
+}
+
+.description-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.description-text {
+  text-align: left;
+  line-height: 1.4;
+}
+
+.continue-button {
+  background: var(--glow-color, #ffd700);
+  border: none;
+  border-radius: 25px;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.continue-button.stage-complete {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.continue-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.continue-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: translateY(20px);
+}
+
+/* Connection line from source to symbol */
+.connection-line {
+  position: absolute;
+  top: var(--source-y, 50%);
+  left: var(--source-x, 50%);
+  width: 2px;
+  height: 0;
+  background: linear-gradient(to bottom, 
+    var(--glow-color, #ffd700), 
+    transparent);
+  transform-origin: top;
+  opacity: 0;
+}
+
+.connection-line.stage-emerging {
+  animation: line-grow 1s ease-out 0.5s forwards;
+}
+
+@keyframes line-grow {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  100% {
+    height: 100px;
+    opacity: 0.7;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .integrated-symbol {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .symbol-info-panel {
+    max-width: 320px;
+    padding: 20px;
+    bottom: 60px;
+  }
+  
+  .symbol-title {
+    font-size: 20px;
+  }
+  
+  .description-line {
+    font-size: 14px;
+  }
+}

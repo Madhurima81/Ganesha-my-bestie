@@ -1,0 +1,320 @@
+/* MooshikaAnimation.css */
+
+.mooshika-container {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    width: 50px;
+    height: 30px;
+  }
+  
+  .mooshika-character {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-origin: center;
+  }
+  
+  .mooshika-body {
+    position: absolute;
+    width: 30px;
+    height: 15px;
+    background-color: var(--mooshika-color, #999999);
+    border-radius: 50% 40% 40% 50%;
+    top: 5px;
+    left: 10px;
+  }
+  
+  .mooshika-ears {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: var(--mooshika-color, #999999);
+    border-radius: 50%;
+    top: 0;
+    left: 15px;
+    box-shadow: 8px 0 0 var(--mooshika-color, #999999);
+  }
+  
+  .mooshika-tail {
+    position: absolute;
+    width: 15px;
+    height: 5px;
+    background-color: var(--mooshika-color, #999999);
+    border-radius: 0 50% 50% 0;
+    top: 10px;
+    left: 0;
+    transform-origin: left center;
+    animation: tailWag 0.3s infinite alternate;
+  }
+  
+  .mooshika-feet {
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    bottom: 0;
+    left: 15px;
+    animation: feetScurry 0.2s infinite alternate;
+  }
+  
+  .mooshika-feet::before,
+  .mooshika-feet::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 4px;
+    background-color: #777;
+    border-radius: 0 0 2px 2px;
+  }
+  
+  .mooshika-feet::before {
+    left: 2px;
+  }
+  
+  .mooshika-feet::after {
+    right: 2px;
+  }
+  
+  /* Tail animation */
+  @keyframes tailWag {
+    0% {
+      transform: rotate(-10deg);
+    }
+    100% {
+      transform: rotate(10deg);
+    }
+  }
+  
+  /* Feet animation */
+  @keyframes feetScurry {
+    0% {
+      transform: scaleX(0.8);
+    }
+    100% {
+      transform: scaleX(1.2);
+    }
+  }
+  
+  /* Movement direction animations */
+  .mooshika-left-to-right {
+    animation: moveLeftToRight var(--animation-duration, 3000ms) linear forwards;
+  }
+  
+  .mooshika-right-to-left {
+    animation: moveRightToLeft var(--animation-duration, 3000ms) linear forwards;
+  }
+  
+  .mooshika-top-to-bottom {
+    animation: moveTopToBottom var(--animation-duration, 3000ms) linear forwards;
+  }
+  
+  .mooshika-bottom-to-top {
+    animation: moveBottomToTop var(--animation-duration, 3000ms) linear forwards;
+  }
+  
+  /* Path variations */
+  .mooshika-path-zigzag {
+    animation-timing-function: steps(10, end) !important;
+  }
+  
+  .mooshika-path-arc {
+    animation-timing-function: ease-in-out !important;
+  }
+  
+  .mooshika-path-wave {
+    animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1) !important;
+  }
+  
+  /* Basic movement keyframes */
+  @keyframes moveLeftToRight {
+    0% {
+      left: -50px;
+    }
+    100% {
+      left: calc(100% + 50px);
+    }
+  }
+  
+  @keyframes moveRightToLeft {
+    0% {
+      right: -50px;
+    }
+    100% {
+      right: calc(100% + 50px);
+    }
+  }
+  
+  @keyframes moveTopToBottom {
+    0% {
+      top: -50px;
+    }
+    100% {
+      top: calc(100% + 50px);
+    }
+  }
+  
+  @keyframes moveBottomToTop {
+    0% {
+      bottom: -50px;
+    }
+    100% {
+      bottom: calc(100% + 50px);
+    }
+  }
+  
+  /* Zigzag path variations */
+  .mooshika-left-to-right.mooshika-path-zigzag {
+    animation: moveLeftToRightZigzag var(--animation-duration, 3000ms) forwards;
+  }
+  
+  .mooshika-right-to-left.mooshika-path-zigzag {
+    animation: moveRightToLeftZigzag var(--animation-duration, 3000ms) forwards;
+  }
+  
+  @keyframes moveLeftToRightZigzag {
+    0% {
+      left: -50px;
+      top: 40%;
+    }
+    20% {
+      left: 20%;
+      top: 60%;
+    }
+    40% {
+      left: 40%;
+      top: 30%;
+    }
+    60% {
+      left: 60%;
+      top: 70%;
+    }
+    80% {
+      left: 80%;
+      top: 20%;
+    }
+    100% {
+      left: calc(100% + 50px);
+      top: 50%;
+    }
+  }
+  
+  @keyframes moveRightToLeftZigzag {
+    0% {
+      right: -50px;
+      top: 40%;
+    }
+    20% {
+      right: 20%;
+      top: 60%;
+    }
+    40% {
+      right: 40%;
+      top: 30%;
+    }
+    60% {
+      right: 60%;
+      top: 70%;
+    }
+    80% {
+      right: 80%;
+      top: 20%;
+    }
+    100% {
+      right: calc(100% + 50px);
+      top: 50%;
+    }
+  }
+  
+  /* Arc path variations */
+  .mooshika-left-to-right.mooshika-path-arc {
+    animation: moveLeftToRightArc var(--animation-duration, 3000ms) forwards;
+  }
+  
+  .mooshika-right-to-left.mooshika-path-arc {
+    animation: moveRightToLeftArc var(--animation-duration, 3000ms) forwards;
+  }
+  
+  @keyframes moveLeftToRightArc {
+    0% {
+      left: -50px;
+      top: 50%;
+    }
+    50% {
+      left: 50%;
+      top: 20%;
+    }
+    100% {
+      left: calc(100% + 50px);
+      top: 50%;
+    }
+  }
+  
+  @keyframes moveRightToLeftArc {
+    0% {
+      right: -50px;
+      top: 50%;
+    }
+    50% {
+      right: 50%;
+      top: 20%;
+    }
+    100% {
+      right: calc(100% + 50px);
+      top: 50%;
+    }
+  }
+  
+  /* Wave path variations */
+  .mooshika-left-to-right.mooshika-path-wave {
+    animation: moveLeftToRightWave var(--animation-duration, 3000ms) forwards;
+  }
+  
+  .mooshika-right-to-left.mooshika-path-wave {
+    animation: moveRightToLeftWave var(--animation-duration, 3000ms) forwards;
+  }
+  
+  @keyframes moveLeftToRightWave {
+    0% {
+      left: -50px;
+      top: 50%;
+    }
+    25% {
+      left: 25%;
+      top: 30%;
+    }
+    50% {
+      left: 50%;
+      top: 70%;
+    }
+    75% {
+      left: 75%;
+      top: 30%;
+    }
+    100% {
+      left: calc(100% + 50px);
+      top: 50%;
+    }
+  }
+  
+  @keyframes moveRightToLeftWave {
+    0% {
+      right: -50px;
+      top: 50%;
+    }
+    25% {
+      right: 25%;
+      top: 30%;
+    }
+    50% {
+      right: 50%;
+      top: 70%;
+    }
+    75% {
+      right: 75%;
+      top: 30%;
+    }
+    100% {
+      right: calc(100% + 50px);
+      top: 50%;
+    }
+  }

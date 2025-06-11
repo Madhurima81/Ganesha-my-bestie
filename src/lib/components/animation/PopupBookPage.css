@@ -1,0 +1,258 @@
+/* lib/components/animation/PopupBookPage.css */
+.popup-book-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-book-container {
+  width: 90%;
+  max-width: 800px;
+  height: 80vh;
+  max-height: 600px;
+  display: flex;
+  background: #f9f3e5;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  position: relative;
+  perspective: 2000px;
+}
+
+/* Book pages */
+.popup-book-page {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background: #f9f3e5;
+  background-image: url('/assets/images/paper-texture.png');
+  padding: 30px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.left-page {
+  border-right: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.right-page {
+  transform-origin: left center;
+  transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* Animation stages for page opening */
+.right-page.stage-closed {
+  transform: rotateY(90deg);
+}
+
+.right-page.stage-opening {
+  transform: rotateY(45deg);
+}
+
+.right-page.stage-page-open,
+.right-page.stage-popping-up,
+.right-page.stage-complete {
+  transform: rotateY(0deg);
+}
+
+/* Content styling */
+.page-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.popup-title {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.popup-image-container {
+  position: relative;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Popup element with 3D effect */
+.popup-element {
+  position: relative;
+  width: 60%;
+  max-width: 200px;
+  height: var(--popup-height, 150px);
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.popup-element.stage-closed,
+.popup-element.stage-opening,
+.popup-element.stage-page-open {
+  transform: translateZ(0);
+}
+
+.popup-element.stage-popping-up {
+  transform: translateZ(40px);
+}
+
+.popup-element.stage-complete {
+  transform: translateZ(80px);
+}
+
+.popup-symbol-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+}
+
+/* 3D sides of the popup */
+.popup-sides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.popup-side {
+  position: absolute;
+  background: var(--accent-color, #ffd700);
+}
+
+.left-side, .right-side {
+  width: 6px;
+  height: 100%;
+  top: 0;
+  transform-origin: center;
+}
+
+.left-side {
+  left: -3px;
+  transform: rotateY(-90deg);
+}
+
+.right-side {
+  right: -3px;
+  transform: rotateY(90deg);
+}
+
+.top-side, .bottom-side {
+  width: 100%;
+  height: 6px;
+  left: 0;
+  transform-origin: center;
+}
+
+.top-side {
+  top: -3px;
+  transform: rotateX(90deg);
+}
+
+.bottom-side {
+  bottom: -3px;
+  transform: rotateX(-90deg);
+}
+
+.popup-shadow {
+  position: absolute;
+  bottom: -15px;
+  left: 10%;
+  width: 80%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  filter: blur(8px);
+  transition: all 0.5s ease;
+}
+
+.popup-element.stage-complete .popup-shadow {
+  opacity: 0.7;
+  filter: blur(15px);
+  width: 90%;
+  height: 15px;
+}
+
+.popup-description {
+  margin-top: 100px;
+  padding: 15px;
+  color: #333;
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.popup-continue-button {
+  align-self: center;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: var(--accent-color, #ffd700);
+  border: none;
+  border-radius: 25px;
+  color: #333;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.popup-continue-button.stage-complete {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.popup-continue-button:hover {
+  transform: scale(1.05) translateY(0);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.popup-continue-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: translateY(20px);
+}
+
+/* Background image styling */
+.page-background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .popup-book-container {
+    width: 95%;
+    height: 75vh;
+  }
+  
+  .popup-title {
+    font-size: 20px;
+  }
+  
+  .popup-description {
+    font-size: 14px;
+    margin-top: 80px;
+  }
+}

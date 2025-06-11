@@ -1,0 +1,180 @@
+/* ProgressModal.css - Simplified Version */
+
+.progress-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.progress-modal-content {
+  background: white;
+  border-radius: 30px;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.4s ease;
+  position: relative;
+  text-align: center;
+}
+
+.progress-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 35px;
+  height: 35px;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-close-btn:hover {
+  background: #e0e0e0;
+  transform: rotate(90deg);
+}
+
+.progress-title {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+
+/* Big Stats */
+.stats-section {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.big-stat {
+  text-align: center;
+}
+
+.big-number {
+  font-size: 48px;
+  font-weight: bold;
+  color: #4CAF50;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 18px;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Zone Grid */
+.zones-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.zone-box {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 15px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.zone-box.unlocked {
+  background: #e8f5e9;
+}
+
+.zone-box.locked {
+  opacity: 0.6;
+}
+
+.zone-box:hover {
+  transform: translateY(-3px);
+}
+
+.zone-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.zone-stars {
+  font-size: 14px;
+  font-weight: bold;
+  color: #666;
+}
+
+/* Continue Button */
+.progress-close-button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.progress-close-button:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .progress-modal-content {
+    padding: 20px;
+  }
+  
+  .progress-title {
+    font-size: 24px;
+  }
+  
+  .big-number {
+    font-size: 36px;
+  }
+  
+  .zones-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .zone-icon {
+    font-size: 28px;
+  }
+}
