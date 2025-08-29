@@ -12,6 +12,9 @@ import InteractionManager from "../../../../lib/components/scenes/InteractionMan
 import GameStateManager from "../../../../lib/services/GameStateManager";
 import { useGameCoach, TriggerCoach } from '../../../../lib/components/coach/GameCoach';
 import ProgressManager from '../../../../lib/services/ProgressManager';
+import SimpleSceneManager from '../../../../lib/services/SimpleSceneManager';
+import CulturalCelebrationModal from '../../../../lib/components/progress/CulturalCelebrationModal';
+import CulturalProgressExtractor from '../../../../lib/services/CulturalProgressExtractor';
 
 // 🎯 NEW: Import Drag & Drop Components
 import DraggableItem from '../../../../lib/components/interactive/DraggableItem';
@@ -40,6 +43,10 @@ import popupModak from './assets/images/popup-modak-info.png';
 import popupMooshika from './assets/images/popup-mooshika-info.png';
 import popupBelly from './assets/images/popup-belly-info.png';
 import mooshikaCoach from "./assets/images/mooshika-coach.png";
+// Add these imports after the existing image imports
+import symbolMooshikaColored from '../../shared/images/icons/symbol-mooshika-colored.png';
+import symbolModakColored from '../../shared/images/icons/symbol-modak-colored.png';
+import symbolBellyColored from '../../shared/images/icons/symbol-belly-colored.png';
 
 // 🎯 UPDATED PHASES - Cultural Sequence: Mooshika → Modaks → Belly
 const PHASES = {
@@ -142,7 +149,12 @@ const NewModakScene = ({
           
           // KEEP RELOAD SYSTEM IDENTICAL
           currentPopup: null,  // 'mooshika_info', 'mooshika_card', 'modak_info', 'modak_card', 'belly_info', 'belly_card', 'final_fireworks'
-          
+            showingCompletionScreen: false,  // Track completion screen display
+  playAgainRequested: false,  // ← ADD THIS LINE
+  fireworksCompleted: false,        // 🆕 NEW: Track fireworks completion
+fireworksStartTime: 0,            // 🆕 NEW: Track when fireworks started
+completionScreenShown: false,    // 🆕 NEW: Track if completion screen was shown
+
           // Symbol discovery state tracking
           symbolDiscoveryState: null,  // 'mooshika_discovering', 'modak_discovering', 'belly_discovering'
           sidebarHighlightState: null, // 'mooshika_highlighting', 'modak_highlighting', 'belly_highlighting'
@@ -189,7 +201,21 @@ const NewModakSceneContent = ({
 }) => {
   console.log('NewModakSceneContent render', { sceneState, isReload, zoneId, sceneId });
 
+  // MINIMAL DEBUG - Just log what's happening
+  console.log('🧪 MODAK RENDER:', { 
+    hasSceneState: !!sceneState,
+    phase: sceneState?.phase,
+    isReload 
+  });
+
+  // SAFETY CHECK - Prevent crashes if props missing
+  if (!sceneState || !sceneActions) {
+    console.warn('⚠️ MODAK: Missing required props');
+    return <div>Loading Modak scene...</div>;
+  }
+
   if (!sceneState?.phase) sceneActions.updateState({ phase: PHASES.MOOSHIKA_SEARCH });
+  
 
   // Add this function near the top of NewModakSceneContent
 const getCollectedModakPosition = (displayIndex) => {
@@ -218,7 +244,7 @@ const getCollectedModakPosition = (displayIndex) => {
 };
 
   // Access GameCoach functionality
-  const { showMessage, hideCoach, isVisible } = useGameCoach();
+const { showMessage, hideCoach, isVisible, clearManualCloseTracking } = useGameCoach();
 
   const [showSparkle, setShowSparkle] = useState(null);
   const [currentSourceElement, setCurrentSourceElement] = useState(null);
@@ -231,6 +257,7 @@ const getCollectedModakPosition = (displayIndex) => {
 
 const [showMooshikaSpeech, setShowMooshikaSpeech] = useState(false);
 const [mooshikaSpeechMessage, setMooshikaSpeechMessage] = useState('');
+
   
   // Timeouts ref for cleanup
   const timeoutsRef = useRef([]);
@@ -238,45 +265,119 @@ const [mooshikaSpeechMessage, setMooshikaSpeechMessage] = useState('');
   const [hintUsed, setHintUsed] = useState(false);
 
   const [showSceneCompletion, setShowSceneCompletion] = useState(false);
+    const [showCulturalCelebration, setShowCulturalCelebration] = useState(false);
+
   const [pendingAction, setPendingAction] = useState(null);
   const previousVisibilityRef = useRef(false);
 
   // 🐭 ADD THESE TWO LINES HERE:
 const [mooshikaPosition, setMooshikaPosition] = useState({ top: '45%', left: '25%' });
 const [mooshikaDragging, setMooshikaDragging] = useState(false);
+const shouldBlockSceneRender = isReload && sceneState?.showingCompletionScreen && !sceneState?.currentPopup;
+
+  // ✅ ADD THIS useEffect (NOT conditional):
+useEffect(() => {
+  if (shouldBlockSceneRender) {
+    console.log('🚫 BLOCKING: Completion screen reload detected, preventing scene flash');
+    setShowSceneCompletion(true);
+    sceneActions.updateState({ isReloadingGameCoach: false });
+  }
+}, [shouldBlockSceneRender]);
+
+// Add this function inside your scene component (around line 200-300)
+const resetSceneForNewPlaythrough = () => {
+  console.log('🔄 RESET: Starting fresh playthrough');
+  
+  // 1. FIRST: Clear all UI states immediately
+  setShowSparkle(null);
+  setShowPopupBook(false);
+  setShowMagicalCard(false);
+  setShowSceneCompletion(false);
+  setCurrentSourceElement(null);
+  setPopupBookContent({});
+  setCardContent({});
+  setPendingAction(null);
+  
+  // 2. For ModakScene, also clear these:
+  if (typeof setShowMooshikaSpeech !== 'undefined') {
+    setShowMooshikaSpeech(false);
+    setMooshikaSpeechMessage('');
+    setMooshikaAnimation('breathing');
+    setMooshikaPosition({ top: '45%', left: '25%' });
+    setMooshikaDragging(false);
+  }
+  
+  // 3. THEN: Reset scene state to initial values
+  setTimeout(() => {
+    sceneActions.updateState({
+      // Copy the EXACT initial state from your SceneManager
+      // For ModakScene:
+      moundStates: [0, 0, 0, 0, 0],
+      correctMound: Math.floor(Math.random() * 5) + 1,
+      mooshikaVisible: false,
+      mooshikaFound: false,
+      // ... all the other initial state values
+      
+      // For PondScene:
+      // lotusStates: [0, 0, 0],
+      // goldenLotusVisible: false,
+      // elephantVisible: false,
+      // ... all the other initial state values
+    });
+  }, 100);
+  
+  // 4. FINALLY: Hide GameCoach if active
+  if (hideCoach) {
+    hideCoach();
+  }
+};
+
+// Add this function around line 300
+const getMessageType = (messageId) => {
+  switch(messageId) {
+    case 'welcome': return 'welcome';
+    case 'mooshika_wisdom': return 'wisdom1';
+    case 'modak_wisdom': return 'wisdom2'; 
+    case 'belly_wisdom': return 'wisdom3';
+    default: return 'welcome';
+  }
+};
+// ✅ ADD: Get profile name for scene messages
+const activeProfile = GameStateManager.getActiveProfile();
+const profileName = activeProfile?.name || 'little explorer';
 
   // 🎯 UPDATED GAMECOACH MESSAGES - Cultural Sequence
   const gameCoachStoryMessages = [
     {
       id: 'welcome',
-      message: "Welcome to Ganesha's magical garden! Someone is playing hide and seek!",
+    message: `Welcome to Ganesha's magical garden, ${profileName}! Someone is playing hide and seek!`,
       timing: 500,
       condition: () => sceneState?.phase === PHASES.MOOSHIKA_SEARCH && !sceneState?.welcomeShown && !sceneState?.isReloadingGameCoach
     },
     {
       id: 'mooshika_wisdom',
-      message: "Amazing! Mooshika shows us that even the smallest acts of service are precious!",
+    message: `Amazing, ${profileName}! Mooshika shows us that even the smallest acts of service are precious!`,
       timing: 1000,
       condition: () => sceneState?.discoveredSymbols?.mooshika && !sceneState?.mooshikaWisdomShown && sceneState?.readyForWisdom && !sceneState?.isReloadingGameCoach
     },
     {
       id: 'modak_wisdom',
-      message: "Wonderful! These modaks represent the sweetness of devotion and life's rewards!",
+    message: `Wonderful, ${profileName}! These modaks represent the sweetness of devotion and life's rewards!`,
       timing: 1000,
       condition: () => sceneState?.discoveredSymbols?.modak && !sceneState?.modakWisdomShown && sceneState?.readyForWisdom && !sceneState?.isReloadingGameCoach
     },
     {
       id: 'belly_wisdom',
-      message: "Incredible! Ganesha's belly contains the entire universe - he holds all our joys and troubles!",
+    message: `Incredible, ${profileName}! Ganesha's belly contains the entire universe - he holds all our joys and troubles!`,
       timing: 1000,
       condition: () => sceneState?.discoveredSymbols?.belly && !sceneState?.bellyWisdomShown && sceneState?.readyForWisdom && !sceneState?.isReloadingGameCoach
     },
-    {
+    /*{
       id: 'mastery_wisdom',
       message: "You've learned about Ganesha's faithful friend, sweet blessings, and cosmic nature! Amazing!",
       timing: 1000,
       condition: () => sceneState?.phase === PHASES.COMPLETE && !sceneState?.masteryShown && !sceneState?.isReloadingGameCoach
-    }
+    }*/
   ];
 
   // 🎯 UPDATED HINT CONFIGS - Cultural Sequence Order + Drag & Drop
@@ -334,6 +435,35 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
     timeoutsRef.current.push(id);
     return id;
   };
+
+   useEffect(() => {
+  console.log('🧹 MODAK: Aggressive GameCoach cleanup on scene entry');
+  
+  // ✅ STEP 1: Clear any zone-specific messages immediately
+  if (hideCoach) {
+    hideCoach();
+  }
+  if (clearManualCloseTracking) {
+    clearManualCloseTracking();
+  }
+  
+  // ✅ STEP 2: Dispatch cleanup event for other components
+  const cleanupEvent = new CustomEvent('clearGameCoach', {
+    detail: { source: 'modak-scene', zoneId: 'symbol-mountain', sceneId: 'modak' }
+  });
+  window.dispatchEvent(cleanupEvent);
+  
+  // ✅ STEP 3: Force clear after delay to catch delayed messages
+  const aggressiveCleanup = setTimeout(() => {
+    console.log('🧹 MODAK: Second cleanup wave');
+    if (hideCoach) {
+      hideCoach();
+    }
+  }, 2000); // Clear any messages that show up within 2 seconds
+  
+  return () => clearTimeout(aggressiveCleanup);
+  
+}, []); // Only run once on mount
   
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -341,6 +471,8 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
       timeoutsRef.current.forEach(id => clearTimeout(id));
     };
   }, []);
+
+
 
   // Watch for GameCoach visibility changes to trigger pending actions
   useEffect(() => {
@@ -364,7 +496,7 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
               });
               
               setShowSparkle(null);
-            }, 1500);
+            }, 800);
             break;
             
           case 'show-rock':
@@ -381,7 +513,7 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
               });
               
               setShowSparkle(null);
-            }, 1500);
+            }, 800);
             break;
             
           case 'transform-rock':
@@ -399,6 +531,19 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
     
     previousVisibilityRef.current = isVisible;
   }, [isVisible, pendingAction]);
+
+  // ✅ ADD this useEffect in both scenes (after existing useEffects):
+
+/*useEffect(() => {
+  // Auto-reset completed scenes for fresh start
+  if (sceneState?.completed && !isReload) {
+    console.log('🔄 AUTO-RESET: Scene was completed, starting fresh');
+    
+    // Call the same reset function as "Start Fresh" button
+        window.location.reload();
+
+  }
+}, [sceneState?.completed, isReload]);*/
 
   useEffect(() => {
   // Show speech bubble 3 seconds after Mooshika is discovered
@@ -420,6 +565,18 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
   }
 }, [sceneState.mooshikaFound, sceneState.mooshikaDragHintShown, mooshikaDragging, showMooshikaSpeech]);
 
+// ✅ ADD THIS: Debug useEffect to track state changes
+useEffect(() => {
+  if (sceneState) {
+    console.log('🧪 STATE CHANGED:', {
+      completed: sceneState.completed,
+      phase: sceneState.phase,
+      stars: sceneState.stars,
+      timestamp: Date.now()
+    });
+  }
+}, [sceneState?.completed, sceneState?.phase, sceneState?.stars]);
+
   // Hide active hints function
   const hideActiveHints = () => {
     if (progressiveHintRef.current && typeof progressiveHintRef.current.hideHint === 'function') {
@@ -435,17 +592,21 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
   }
 }, [sceneState.mooshikaVisible, sceneState.mooshikaLastPosition]);
 
+
+
   // GAMECOACH LOGIC - Keep identical to PondScene
   useEffect(() => {
-    console.log('🎯 MODAK GAMECOACH DEBUG:', {
+    console.log('🎭 GAMECOACH DEBUG:', {
     'sceneState exists': !!sceneState,
     'showMessage exists': !!showMessage,
     'welcomeShown': sceneState?.welcomeShown,
     'phase': sceneState?.phase,
-    'gameCoachMessages length': gameCoachStoryMessages.length,
-    'matching message': gameCoachStoryMessages.find(item => typeof item.condition === 'function' && item.condition()),
-    'isReloadingGameCoach': sceneState?.isReloadingGameCoach
+    'isReloadingGameCoach': sceneState?.isReloadingGameCoach,
+    'timestamp': Date.now()
   });
+
+// ✅ REPLACE WITH SIMPLE DEBUG:
+console.log('🎯 MODAK GAMECOACH: Starting check');
     if (!sceneState || !showMessage) return;
     
     if (sceneState.isReloadingGameCoach) {
@@ -498,11 +659,23 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
       const timer = setTimeout(() => {
         console.log(`🎭 GameCoach: Showing ${matchingMessage.id} message (normal flow)`);
         
-        showMessage(matchingMessage.message, {
-          duration: 8000,
-          animation: 'bounce',
-          position: 'top-right'
-        });
+        console.log('🐭 DEBUG: matchingMessage.id =', matchingMessage.id);
+
+        // ✨ Show divine light effect first
+  setShowSparkle('divine-light');
+  
+  // Then show GameCoach message after divine light
+  setTimeout(() => {
+    setShowSparkle(null);
+    
+    showMessage(matchingMessage.message, {
+      duration: 8000,
+      animation: 'bounce',
+      position: 'top-right',
+      source: 'scene',
+      messageType: getMessageType(matchingMessage.id)
+    });
+  }, 2000); // 2 seconds for divine light
         
         switch (matchingMessage.id) {
           case 'welcome':
@@ -535,13 +708,13 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
             });
             setPendingAction('transform-rock');
             break;
-          case 'mastery_wisdom':
+          /*case 'mastery_wisdom':
             sceneActions.updateState({ 
               masteryShown: true,
               gameCoachState: 'mastery_wisdom',
               lastGameCoachTime: Date.now()
             });
-            break;
+            break;*/
         }
       }, matchingMessage.timing);
       
@@ -563,33 +736,114 @@ const [mooshikaDragging, setMooshikaDragging] = useState(false);
   ]);
 
   // RELOAD LOGIC - Handle all interrupted states
+// COMPLETELY REWRITTEN RELOAD LOGIC - Handles all ModakScene states
 useEffect(() => {
   if (!isReload || !sceneState) return;
   
+ // ✅ ADD THIS DEBUG BLOCK:
+  const profileId = localStorage.getItem('activeProfileId');
+  const playAgainKey = `play_again_${profileId}_symbol-mountain_modak`;
+  const flagValue = localStorage.getItem(playAgainKey);
+  const playAgainRequested = localStorage.getItem(playAgainKey);
+
+  console.log('🧪 RELOAD DEBUG:', {
+    currentPopup: sceneState.currentPopup,
+    showingCompletionScreen: sceneState.showingCompletionScreen,
+    playAgainFlag: flagValue,
+    phase: sceneState.phase
+  });
+
   console.log('🔄 RELOAD: Starting ModakScene reload sequence', {
     currentPopup: sceneState.currentPopup,
     gameCoachState: sceneState.gameCoachState,
-    symbolDiscoveryState: sceneState.symbolDiscoveryState,
-    sidebarHighlightState: sceneState.sidebarHighlightState
+    phase: sceneState.phase,
+    completed: sceneState.completed,
+    showingCompletionScreen: sceneState.showingCompletionScreen
   });
+
+// ✅ IMMEDIATE: Handle active popups FIRST (like fireworks)
+if (sceneState.currentPopup === 'final_fireworks') {
+  const profileId = localStorage.getItem('activeProfileId');
+  const playAgainKey = `play_again_${profileId}_symbol-mountain_modak`;
+  const playAgainRequested = localStorage.getItem(playAgainKey);
+  
+  if (playAgainRequested === 'true') {
+    console.log('🚫 FIREWORKS BLOCKED: Play Again was clicked');
+    localStorage.removeItem(playAgainKey);
+    sceneActions.updateState({
+      currentPopup: null,
+      showingCompletionScreen: false,
+      completed: false,
+      phase: PHASES.MOOSHIKA_SEARCH,
+      stars: 0,
+      isReloadingGameCoach: false
+    });
+    return;
+  }
+  
+  console.log('🎆 Resuming final fireworks');
+  setShowSparkle('final-fireworks');
+  sceneActions.updateState({ isReloadingGameCoach: false });
+  return;
+}
+
+// ✅ THEN: Handle completion screen (only if no active popup)
+if (sceneState.showingCompletionScreen && !sceneState.currentPopup) {
+  console.log('🔄 Resuming completion screen immediately');
+  setShowSceneCompletion(true);
+  sceneActions.updateState({ isReloadingGameCoach: false });
+  return;
+}
+  // ✅ CRITICAL FIX: Check if this is a fresh restart after Play Again
+  const isFreshRestartAfterPlayAgain = (
+      playAgainRequested === 'true' ||  // ← ADD THIS FIRST - Most reliable
+    sceneState.phase === 'mooshika_search' && 
+    sceneState.completed === false && 
+    sceneState.stars === 0 && 
+    !sceneState.mooshikaFound &&
+    !sceneState.welcomeShown &&
+    (sceneState.currentPopup === 'final_fireworks' || sceneState.showingCompletionScreen)
+  );
+  
+  if (isFreshRestartAfterPlayAgain) {
+    console.log('🔄 RELOAD: Detected fresh restart after Play Again - clearing completion state');
+
+    // ✅ ADD: Clear the storage flag if it exists
+  if (playAgainRequested === 'true') {
+    localStorage.removeItem(playAgainKey);
+    console.log('✅ CLEARED: Play Again storage flag');
+  }
+
+    sceneActions.updateState({ 
+      isReloadingGameCoach: false,
+      showingCompletionScreen: false,
+      currentPopup: null,
+      completed: false,
+      phase: 'mooshika_search'
+    });
+    return; // Exit early - don't resume completion screen
+  }
 
   // IMMEDIATELY block GameCoach normal flow
   sceneActions.updateState({ isReloadingGameCoach: true });
   
   setTimeout(() => {
-    // 1. HANDLE SYMBOL DISCOVERY STATES FIRST
+    
+    // 🔥 PRIORITY 1: Handle active symbol discovery states first
     if (sceneState.symbolDiscoveryState) {
       console.log('🔄 Resuming symbol discovery:', sceneState.symbolDiscoveryState);
       
       switch(sceneState.symbolDiscoveryState) {
         case 'mooshika_discovering':
-            if (sceneState.moundsVanishing && !sceneState.moundsVanished) {
-    sceneActions.updateState({ moundsVanished: true });
-  }
+          // Ensure mounds are vanished for visual consistency
+          if (sceneState.moundsVanishing && !sceneState.moundsVanished) {
+            sceneActions.updateState({ moundsVanished: true });
+          }
+          
           setPopupBookContent({
             title: "Mooshika - Divine Vehicle",
             symbolImage: popupMooshika,
-            description: "Mooshika is Ganesha's faithful mouse companion! Though small, he carries the mighty Ganesha, teaching us that no act of love or service is too small!"
+            description: "Mooshika is Ganesha's faithful mouse companion! ${profileName}! Though small, he carries the mighty Ganesha, teaching us that no act of love or service is too small!"
           });
           setCurrentSourceElement('mooshika-1');
           setShowPopupBook(true);
@@ -597,13 +851,13 @@ useEffect(() => {
             currentPopup: 'mooshika_info',
             isReloadingGameCoach: false 
           });
-          break;
+          return;
           
         case 'modak_discovering':
           setPopupBookContent({
             title: "Ganesha's Favorite Sweet",
             symbolImage: popupModak,
-            description: "Modaks are Ganesha's favorite sweets! These golden dumplings represent the sweetness of life and the rewards of spiritual devotion."
+            description: "Modaks are Ganesha's favorite sweets! ${profileName}! These golden dumplings represent the sweetness of life and the rewards of spiritual devotion."
           });
           setCurrentSourceElement('modak-1');
           setShowPopupBook(true);
@@ -611,13 +865,13 @@ useEffect(() => {
             currentPopup: 'modak_info',
             isReloadingGameCoach: false 
           });
-          break;
+          return;
           
         case 'belly_discovering':
           setPopupBookContent({
             title: "Ganesha's Cosmic Belly",
             symbolImage: popupBelly,
-            description: "Ganesha's cosmic belly contains the entire universe! It represents his ability to digest all experiences and transform them into wisdom."
+            description: "Ganesha's cosmic belly contains the entire universe! ${profileName}! It represents his ability to digest all experiences and transform them into wisdom."
           });
           setCurrentSourceElement('belly-1');
           setShowPopupBook(true);
@@ -625,12 +879,11 @@ useEffect(() => {
             currentPopup: 'belly_info',
             isReloadingGameCoach: false 
           });
-          break;
+          return;
       }
-      return;
     }
     
-    // 2. HANDLE SIDEBAR HIGHLIGHT STATES
+    // 🔥 PRIORITY 2: Handle sidebar highlight states
     else if (sceneState.sidebarHighlightState) {
       console.log('🔄 Resuming sidebar highlight:', sceneState.sidebarHighlightState);
       
@@ -648,7 +901,7 @@ useEffect(() => {
       return;
     }
 
-    // 3. HANDLE REGULAR POPUP STATES
+    // 🔥 PRIORITY 3: Handle explicit popup states
     else if (sceneState.currentPopup) {
       console.log('🔄 Resuming popup:', sceneState.currentPopup);
       
@@ -665,7 +918,7 @@ useEffect(() => {
           
         case 'mooshika_card':
           setCardContent({ 
-            title: "You've discovered the Mooshika Symbol!",
+  title: `You've discovered the Mooshika Symbol, ${profileName}!`,
             image: popupMooshika,
             stars: 2
           });
@@ -684,7 +937,7 @@ useEffect(() => {
           
         case 'modak_card':
           setCardContent({ 
-            title: "You've discovered the Modak Symbol!",
+  title: `You've discovered the Modak Symbol, ${profileName}!`,
             image: popupModak,
             stars: 3
           });
@@ -703,35 +956,93 @@ useEffect(() => {
           
         case 'belly_card':
           setCardContent({ 
-            title: "You've discovered the Belly Symbol!",
+  title: `You've discovered the Belly Symbol, ${profileName}!`,
             image: popupBelly,
             stars: 3
           });
           setShowMagicalCard(true);
           break;
+          case 'final_fireworks':
 
-        case 'final_fireworks':
-          console.log('🎆 Resuming final fireworks');
-          setShowSparkle('final-fireworks');
-          sceneActions.updateState({ 
-            gameCoachState: null,  
-            isReloadingGameCoach: false,
-            phase: PHASES.COMPLETE,
-            stars: 8,
-            completed: true,
-            progress: {
-              percentage: 100,
-              starsEarned: 8,
-              completed: true
-            }
-          });
-          return;
+// ✅ CHECK: Is this a Play Again reset using storage?
+  const profileId = localStorage.getItem('activeProfileId');
+  const playAgainKey = `play_again_${profileId}_symbol-mountain_modak`;
+  const playAgainRequested = localStorage.getItem(playAgainKey);
+  
+  if (playAgainRequested === 'true') {
+    console.log('🚫 FIREWORKS BLOCKED: Play Again was clicked (from storage)');
+    
+    // Clear the flag
+    localStorage.removeItem(playAgainKey);
+    
+    sceneActions.updateState({
+      currentPopup: null,
+      showingCompletionScreen: false,
+      completed: false,
+      phase: PHASES.MOOSHIKA_SEARCH,
+      stars: 0
+    });
+    return;
+  
+  }
+  
+  // ✅ LEGITIMATE: Real fireworks reload
+  console.log('🎆 Resuming final fireworks');
+  setShowSparkle('final-fireworks');
+  sceneActions.updateState({
+    gameCoachState: null,
+    isReloadingGameCoach: false,
+    phase: PHASES.COMPLETE,
+    stars: 8,
+    completed: true,
+    progress: {
+      percentage: 100,
+      starsEarned: 8,
+      completed: true
+    }
+  });
+  
+  setTimeout(() => {
+    setShowSparkle('final-fireworks');
+  }, 500);
+  return;
+    
       }
       
-      sceneActions.updateState({ isReloadingGameCoach: false });
+      return;
     }
+
+// 3.5. HANDLE COMPLETION SCREEN RELOAD
+else if (sceneState.showingCompletionScreen) {
+  // ✅ CHECK: Is this a Play Again reset using storage?
+  const profileId = localStorage.getItem('activeProfileId');
+  const playAgainKey = `play_again_${profileId}_symbol-mountain_modak`;
+  const playAgainRequested = localStorage.getItem(playAgainKey);
+  
+  if (playAgainRequested === 'true') {
+    console.log('🚫 COMPLETION BLOCKED: Play Again was clicked');
     
-    // 4. HANDLE GAMECOACH STATES
+    // Clear the flag
+    localStorage.removeItem(playAgainKey);
+    
+    sceneActions.updateState({
+      currentPopup: null,
+      showingCompletionScreen: false,
+      completed: false,
+      phase: PHASES.MOOSHIKA_SEARCH,
+      stars: 0,
+      isReloadingGameCoach: false
+    });
+    return;
+  }
+  
+  // ✅ LEGITIMATE: Real completion screen reload
+  console.log('🔄 Resuming completion screen');
+  setShowSceneCompletion(true);
+  sceneActions.updateState({ isReloadingGameCoach: false });
+}
+
+    // 🔥 PRIORITY 4: Handle GameCoach states
     else if (sceneState.gameCoachState) {
       console.log('🔄 Resuming GameCoach:', sceneState.gameCoachState);
       
@@ -770,69 +1081,105 @@ useEffect(() => {
           });
           break;
       }
+      return;
     }
 
-    // 🌟 ADD THIS NEW CASE - Handle partial rock feeding reload
-else if (sceneState.rockVisible && sceneState.rockFeedCount > 0 && sceneState.rockFeedCount < 5 && !sceneState.symbolDiscoveryState) {
-  console.log('🔄 Resuming partial rock feeding - no action needed');
-  sceneActions.updateState({ isReloadingGameCoach: false });
-  return;
-}
-
-    // 5. HANDLE TRANSFORMATION GAPS (NEW)
-else if (sceneState.moundsVanishing && !sceneState.symbolDiscoveryState) {
-  console.log('🔄 Resuming mounds transformation');
-  sceneActions.updateState({ 
-    moundsVanished: true,
-    symbolDiscoveryState: 'mooshika_discovering',
-    currentPopup: 'mooshika_info',
-    isReloadingGameCoach: false
-  });
-  
-  setPopupBookContent({
-    title: "Mooshika - Divine Vehicle", 
-    symbolImage: popupMooshika,
-    description: "Mooshika is Ganesha's faithful mouse companion! Though small, he carries the mighty Ganesha, teaching us that no act of love or service is too small!"
-  });
-  setCurrentSourceElement('mooshika-1');
-  setShowPopupBook(true);
-  return;
-}
-
-else if (sceneState.rockFeedingComplete && !sceneState.rockTransformed && !sceneState.symbolDiscoveryState) {
-      console.log('🔄 Resuming smooth rock transformation');
-  
-  // Continue the smooth transformation from where it was interrupted
-  setShowSparkle('belly-transform');
-  
-  safeSetTimeout(() => {
-    sceneActions.updateState({
-      rockTransformed: true,
-      phase: PHASES.ROCK_TRANSFORMED,
-      isReloadingGameCoach: false
-    });
+    // 🔥 PRIORITY 5: Handle mid-game states that need special attention
     
-    safeSetTimeout(() => {
-      sceneActions.updateState({
-        symbolDiscoveryState: 'belly_discovering',
-        currentPopup: 'belly_info'
+    // Handle partial rock feeding (normal state - no action needed)
+    else if (sceneState.rockVisible && sceneState.rockFeedCount > 0 && sceneState.rockFeedCount < 5) {
+      console.log('🔄 Resuming partial rock feeding - no special action needed');
+      sceneActions.updateState({ isReloadingGameCoach: false });
+      return;
+    }
+
+    // Handle incomplete mound transformation
+    else if (sceneState.moundsVanishing && !sceneState.moundsVanished && !sceneState.symbolDiscoveryState) {
+      console.log('🔄 Completing mound transformation and starting Mooshika discovery');
+      sceneActions.updateState({ 
+        moundsVanished: true,
+        symbolDiscoveryState: 'mooshika_discovering',
+        currentPopup: 'mooshika_info',
+        isReloadingGameCoach: false
       });
       
       setPopupBookContent({
-        title: "Ganesha's Cosmic Belly",
-        symbolImage: popupBelly,
-        description: "Ganesha's cosmic belly contains the entire universe! It represents his ability to digest all experiences and transform them into wisdom."
+        title: "Mooshika - Divine Vehicle", 
+        symbolImage: popupMooshika,
+        description: "Mooshika is Ganesha's faithful mouse companion! Though small, he carries the mighty Ganesha, teaching us that no act of love or service is too small!"
       });
-      setCurrentSourceElement('belly-1');
+      setCurrentSourceElement('mooshika-1');
       setShowPopupBook(true);
-      setShowSparkle(null);
-    }, 2000);
+      return;
+    }
+
+    // Handle incomplete rock transformation
+    else if (sceneState.rockFeedingComplete && !sceneState.rockTransformed) {
+      console.log('🔄 Resuming rock transformation to belly');
+      
+      setShowSparkle('belly-transform');
+      
+      safeSetTimeout(() => {
+        sceneActions.updateState({
+          rockTransformed: true,
+          phase: PHASES.ROCK_TRANSFORMED,
+          isReloadingGameCoach: false
+        });
+        
+        safeSetTimeout(() => {
+          sceneActions.updateState({
+            symbolDiscoveryState: 'belly_discovering',
+            currentPopup: 'belly_info'
+          });
+          
+          setPopupBookContent({
+            title: "Ganesha's Cosmic Belly",
+            symbolImage: popupBelly,
+            description: "Ganesha's cosmic belly contains the entire universe! It represents his ability to digest all experiences and transform them into wisdom."
+          });
+          setCurrentSourceElement('belly-1');
+          setShowPopupBook(true);
+          setShowSparkle(null);
+        }, 1000);
+        
+      }, 1000);
+      return;
+    }
+
+    // ⚠️ CRITICAL FIX: Handle phase states that shouldn't trigger symbol discovery
+    else if (sceneState.phase === PHASES.MODAKS_UNLOCKED || 
+             sceneState.phase === PHASES.SOME_COLLECTED || 
+             sceneState.phase === PHASES.ROCK_VISIBLE || 
+             sceneState.phase === PHASES.ROCK_FEEDING) {
+      console.log('🔄 Normal mid-game state, no special reload needed:', sceneState.phase);
+      sceneActions.updateState({ isReloadingGameCoach: false });
+      return;
+    }
     
-  }, 2000);
-  return;
-}
+    // ⚠️ CRITICAL FIX: Detect if all modaks collected but no discovery started
+    else if ((sceneState.phase === PHASES.ALL_COLLECTED || 
+              sceneState.modakStates?.every(state => state === 1)) && 
+             !sceneState.discoveredSymbols?.modak &&
+             !sceneState.symbolDiscoveryState &&
+             !sceneState.currentPopup) {
+      console.log('🔄 All modaks collected but discovery not started - triggering modak discovery');
+      sceneActions.updateState({ 
+        symbolDiscoveryState: 'modak_discovering',
+        currentPopup: 'modak_info',
+        isReloadingGameCoach: false
+      });
+      
+      setPopupBookContent({
+        title: "Ganesha's Favorite Sweet",
+        symbolImage: popupModak,
+        description: "Modaks are Ganesha's favorite sweets! These golden dumplings represent the sweetness of life and the rewards of spiritual devotion."
+      });
+      setCurrentSourceElement('modak-1');
+      setShowPopupBook(true);
+      return;
+    }
     
-    // 5. NO SPECIAL RELOAD NEEDED
+    // 🔥 DEFAULT: No special reload handling needed
     else {
       console.log('🔄 No special reload needed, clearing flags');
       setTimeout(() => {
@@ -843,6 +1190,8 @@ else if (sceneState.rockFeedingComplete && !sceneState.rockTransformed && !scene
   }, 500);
   
 }, [isReload]);
+
+
 
   // 🎯 PHASE 1: Mud Mound Click Handler (Primary action) - UPDATED with Magical Transformation
   const handleMoundClick = (moundIndex) => {
@@ -936,7 +1285,7 @@ safeSetTimeout(() => {
   setCurrentSourceElement('mooshika-1');
   setShowPopupBook(true);
   setShowSparkle(null);
-}, 1500); // Wait for mound fade-out animation
+}, 800); // Wait for mound fade-out animation
         
       }, 2000); // Wait for initial Mooshika celebration
     } else {
@@ -1152,13 +1501,31 @@ sceneActions.updateState({
         setShowMagicalCard(true);
         break;
 
-      case 'final':
+       // NewModakScene.jsx - Line ~1140
+case 'final':
   console.log('Final mastery achieved - showing fireworks celebration');
+
+   // ✅ ADD THESE LINES - Clear ALL UI states before fireworks
+  setShowMagicalCard(false);  // ← This stops the confetti!
+  setShowPopupBook(false);
+  setShowSparkle(null);
+  setCardContent({});
+  setPopupBookContent({});
+
+   // ✅ ADD THIS DEBUG:
+  console.log('🧪 COMPLETION TRIGGER:', {
+    source: 'fireworks',
+    timestamp: Date.now(),
+    sceneState: sceneState.phase
+  });
+  
+  // ✅ NEW: DON'T save permanent completion yet - just mark completion screen showing
   sceneActions.updateState({ 
+    //showingCompletionScreen: true,  // ← NEW: Flag for ZoneWelcome detection
     currentPopup: 'final_fireworks',
     phase: PHASES.COMPLETE,
     stars: 8,
-    completed: true,
+    completed: true,  // ← This stays in temp session only
     progress: {
       percentage: 100,
       starsEarned: 8,
@@ -1166,25 +1533,15 @@ sceneActions.updateState({
     }
   });
 
-    GameStateManager.clearLastLocation();
-
   setShowSparkle('final-fireworks');
   
-  safeSetTimeout(() => {
-    showMessage("Amazing! You've mastered all of Ganesha's garden symbols! You're now a true keeper of ancient wisdom!", {
-      duration: 6000,
-      animation: 'bounce',
-      position: 'top-center'
-    });
-  }, 500);
+  // ✅ REMOVED: No longer save to permanent storage here
   
-safeSetTimeout(() => {
-  sceneActions.updateState({ currentPopup: null });
-  
-  // ✅ ONLY show celebration - don't call onComplete yet
-  setShowSceneCompletion(true);
-  
-}, 8000);
+  /*safeSetTimeout(() => {
+    sceneActions.updateState({ currentPopup: null });
+      console.log('🧪 DEBUG: About to show scene completion - triggered by fireworks');
+    setShowSceneCompletion(true);
+  }, 4000);*/
   return;
 
       default:
@@ -1207,7 +1564,7 @@ safeSetTimeout(() => {
           gameCoachState: 'mooshika_wisdom'
         });
         setPendingAction('unlock-modaks');
-      }, 1500);
+      }, 500);
     }
     
     else if (cardContent.title?.includes("Modak Symbol")) {
@@ -1219,7 +1576,7 @@ safeSetTimeout(() => {
           gameCoachState: 'modak_wisdom'
         });
         setPendingAction('show-rock');
-      }, 500);
+      }, 300);
     }
     
     else if (cardContent.title?.includes("Belly Symbol")) {
@@ -1230,7 +1587,7 @@ safeSetTimeout(() => {
           readyForWisdom: true,
           gameCoachState: 'belly_wisdom'
         });
-      }, 500);
+      }, 300);
     }
   };
 
@@ -1257,7 +1614,7 @@ safeSetTimeout(() => {
       safeSetTimeout(() => {
         console.log('🎉 Showing mooshika celebration after sidebar highlight');
         showSymbolCelebration('mooshika');
-      }, 2500);
+      }, 1000);
       
     } else if (popupBookContent.title?.includes("Modak") || popupBookContent.title?.includes("Favorite Sweet")) {
       console.log('🍯 Modak info closed - highlighting sidebar first');
@@ -1274,7 +1631,7 @@ safeSetTimeout(() => {
       safeSetTimeout(() => {
         console.log('🎉 Showing modak celebration after sidebar highlight');
         showSymbolCelebration('modak');
-      }, 3000);
+      }, 1000);
       
     } else if (popupBookContent.title?.includes("Belly") || popupBookContent.title?.includes("Cosmic")) {
       console.log('🌌 Belly info closed - highlighting sidebar first');
@@ -1291,7 +1648,7 @@ safeSetTimeout(() => {
       safeSetTimeout(() => {
         console.log('🎉 Showing belly celebration after sidebar highlight');
         showSymbolCelebration('belly');
-      }, 2500);
+      }, 1000);
     }
   };
 
@@ -1325,6 +1682,26 @@ safeSetTimeout(() => {
       }, 500);
     }
   }, [sceneState?.phase, sceneState?.modakStates, sceneActions]);
+
+  // 🎯 GENTLE GAMECOACH FIX - Add this to BOTH scene files
+// Add this useEffect at the end of your existing useEffect hooks
+
+// 🛡️ GENTLE: Hide GameCoach when navigating away (don't destroy it)
+/*useEffect(() => {
+  return () => {
+    console.log('🧹 GENTLE CLEANUP: Hiding active GameCoach messages');
+    
+    // Only hide active messages - don't destroy GameCoach
+    if (hideCoach) {
+      hideCoach();
+    }
+    
+    // Clear any pending scene-specific actions
+    setPendingAction(null);
+    
+    console.log('✅ GENTLE CLEANUP: GameCoach messages hidden');
+  };
+}, []); // Empty dependency array - only runs on unmount*/
 
   // Hint interaction handlers
   const handleHintShown = (level) => {
@@ -1599,6 +1976,28 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
                 />
               </div>
             )}
+
+            {/* 🪨 Rock appear sparkle - BEFORE rock becomes visible */}
+{showSparkle === 'rock-appear' && (
+<div className="rock-appear-sparkle" style={{
+  position: 'absolute',
+  top: '45%',     // Same as rock position
+  left: '65%',    // Same as rock position  
+  width: '120px',
+  height: '120px',
+  transform: 'translate(-50%, -50%)',
+  zIndex: 20
+}}>   <SparkleAnimation
+  type="magic"
+  count={25}           // More concentrated
+  color="#DAA520"      // Divine gold
+  size={12}
+  duration={3000}      // Longer for fade effect
+  fadeOut={true}
+  area="contained"     // Keep sparkles in the div area
+/>
+  </div>
+)}
             
            {/* 🧺 SIMPLIFIED: Basket without nested modaks */}
 {sceneState.basketVisible && (
@@ -1698,7 +2097,9 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
                     style={{ 
                       width: '100%', 
                       height: '100%',
-                      transition: 'all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1)'
+                      transition: 'all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1)',
+                      opacity: showSparkle === 'rock-appear' ? 0.3 : 1,  // ← ADD THIS LINE
+    animation: showSparkle === 'rock-appear' ? 'rockMaterialize 2s ease-out' : 'none'  // ← ADD THIS
                     }}
                   />
 
@@ -1822,6 +2223,109 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
   COMPLETE
 </div>
 
+{/* 🆘 EMERGENCY: Start Fresh Button */}
+<div style={{
+  position: 'fixed',
+  top: '20px',
+  right: '20px',
+  zIndex: 9999,
+  background: '#FF4444',
+  color: 'white',
+  padding: '12px 20px',
+  borderRadius: '25px',
+  cursor: 'pointer',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  boxShadow: '0 4px 12px rgba(255, 68, 68, 0.3)',
+  border: '2px solid white'
+}} onClick={() => {
+  if (confirm('Start this scene from the beginning? You will lose current progress.')) {
+    console.log('🔄 MODAK EMERGENCY RESTART: User chose to start fresh');
+    
+    // 1. FIRST: Clear all UI states immediately
+    setShowSparkle(null);
+    setShowPopupBook(false);
+    setShowMagicalCard(false);
+    setShowSceneCompletion(false);
+    setCurrentSourceElement(null);
+    setPopupBookContent({});
+    setCardContent({});
+    setPendingAction(null);
+    setShowMooshikaSpeech(false);
+    setMooshikaSpeechMessage('');
+    setMooshikaAnimation('breathing');
+    setMooshikaPosition({ top: '45%', left: '25%' });
+    setMooshikaDragging(false);
+    
+    // 2. THEN: Reset scene state after UI cleared
+    setTimeout(() => {
+      sceneActions.updateState({
+        // Reset all Modak-specific states
+        moundStates: [0, 0, 0, 0, 0],
+        correctMound: Math.floor(Math.random() * 5) + 1,
+        mooshikaVisible: false,
+        mooshikaFound: false,
+        mooshikaDragHintShown: false,
+        mooshikaLastPosition: { top: '45%', left: '25%' },
+        moundsVanished: false,
+        moundsVanishing: false,
+        
+        modakStates: [0, 0, 0, 0, 0],
+        modaksUnlocked: false,
+        basketVisible: false,
+        basketFull: false,
+        collectedModaks: [],
+        fedModaks: [],
+        
+        rockVisible: false,
+        rockFeedCount: 0,
+        rockTransformed: false,
+        rockFeedingComplete: false,
+        
+        phase: PHASES.MOOSHIKA_SEARCH,
+        currentFocus: 'mooshika',
+        discoveredSymbols: {},
+
+        welcomeShown: false,           // ← ENSURE THIS IS FALSE
+    isReloadingGameCoach: false,   // ← ENSURE THIS IS FALSE
+    gameCoachState: null,          // ← CLEAR ANY COACH STATE
+           
+        // Clear all message flags
+        welcomeShown: false,
+        mooshikaWisdomShown: false,
+        modakWisdomShown: false,
+        bellyWisdomShown: false,
+        masteryShown: false,
+        readyForWisdom: false,
+        
+        // Clear reload states
+        currentPopup: null,
+        symbolDiscoveryState: null,
+        sidebarHighlightState: null,
+        gameCoachState: null,
+        isReloadingGameCoach: false,
+        lastGameCoachTime: 0,
+        
+        // Reset progress
+        stars: 0,
+        completed: false,
+        progress: {
+          percentage: 0,
+          starsEarned: 0,
+          completed: false
+        }
+      });
+    }, 100);
+    
+    // 3. FINALLY: Hide GameCoach if active
+    if (hideCoach) {
+      hideCoach();
+    }
+  }
+}}>
+  🔄 Start Fresh
+</div>
+
             <ProgressiveHintSystem
               ref={progressiveHintRef}
               sceneId={sceneId}
@@ -1893,6 +2397,30 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
             </div>
           )}
 
+          {/* Divine light for GameCoach entrance */}
+{showSparkle === 'divine-light' && (
+  <div style={{
+    position: 'fixed',
+    top: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: '400px',
+    height: '200px',
+    zIndex: 199,
+    pointerEvents: 'none'
+  }}>
+   <SparkleAnimation
+  type="glitter"
+  count={80}
+  color="#FFD700" 
+  size={3}        // ← Tiny glitter
+  duration={2000}
+  fadeOut={true}
+  area="full"
+/>
+  </div>
+)}
+
           <style>{`
             @keyframes confettiFall {
               to {
@@ -1903,19 +2431,39 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
 
           {/* Navigation */}
           <TocaBocaNav
-            onHome={() => onNavigate?.('home')}
-            onProgress={() => console.log('Show progress')}
-            onHelp={() => console.log('Show help')}
+ onHome={() => {
+    console.log('🧹 HOME: Cleaning GameCoach before navigation');
+    if (hideCoach) hideCoach();
+    if (clearManualCloseTracking) clearManualCloseTracking();
+    setTimeout(() => onNavigate?.('home'), 100);
+  }}onProgress={() => {
+  const activeProfile = GameStateManager.getActiveProfile();
+  const name = activeProfile?.name || 'little explorer';
+  
+  console.log(`Great progress, ${name}!`);
+  if (hideCoach) hideCoach();
+  setShowCulturalCelebration(true);
+}}            onHelp={() => console.log('Show help')}
             onParentMenu={() => console.log('Parent menu')}
             isAudioOn={true}
             onAudioToggle={() => console.log('Toggle audio')}
-            onZonesClick={() => onNavigate?.('zones')}
-            currentProgress={{
+onZonesClick={() => {
+    console.log('🧹 ZONES: Cleaning GameCoach before navigation');
+    if (hideCoach) hideCoach();
+    if (clearManualCloseTracking) clearManualCloseTracking();
+    setTimeout(() => onNavigate?.('zones'), 100);
+  }}            currentProgress={{
               stars: sceneState.celebrationStars || 0,
               completed: sceneState.phase === PHASES.COMPLETE ? 1 : 0,
               total: 1
             }}
           />
+
+          <CulturalCelebrationModal
+  show={showCulturalCelebration}
+  onClose={() => setShowCulturalCelebration(false)}
+  {...CulturalProgressExtractor.getCulturalProgressData()}
+/>
 
           {/* Symbol Sidebar */}
           <SymbolSidebar 
@@ -1927,35 +2475,45 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
 
           {showSparkle === 'final-fireworks' && (
   <Fireworks
-    show={true}
-    duration={8000}
-    count={15}
-    colors={['#FFD700', '#FF1493', '#00CED1', '#98FB98', '#FF6347', '#9370DB']}
+  show={true}
+  duration={8000}
+  onComplete={() => {
+    console.log('🎯 Fireworks complete');
 
-    onComplete={() => {
-  console.log('🎯 Fireworks complete - using fixed GameStateManager');
+     // ✅ IMMEDIATE: Stop ALL sparkle effects
   setShowSparkle(null);
   
-// 🔍 ADD THIS DEBUG LINE BEFORE setTimeout:
-  console.log('🔍 DEBUG: What we are about to save:', {
-    completed: true,
-    stars: 8, // or 5 for pond
-    symbols: { mooshika: true, modak: true, belly: true }, // or pond symbols
-    phase: 'complete'
+  // ✅ FORCE: Clear any lingering animations
+  const sparkleElements = document.querySelectorAll('[class*="sparkle"], [class*="glitter"]');
+  sparkleElements.forEach(el => el.remove());
+
+   // ✅ CRITICAL: Update scene state first
+  sceneActions.updateState({
+    showingCompletionScreen: true,
+    currentPopup: null  // ← CLEAR the fireworks popup!
   });
 
-  setTimeout(() => {
-    GameStateManager.saveGameState('symbol-mountain', 'modak', {
-      completed: true,
-      stars: 8,
-      symbols: { mooshika: true, modak: true, belly: true },
-      phase: 'complete'
-    });
-    console.log('✅ MODAK: Saved with cumulative GameStateManager');
-  }, 500);
+    // 🎯 ADD COMPLETION PATTERN HERE
+    const profileId = localStorage.getItem('activeProfileId');
+    if (profileId) {
+      GameStateManager.saveGameState('symbol-mountain', 'modak', {
+        completed: true,
+        stars: 8,
+        symbols: { mooshika: true, modak: true, belly: true },
+        phase: 'complete',
+        timestamp: Date.now()
+      });
+      
+      localStorage.removeItem(`temp_session_${profileId}_symbol-mountain_modak`);
+              SimpleSceneManager.clearCurrentScene(); // ← ADD THIS LINE
+      console.log('✅ MODAK: Completion saved and temp session cleared');
+    }
+    
+    // Then show scene completion UI
+      setShowSceneCompletion(true);
+  }}
+/>
 
-    }}
-  />
 )}
 
           <SceneCompletionCelebration
@@ -1967,49 +2525,272 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
   totalStars={8}
   discoveredSymbols={['mooshika', 'modak', 'belly']}
   symbolImages={{
-    mooshika: popupMooshika,
-    modak: popupModak,
-    belly: popupBelly
-  }}
+  mooshika: symbolMooshikaColored,
+  modak: symbolModakColored,
+  belly: symbolBellyColored
+}}
   nextSceneName="Temple Discovery"
-
-  onReplay={() => {
-    console.log('🔧 REPLAY: Saving progress then restarting scene');
-    
-    // Save progress first
-    if (onComplete) {
-      onComplete('modak', {
-        stars: 8,
-        symbols: { mooshika: true, modak: true, belly: true },
-        completed: true,
-        totalStars: 8
-      });
-    }
-    
-    // Then navigate to replay
-    setTimeout(() => {
-      onNavigate?.('scene');
-    }, 500);
+  sceneId="modak"                    // ← ADD THIS LINE
+  completionData={{                  // ← ADD THIS BLOCK
+    stars: 8,
+    symbols: { mooshika: true, modak: true, belly: true },
+    completed: true,
+    totalStars: 8
   }}
 
-  onContinue={() => {
-    console.log('🔧 CONTINUE: Saving progress then navigating to zone');
+    onComplete={onComplete}  // ← ADD THIS LINE
+
+/*onReplay={() => {
+    console.log('🧪 ONREPLAY CALLED: Button was actually clicked'); // ← ADD THIS LINE
+  console.log('🔧 PLAY AGAIN: Resetting scene but keeping resume tracking');
+
+  // ✅ NEW: Use temporary storage instead of scene state
+  const profileId = localStorage.getItem('activeProfileId');
+  if (profileId) {
+    const playAgainKey = `play_again_${profileId}_symbol-mountain_modak`;
+    localStorage.setItem(playAgainKey, 'true');
+    console.log('✅ PLAY AGAIN: Flag set in storage');
+  }
+  
+  // ✅ ALSO: Clear popup immediately
+  sceneActions.updateState({ 
+    currentPopup: null,
+    showingCompletionScreen: false
+  });
+
+// 1. ✅ ENHANCED: More aggressive GameCoach clearing
+  if (clearManualCloseTracking) {
+    clearManualCloseTracking();
+    console.log('✅ PLAY AGAIN: GameCoach manual tracking cleared');
+  }
+  if (hideCoach) {
+    hideCoach();
+    console.log('✅ PLAY AGAIN: GameCoach hidden');
+  }
+  
+  // ✅ ADD THIS NEW TIMEOUT HERE (before line 2400):
+  setTimeout(() => {
+    console.log('🎭 PLAY AGAIN: Forcing GameCoach fresh start');
     
-    // Save progress first
-    if (onComplete) {
-      onComplete('modak', {
-        stars: 8,
-        symbols: { mooshika: true, modak: true, belly: true },
-        completed: true,
-        totalStars: 8
-      });
+    // Force clear any GameCoach internal state again
+    if (clearManualCloseTracking) {
+      clearManualCloseTracking(); // Call it again after delay
+      console.log('🎭 PLAY AGAIN: GameCoach cleared again after delay');
     }
+  }, 500);
+
+  // 2. Clear temp storage FIRST
+  if (profileId) {
+    const tempKey = `temp_session_${profileId}_symbol-mountain_modak`;
+    localStorage.removeItem(tempKey);
+    console.log('✅ PLAY AGAIN: Cleared temp storage');
     
-    // Then navigate to zone welcome
+    SimpleSceneManager.setCurrentScene('symbol-mountain', 'modak', false, false);
+    console.log('✅ PLAY AGAIN: Current scene preserved for resume tracking');
+  }
+  
+  // 3. ✅ FORCE RESET: Multiple state updates to ensure it sticks
+  console.log('🔧 PLAY AGAIN: FORCING state reset');
+  
+  // First: Reset completion flags immediately
+  sceneActions.updateState({ 
+    completed: false, 
+    phase: PHASES.MOOSHIKA_SEARCH,
+    stars: 0,
+    showingCompletionScreen: false
+  });
+  
+  setTimeout(() => {
+    // Second: Clear UI states
+    setShowSparkle(null);
+    setShowPopupBook(false);
+    setShowMagicalCard(false);
+    setShowSceneCompletion(false);
+    setCurrentSourceElement(null);
+    setPopupBookContent({});
+    setCardContent({});
+    setPendingAction(null);
+    setShowMooshikaSpeech(false);
+    setMooshikaSpeechMessage('');
+    setMooshikaAnimation('breathing');
+    setMooshikaPosition({ top: '45%', left: '25%' });
+    setMooshikaDragging(false);
+    
     setTimeout(() => {
-      onNavigate?.('zone-welcome');
-    }, 500);
-  }}
+      // Third: Full state reset
+      sceneActions.updateState({
+        // ✅ CRITICAL: Force these to false again
+        completed: false,
+        phase: PHASES.MOOSHIKA_SEARCH,
+        stars: 0,
+        progress: {
+          percentage: 0,
+          starsEarned: 0,
+          completed: false
+        },
+        
+        // Reset all game states
+        moundStates: [0, 0, 0, 0, 0],
+        correctMound: Math.floor(Math.random() * 5) + 1,
+        mooshikaVisible: false,
+        mooshikaFound: false,
+        mooshikaDragHintShown: false,
+        mooshikaLastPosition: { top: '45%', left: '25%' },
+        moundsVanished: false,
+        moundsVanishing: false,
+        
+        modakStates: [0, 0, 0, 0, 0],
+        modaksUnlocked: false,
+        basketVisible: false,
+        basketFull: false,
+        collectedModaks: [],
+        fedModaks: [],
+        
+        rockVisible: false,
+        rockFeedCount: 0,
+        rockTransformed: false,
+        rockFeedingComplete: false,
+        
+        currentFocus: 'mooshika',
+        discoveredSymbols: {},
+        
+        // Reset all message flags
+        welcomeShown: false,
+        mooshikaWisdomShown: false,
+        modakWisdomShown: false,
+        bellyWisdomShown: false,
+        masteryShown: false,
+        readyForWisdom: false,
+        
+        // Reset all popup states
+        currentPopup: null,
+        symbolDiscoveryState: null,
+        sidebarHighlightState: null,
+        gameCoachState: null,
+        isReloadingGameCoach: false,
+        showingCompletionScreen: false,
+        lastGameCoachTime: 0
+      });
+      
+      console.log('✅ PLAY AGAIN: Final state reset complete');
+
+      setTimeout(() => {
+  const resumeData = SimpleSceneManager.shouldResumeScene();
+  const tempStorage = localStorage.getItem(`temp_session_${localStorage.getItem('activeProfileId')}_symbol-mountain_modak`);
+  console.log('🧪 RESUME DEBUG:', { resumeData, tempStorage: !!tempStorage });
+}, 2000);
+    }, 200);
+  }, 200);
+
+  // Replace your existing timeout with this:
+setTimeout(() => {
+  // Clear ALL possible completion storage locations
+  const profileId = localStorage.getItem('activeProfileId');
+  if (profileId) {
+    const tempKey = `temp_session_${profileId}_symbol-mountain_modak`;
+    const replayKey = `replay_session_${profileId}_symbol-mountain_modak`;
+    
+    localStorage.removeItem(tempKey);
+    localStorage.removeItem(replayKey);
+    console.log('🧪 AGGRESSIVE CLEAR: Removed all session storage');
+  }
+  
+  // Force multiple state updates to ensure it sticks
+  sceneActions.updateState({
+    showingCompletionScreen: false,
+    currentPopup: null,
+    completed: false,
+    phase: PHASES.MOOSHIKA_SEARCH,
+    stars: 0
+  });
+  
+  // Add a flag to prevent auto-save temporarily
+  sceneActions.updateState({
+    preventAutoSave: true
+  });
+  
+  // Clear the flag after a delay
+  setTimeout(() => {
+    sceneActions.updateState({
+      preventAutoSave: false
+    });
+  }, 2000);
+  
+  console.log('✅ PLAY AGAIN: Aggressive cleanup complete');
+}, 1000);
+}}*/
+
+onReplay={() => {
+  console.log('🔧 NUCLEAR OPTION: Bulletproof Play Again');
+  
+  const profileId = localStorage.getItem('activeProfileId');
+  if (profileId) {
+    // Clear ALL storage
+    localStorage.removeItem(`temp_session_${profileId}_symbol-mountain_modak`);
+    localStorage.removeItem(`replay_session_${profileId}_symbol-mountain_modak`);
+    localStorage.removeItem(`play_again_${profileId}_symbol-mountain_modak`);
+    
+    SimpleSceneManager.setCurrentScene('symbol-mountain', 'modak', false, false);
+    console.log('🗑️ NUCLEAR: All storage cleared');
+  }
+  
+  // Force clean reload
+  console.log('🔄 NUCLEAR: Forcing reload in 100ms');
+  setTimeout(() => {
+    window.location.reload();
+  }, 100);
+}}
+
+onContinue={() => {
+  console.log('🔧 CONTINUE: Going to next scene + preserving resume');
+  
+  // 1. ✅ ENHANCED: More aggressive GameCoach clearing (same as Play Again)
+  if (clearManualCloseTracking) {
+    clearManualCloseTracking();
+    console.log('✅ CONTINUE: GameCoach manual tracking cleared');
+  }
+  if (hideCoach) {
+    hideCoach();
+    console.log('✅ CONTINUE: GameCoach hidden');
+  }
+  
+  // ✅ NEW: Enhanced GameCoach timeout for Continue too
+  setTimeout(() => {
+    console.log('🎭 CONTINUE: Forcing GameCoach fresh start for next scene');
+    if (clearManualCloseTracking) {
+      clearManualCloseTracking();
+      console.log('🎭 CONTINUE: GameCoach cleared again after delay');
+    }
+  }, 500);
+  
+  // 2. Save completion data
+  const profileId = localStorage.getItem('activeProfileId');
+  if (profileId) {
+    ProgressManager.updateSceneCompletion(profileId, 'symbol-mountain', 'modak', {
+      completed: true,
+      stars: 8,
+      symbols: { mooshika: true, modak: true, belly: true }
+    });
+    
+    GameStateManager.saveGameState('symbol-mountain', 'modak', {
+      completed: true,
+      stars: 8,
+      symbols: { mooshika: true, modak: true, belly: true }
+    });
+    
+    console.log('✅ CONTINUE: Completion data saved');
+  }
+
+  // 3. ✅ CRITICAL: Set NEXT scene for resume tracking
+  setTimeout(() => {
+    SimpleSceneManager.setCurrentScene('symbol-mountain', 'pond', false, false);
+    console.log('✅ CONTINUE: Next scene (pond) set for resume tracking');
+    
+    // Navigate to next scene
+    onNavigate?.('scene-complete-continue');
+  }, 100);
+}}
+
 />
 
         </div>       
@@ -2018,4 +2799,4 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
   );
 };
 
-export default NewModakScene;
+export default NewModakScene

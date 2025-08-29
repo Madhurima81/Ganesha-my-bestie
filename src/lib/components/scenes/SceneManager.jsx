@@ -1,4 +1,4 @@
-// lib/components/scenes/SceneManager.jsx - DISNEY RELOAD-ONLY VERSION
+// lib/components/scenes/SceneManager.jsx - ROLE SEPARATED VERSION with IMMEDIATE SAVE FIX
 import React, { useState, useEffect, useRef } from 'react';
 import GameStateManager from '../../services/GameStateManager';
 
@@ -7,147 +7,270 @@ export const SceneManager = ({
   zoneId, 
   sceneId,
   initialState = {},
+  forceRestart = false,
 }) => {
   const [sceneState, setSceneState] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isReload, setIsReload] = useState(false);
+  const [isReplay, setIsReplay] = useState(false);
   const saveTimeoutRef = useRef(null);
   const hasInitialized = useRef(false);
-  const completionInProgress = useRef(false); // ✅ Track completion state
+  
+  // 🎯 ROLE: SceneManager handles ALL scene playback (normal + replay)
+  // GameStateManager handles ONLY permanent completion data
+  
+  // Get storage key based on mode
+  const getStorageKey = (isReplayMode) => {
+    const profileId = GameStateManager.activeProfileId;
+    if (isReplayMode) {
+      return `replay_session_${profileId}_${zoneId}_${sceneId}`;
+    } else {
+      return `temp_session_${profileId}_${zoneId}_${sceneId}`;
+    }
+  };
+  
+  // Save scene progress to SceneManager's own storage
+  const saveSceneProgress = (state, isReplayMode) => {
+    try {
+      const storageKey = getStorageKey(isReplayMode);
+      const progressData = {
+        ...state,
+        isReplaySession: isReplayMode,
+        lastSaved: Date.now(),
+        sceneId,
+        zoneId
+      };
+      
+      localStorage.setItem(storageKey, JSON.stringify(progressData));
+      
+      if (isReplayMode) {
+        console.log(`🎮 SCENE: Replay progress saved to ${storageKey}`);
+      } else {
+        console.log(`💾 SCENE: Normal progress saved to ${storageKey}`);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error saving scene progress:', error);
+      return false;
+    }
+  };
+  
+  // Load scene progress from SceneManager's own storage
+const loadSceneProgress = () => {
+  try {
+    const profileId = GameStateManager.activeProfileId;
+    
+    // Check completion status from GameStateManager (permanent data only)
+    const permanentState = GameStateManager.getSceneState(zoneId, sceneId);
+    const isCompleted = permanentState?.completed || false;
+    
+    console.log(`🔍 SCENE: Loading ${sceneId}, completed status:`, isCompleted);
+    
+    // Determine if this is a reload vs fresh start
+    const isActualReload = performance.navigation?.type === 1 || 
+                          performance.getEntriesByType('navigation')[0]?.type === 'reload';
+    
+    // ✅ FIXED: Check for temp session data FIRST, even if completed
+    const normalKey = `temp_session_${profileId}_${zoneId}_${sceneId}`;
+    const normalData = localStorage.getItem(normalKey);
+    
+    if (normalData) {
+      console.log('🔄 SCENE: Found temp session data - loading progress');
+      const normalState = JSON.parse(normalData);
+      setIsReplay(false);
+      setIsReload(isActualReload);
+      return {
+        ...initialState,
+        ...normalState
+      };
+    }
+    
+    // Check for existing replay session
+    const replayKey = `replay_session_${profileId}_${zoneId}_${sceneId}`;
+    const replayData = localStorage.getItem(replayKey);
+    
+    if (isActualReload && replayData) {
+      console.log('🔄 SCENE: Reload during replay detected');
+      const replayState = JSON.parse(replayData);
+      setIsReplay(true);
+      setIsReload(true);
+      return {
+        ...initialState,
+        ...replayState,
+        originalCompletion: permanentState
+      };
+    }
+    
+    // If completed but no session data, start fresh
+    if (isCompleted && !isActualReload) {
+      console.log('🎮 SCENE: Starting fresh replay of completed scene');
+      localStorage.removeItem(replayKey);
+      setIsReplay(true);
+      setIsReload(false);
+      return {
+        ...initialState,
+        completed: false,
+        stars: 0,
+        originalCompletion: permanentState
+      };
+    }
+    
+    // Normal fresh start
+    console.log('🆕 SCENE: Starting fresh normal play');
+    setIsReplay(false);
+    setIsReload(false);
+    return { ...initialState };
+    
+  } catch (error) {
+    console.error('Error loading scene progress:', error);
+    setIsReplay(false);
+    setIsReload(false);
+    return { ...initialState };
+  }
+};
   
   // Initialize state
   useEffect(() => {
     if (hasInitialized.current) return;
     
-    const loadSavedState = async () => {
+    const initializeScene = async () => {
       try {
-        console.log(`🔄 SceneManager: Loading state for ${zoneId}/${sceneId}`);
+        console.log(`🎬 SCENE: Initializing ${zoneId}/${sceneId}`);
         
-        const savedState = GameStateManager.getSceneState(zoneId, sceneId);
-        
-        if (savedState && Object.keys(savedState).length > 0) {
-          console.log(`📂 Found saved state for ${sceneId}:`, savedState);
-          
-          const isActualReload = performance.navigation?.type === 1 || 
-                                performance.getEntriesByType('navigation')[0]?.type === 'reload';
-          
-          const mergedState = {
-            phase: 'initial',
-            messagesShown: {},
-            interactions: {},
-            progress: {},
-            ...initialState,
-            ...savedState,
-            // Always preserve completion data
-            ...(savedState?.completed && {
-              completed: savedState.completed,
-              stars: savedState.stars || 0,
-              progress: {
-                ...initialState.progress,
-                ...savedState.progress,
-                completed: savedState.completed,
-                starsEarned: savedState.stars || 0
-              }
-            })
-          };
-          
-          setSceneState(mergedState);
-          setIsReload(isActualReload);
-        } else {
-          console.log(`🆕 Using initial state for ${sceneId}:`, initialState);
-          
-          const defaultState = {
-            phase: 'initial',
-            messagesShown: {},
-            interactions: {},
-            progress: {},
-            ...initialState
-          };
-          
-          setSceneState(defaultState);
-          setIsReload(false);
-        }
+        const loadedState = loadSceneProgress();
+        setSceneState(loadedState);
         
         hasInitialized.current = true;
       } catch (error) {
-        console.error('Error loading state:', error);
-        
-        setSceneState({
-          phase: 'initial',
-          messagesShown: {},
-          interactions: {},
-          progress: {},
-          ...initialState
-        });
-        setIsReload(false);
+        console.error('Error initializing scene:', error);
+        setSceneState({ ...initialState });
         hasInitialized.current = true;
       } finally {
         setIsLoading(false);
       }
     };
     
-    loadSavedState();
-  }, [zoneId, sceneId]);
+    initializeScene();
+  }, [zoneId, sceneId, forceRestart]);
   
-// ✅ DISNEY: RELOAD-ONLY AUTO-SAVE - FIXED TO PREVENT OVERWRITES
-useEffect(() => {
-  // Don't auto-save if still loading, no state, or completion in progress
-  if (isLoading || !sceneState || !hasInitialized.current) {
-    return;
-  }
-  
-  // ✅ DISNEY RULE: Never auto-save completed scenes - scenes handle their own completion
-  if (sceneState.completed === true || sceneState.phase === 'complete') {
-    console.log(`🚫 DISNEY: Skipping auto-save for completed scene: ${sceneId}`);
-    return;
-  }
-  
-  // ✅ DISNEY RULE: Block auto-save during completion sequences
-  if (completionInProgress.current) {
-    console.log(`🚫 DISNEY: Completion in progress, no auto-save for ${sceneId}`);
-    return;
-  }
-  
-  // 🚫 NEW: Don't auto-save fresh/empty scene states that could overwrite other scenes
-  const currentProgress = GameStateManager.getGameProgress();
-  const isEmpty = !sceneState.completed && 
-                 (sceneState.stars === 0 || !sceneState.stars) && 
-                 (!sceneState.discoveredSymbols || Object.keys(sceneState.discoveredSymbols).length === 0);
-  
-  if (isEmpty) {
-    console.log(`🚫 DISNEY: Skipping auto-save for empty scene state: ${sceneId}`);
-    return;
-  }
-  
-  // Clear existing timeout
-  if (saveTimeoutRef.current) {
-    clearTimeout(saveTimeoutRef.current);
-  }
-  
-  // Debounced auto-save for mid-scene progress ONLY
-  saveTimeoutRef.current = setTimeout(() => {
-    try {
-      console.log(`💾 DISNEY: Auto-saving progress for ${sceneId}:`, sceneState);
+  // ✅ FIXED: Auto-save with immediate save for celebration states
+  useEffect(() => {
+    // ✅ ADD THIS DEBUG HERE (in SceneManager.jsx)
+  console.log('🔄 SCENEMANAGER STATE CHANGE:', {
+    sceneId,
+    hasState: !!sceneState,
+    isLoading,
+    hasInitialized: hasInitialized.current,
+    currentPopup: sceneState?.currentPopup,
+    phase: sceneState?.phase,
+    showingZoneCompletion: sceneState?.showingZoneCompletion,
+    completed: sceneState?.completed
+  });
+    // Don't auto-save if still loading or no state
+    if (isLoading || !sceneState || !hasInitialized.current) {
+      return;
+    }
+    
+    console.log('🧪 AUTO-SAVE DEBUG:', {
+      sceneId,
+      completed: sceneState.completed,
+      phase: sceneState.phase,
+      currentPopup: sceneState.currentPopup,
+      showingCompletionScreen: sceneState.showingCompletionScreen,
+      showingZoneCompletion: sceneState.showingZoneCompletion,
+      timestamp: Date.now()
+    });
+
+    // ✅ ENHANCED: Detect celebration states (including new zone completion states)
+    const isInCelebration = sceneState.currentPopup === 'final_fireworks' || 
+                           sceneState.currentPopup === 'fireworks' ||
+                           sceneState.currentPopup === 'zone_completion' ||  // ← ADD: New zone completion popup
+                           sceneState.phase === 'celebration' ||
+                           sceneState.phase === 'zone-complete' ||  
+                           sceneState.showingZoneCompletion === true ||      // ← ADD: Zone completion flag
+                           sceneState.showingCompletionScreen === true ||    // ← ADD: Completion screen flag
+                           (sceneState.phase === 'complete' && sceneState.currentPopup);
+
+    // Don't auto-save completed scenes UNLESS they're in celebration
+    if ((sceneState.completed === true || sceneState.phase === 'complete') && !isInCelebration) {
+      console.log(`🚫 SCENE: Skipping auto-save for completed scene: ${sceneId}`);
+      return;
+    }
+    
+    // Don't auto-save empty/initial states
+    const isEmpty = !sceneState.completed && 
+                   (sceneState.stars === 0 || !sceneState.stars) && 
+                   (!sceneState.discoveredSymbols || Object.keys(sceneState.discoveredSymbols).length === 0) &&
+                   (!sceneState.lotusStates || sceneState.lotusStates.every(state => state === 0)) &&
+                   (!sceneState.collectedModaks || sceneState.collectedModaks.length === 0) &&
+                   (!sceneState.mooshikaFound || sceneState.mooshikaFound === false) &&
+                   (!sceneState.mooshikaVisible || sceneState.mooshikaVisible === false) &&
+                   (!sceneState.rockTransformed || sceneState.rockTransformed === false) &&
+                   (!sceneState.placedSymbols || Object.keys(sceneState.placedSymbols).length === 0) &&  // ← ADD: Assembly scene check
+                   (!sceneState.phase || sceneState.phase === 'initial') &&
+                   (!sceneState.interactions || Object.keys(sceneState.interactions).length === 0);
+    
+    if (isEmpty) {
+      console.log(`🚫 SCENE: Skipping auto-save for empty scene state: ${sceneId}`);
+      return;
+    }
+    
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    
+    // Helper function to update current location
+    const updateCurrentLocation = () => {
+      const activeProfileId = GameStateManager.activeProfileId;
+      if (activeProfileId && !isEmpty) {
+        const progressKey = `${activeProfileId}_gameProgress`;
+        const progress = JSON.parse(localStorage.getItem(progressKey) || '{}');
+        progress.currentZone = zoneId;
+        progress.currentScene = sceneId;
+        progress.lastUpdated = Date.now();
+        localStorage.setItem(progressKey, JSON.stringify(progress));
+        console.log(`📍 SCENE: Updated current location to ${zoneId}/${sceneId}`);
+      }
+    };
+    
+    // ✅ FIX: Immediate save for celebration states to prevent reload gaps
+    if (isInCelebration) {
+      console.log(`🚨 SCENE: IMMEDIATE SAVE for celebration state: ${sceneState.phase}, popup: ${sceneState.currentPopup}`);
       
-      // ✅ DISNEY: Only save progress, never completion
       const progressState = {
         ...sceneState,
-        completed: false, // Force to false for progress saves
+        completed: false, // Force to false for progress saves  
         phase: sceneState.phase === 'complete' ? 'in-progress' : sceneState.phase
       };
       
-      GameStateManager.saveGameState(zoneId, sceneId, progressState);
-    } catch (error) {
-      console.error('Error in auto-save:', error);
+      // Save immediately - no timeout delay
+      saveSceneProgress(progressState, isReplay);
+      updateCurrentLocation();
+      
+    } else {
+      // ✅ KEEP: Delayed save for normal gameplay (performance optimization)
+      console.log(`⏰ SCENE: Delayed save for normal gameplay: ${sceneState.phase}`);
+      
+      saveTimeoutRef.current = setTimeout(() => {
+        const progressState = {
+          ...sceneState,
+          completed: false, // Force to false for progress saves
+          phase: sceneState.phase === 'complete' ? 'in-progress' : sceneState.phase
+        };
+        
+        saveSceneProgress(progressState, isReplay);
+        updateCurrentLocation();
+      }, 1000);
     }
-  }, 1000);
     
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [sceneState, zoneId, sceneId, isLoading]);
+  }, [sceneState, zoneId, sceneId, isLoading, isReplay]);
   
   // Safe state update function
   const updateState = (updates) => {
@@ -157,13 +280,11 @@ useEffect(() => {
         return currentState;
       }
       
-      const newState = { ...currentState, ...updates };
-      
-      return newState;
+      return { ...currentState, ...updates };
     });
   };
   
-  // Scene action handlers
+  // 🎯 ROLE: SceneManager provides actions, GameStateManager handles ONLY completion
   const sceneActions = {
     setPhase: (newPhase) => {
       updateState({ phase: newPhase });
@@ -202,16 +323,15 @@ useEffect(() => {
       });
     },
     
-    // ✅ DISNEY: DISABLED - Scenes handle their own completion
-    completeScene: (stars = 0, data = {}) => {
-      console.log('🚫 DISNEY: completeScene disabled - scenes handle completion directly');
-      console.log('🎯 DISNEY: Use GameStateManager.saveGameState() directly in scenes instead');
-      console.log('📊 DISNEY: Completion data attempted:', { zoneId, sceneId, stars, data });
+    // 🎯 ROLE: Scene completion calls GameStateManager directly (not auto-save)
+    completeScene: (stars = 0, symbols = {}, data = {}) => {
+      console.log('🏆 SCENE: Scene completion triggered, calling GameStateManager');
       
-      // Just update local state for UI feedback, don't save anything
+      // Update local state for immediate UI feedback
       const completionData = {
         completed: true,
         stars,
+        symbols,
         completedAt: Date.now(),
         phase: 'complete',
         ...data
@@ -219,8 +339,24 @@ useEffect(() => {
       
       updateState(completionData);
       
-      // ✅ DISNEY: No GameStateManager calls - scenes handle this directly
-      console.log('✨ DISNEY: Local state updated for UI only - scene must handle actual save');
+      // 🎯 ROLE: ONLY completion calls GameStateManager
+      if (!isReplay) {
+        console.log('💾 SCENE: Saving completion to GameStateManager (permanent)');
+        GameStateManager.saveGameState(zoneId, sceneId, {
+          completed: true,
+          stars,
+          symbols,
+          completedAt: Date.now(),
+          ...data
+        });
+      } else {
+        console.log('🎮 SCENE: Replay completion - not saving to GameStateManager');
+      }
+      
+      // Clean up temporary session storage
+      const storageKey = getStorageKey(isReplay);
+      localStorage.removeItem(storageKey);
+      console.log(`🧹 SCENE: Cleaned up session storage: ${storageKey}`);
     }
   };
   
@@ -243,7 +379,8 @@ useEffect(() => {
   return children({
     sceneState,
     sceneActions,
-    isReload
+    isReload,
+    isReplay
   });
 };
 

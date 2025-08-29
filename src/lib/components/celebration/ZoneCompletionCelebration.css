@@ -1,0 +1,652 @@
+/* ZoneCompletionCelebration.css - Epic effects + Clean card UI */
+
+/* Container */
+.zone-completion-celebration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Epic Effects Phase - Divine Manifestation */
+.divine-manifestation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  animation: manifestationAppear 2s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes manifestationAppear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.manifestation-container {
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  padding: 40px;
+}
+
+/* Epic Cosmic Ganesha */
+.divine-ganesha-large {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.ganesha-cosmic {
+  font-size: 8rem;
+  animation: cosmicGaneshaPulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 40px currentColor);
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes cosmicGaneshaPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 40px currentColor);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 60px currentColor);
+  }
+}
+
+/* Epic Ring Animations */
+.divine-aura-rings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.aura-ring {
+  position: absolute;
+  border: 3px solid;
+  border-radius: 50%;
+  animation: auraExpand 4s ease-out infinite;
+}
+
+.ring-1 {
+  width: 200px;
+  height: 200px;
+  margin: -100px 0 0 -100px;
+  animation-delay: 0s;
+}
+
+.ring-2 {
+  width: 300px;
+  height: 300px;
+  margin: -150px 0 0 -150px;
+  animation-delay: 1s;
+}
+
+.ring-3 {
+  width: 400px;
+  height: 400px;
+  margin: -200px 0 0 -200px;
+  animation-delay: 2s;
+}
+
+.ring-4 {
+  width: 500px;
+  height: 500px;
+  margin: -250px 0 0 -250px;
+  animation-delay: 3s;
+}
+
+@keyframes auraExpand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Title Granting */
+.title-granting {
+  margin-bottom: 40px;
+  animation: titleDescend 2s ease-out 1s forwards;
+  opacity: 0;
+  transform: translateY(-50px);
+}
+
+@keyframes titleDescend {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.divine-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 0 0 30px currentColor;
+  animation: titleGlow 2s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    text-shadow: 0 0 30px currentColor;
+  }
+  50% {
+    text-shadow: 0 0 50px currentColor, 0 0 70px currentColor;
+  }
+}
+
+.title-subtitle {
+  font-size: 1.3rem;
+  color: #E0E0E0;
+  margin-bottom: 20px;
+}
+
+.achievement-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 25px;
+  border-radius: 25px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.badge-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.badge-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #E0E0E0;
+}
+
+/* Divine Blessing Speech */
+.divine-blessing-speech {
+  animation: speechAppear 2s ease-out 2s forwards;
+  opacity: 0;
+}
+
+@keyframes speechAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.blessing-text {
+  font-size: 1.4rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blessing-signature {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #FFD700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ===== CLEAN CARD PHASE ===== */
+
+/* Card backdrop */
+.zone-card-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 500;
+}
+
+/* Main zone completion card - Based on scene completion */
+.zone-celebration-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 400px;
+  background: linear-gradient(145deg, #fef7e0, #f5e6b8);
+  border: 3px solid #d4a574;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  z-index: 501;
+  box-sizing: border-box;
+  opacity: 1;
+  visibility: visible;
+  animation: zoneCardAppear 1s ease-out forwards;
+}
+
+@keyframes zoneCardAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Zone title section */
+.zone-title-section {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 500px;
+}
+
+.zone-title {
+  font-family: 'Georgia', serif;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #8B4513;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.zone-subtitle {
+  font-family: 'Georgia', serif;
+  font-size: 1.3rem;
+  color: #6B46C1;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.zone-icon {
+  font-size: 1.5rem;
+}
+
+/* Achievement display */
+.zone-achievement-display {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid #FFD700;
+  border-radius: 15px;
+  padding: 15px 25px;
+  width: 400px;
+}
+
+.achievement-title {
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  color: #8B4513;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.achievement-symbols {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.achievement-symbol {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.6));
+  animation: symbolCelebrate 2s ease-in-out infinite;
+}
+
+@keyframes symbolCelebrate {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg); 
+  }
+  50% { 
+    transform: scale(1.1) rotate(5deg); 
+  }
+}
+
+.achievement-stats {
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  color: #8B4513;
+  font-weight: bold;
+}
+
+.stars-earned {
+  color: #FFD700;
+  font-size: 1.2rem;
+}
+
+/* Character celebration - Cosmic Ganesha in card */
+.zone-character-container {
+  position: absolute;
+  right: 50px;
+  top: 100px;
+  width: 150px;
+  height: 200px;
+}
+
+.zone-ganesha {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4rem;
+  animation: zoneGaneshaJoy 3s ease-in-out infinite;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+}
+
+@keyframes zoneGaneshaJoy {
+  0%, 100% { 
+    transform: translateX(-50%) translateY(0) rotate(-2deg); 
+  }
+  50% { 
+    transform: translateX(-50%) translateY(-8px) rotate(2deg); 
+  }
+}
+
+/* Zone speech bubble */
+.zone-speech-bubble {
+  position: absolute;
+  top: 0;
+  left: -120px;
+  width: 200px;
+  background: var(--bubble-color, #4CAF50);
+  border: 3px solid var(--bubble-border, #45a049);
+  border-radius: 25px;
+  padding: 15px 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  animation: zoneBubbleAppear 0.8s ease-out 0.5s both;
+  z-index: 5;
+}
+
+.zone-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  right: 30px;
+  border: 12px solid transparent;
+  border-top-color: var(--bubble-border, #45a049);
+}
+
+@keyframes zoneBubbleAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.zone-bubble-title {
+  font-family: 'Georgia', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.zone-bubble-text {
+  font-family: 'Georgia', serif;
+  font-size: 12px;
+  color: white;
+  line-height: 1.3;
+}
+
+/* Zone action buttons - Same structure as scene */
+.zone-action-buttons {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  animation: zoneButtonsSlideUp 0.8s ease-out;
+}
+
+@keyframes zoneButtonsSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.zone-action-btn {
+  padding: 15px 35px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Georgia', serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  min-width: 120px;
+}
+
+.zone-action-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Primary button - Next Adventure (Teal) */
+.next-adventure-btn {
+  background: linear-gradient(135deg, #20B2AA, #008B8B);
+  color: white;
+}
+
+.next-adventure-btn:hover {
+  box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
+}
+
+/* Secondary button - Celebrate Again (Yellow) */
+.celebrate-again-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #8B4513;
+}
+
+.celebrate-again-btn:hover {
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* Tertiary button - Home (Dark Blue) */
+.home-btn {
+  background: linear-gradient(135deg, #1e3a5f, #2F4F4F);
+  color: white;
+}
+
+.home-btn:hover {
+  box-shadow: 0 4px 12px rgba(47, 79, 79, 0.4);
+}
+
+.zone-btn-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.zone-btn-subtitle {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+/* Card sparkle effects */
+.zone-card-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.zone-card-sparkle {
+  position: absolute;
+  font-size: 16px;
+  color: #FFD700;
+  animation: zoneCardSparkleShine 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+}
+
+@keyframes zoneCardSparkleShine {
+  0%, 100% { 
+    opacity: 0.3; 
+    transform: scale(0.8) rotate(0deg); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2) rotate(180deg); 
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  /* Epic effects mobile */
+  .manifestation-container {
+    padding: 20px;
+  }
+
+  .ganesha-cosmic {
+    font-size: 5rem;
+  }
+
+  .divine-title {
+    font-size: 2rem;
+  }
+
+  .blessing-text {
+    font-size: 1.2rem;
+  }
+
+  /* Card mobile */
+  .zone-celebration-card {
+    width: 95%;
+    height: 350px;
+    padding: 20px;
+  }
+
+  .zone-title-section {
+    width: 90%;
+  }
+
+  .zone-title {
+    font-size: 1.8rem;
+  }
+
+  .zone-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .zone-achievement-display {
+    width: 90%;
+    top: 100px;
+    padding: 12px 20px;
+  }
+
+  .achievement-symbols {
+    gap: 6px;
+  }
+
+  .achievement-symbol {
+    font-size: 1.4rem;
+  }
+
+  .zone-character-container {
+    right: 20px;
+    top: 80px;
+    width: 100px;
+    height: 150px;
+  }
+
+  .zone-ganesha {
+    font-size: 3rem;
+  }
+
+  .zone-speech-bubble {
+    left: -80px;
+    width: 150px;
+    padding: 10px 12px;
+  }
+
+  .zone-action-buttons {
+    flex-direction: column;
+    gap: 12px;
+    bottom: 20px;
+  }
+
+  .zone-action-btn {
+    padding: 12px 25px;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .zone-celebration-card {
+    width: 95%;
+    height: 320px;
+  }
+
+  .zone-action-buttons {
+    gap: 8px;
+  }
+
+  .zone-action-btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+
+  .zone-title {
+    font-size: 1.6rem;
+  }
+
+  .zone-subtitle {
+    font-size: 1rem;
+  }
+}

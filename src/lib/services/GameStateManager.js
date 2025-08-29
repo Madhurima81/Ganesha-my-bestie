@@ -14,14 +14,20 @@ class GameStateManager {
       id: 1,
       name: 'Symbol Mountain',
       icon: '🏔️',
-      scenes: ['modak', 'pond', 'temple', 'garden']  // ← Match ZoneConfig!
+scenes: ['modak', 'pond', 'symbol', 'final-scene']
     },
-    'rainbow-valley': {
+    'cave-of-secrets': {
       id: 2,
-      name: 'Rainbow Valley',
+      name: 'Cave of Secrets',
       icon: '🌈',
-      scenes: ['meadow', 'bridge', 'cave', 'stream', 'village']
-    },
+ scenes: [
+      'vakratunda-mahakaya', 
+      'suryakoti-samaprabha', 
+      'nirvighnam-kurumedeva',
+      'sarvakaryeshu-sarvada',    // ✅ Scene 4
+      'mantra-assembly'           // ✅ Scene 5 (final)
+    ],    },
+    
     'ocean-depths': {
       id: 3,
       name: 'Ocean Depths',
@@ -101,6 +107,8 @@ class GameStateManager {
       lastUpdated: Date.now()
     };
   }
+
+ 
 
   // 🔧 FIXED: Create a new profile - now accepts direct avatar and color values
   createProfile(name, avatar, color) {
@@ -351,6 +359,15 @@ class GameStateManager {
     
     return true;
   }
+
+// 🎮 HYBRID: Clean up replay sessions when starting fresh replay
+clearReplaySession(zoneId, sceneId) {
+  if (!this.activeProfileId) return;
+  
+  const replaySessionKey = `replay_session_${this.activeProfileId}_${zoneId}_${sceneId}`;
+  localStorage.removeItem(replaySessionKey);
+  console.log('🧹 HYBRID: Cleared replay session for fresh start');
+}
 
   // Update profile stats - FIXED null checks
   updateProfileStats(stars, completedScenes) {
@@ -842,6 +859,16 @@ getCompletionHistory(profileId = null) {
     return null;
   }
 
+// Clear current scene tracking for map navigation
+  clearCurrentScene() {
+    const activeProfileId = localStorage.getItem('activeProfileId');
+    if (activeProfileId) {
+      const locationKey = `${activeProfileId}_lastLocation`;
+      localStorage.removeItem(locationKey);
+      console.log('🧹 Cleared current scene tracking for map navigation');
+    }
+  }
+
   // Updated reset methods with profile support
   resetScene(zoneId, sceneId) {
     if (!this.activeProfileId) return;
@@ -1056,6 +1083,44 @@ getCompletionHistory(profileId = null) {
       completed: zone.completed || false
     };
   }
+   getActiveProfile() {
+  try {
+    const activeProfileId = this.activeProfileId || localStorage.getItem('activeProfileId');
+    
+    if (!activeProfileId) {
+      console.log('No active profile ID found');
+      return null;
+    }
+    
+    // ✅ FIXED: Use the correct structure - get the profiles object, not array
+    const gameProfiles = this.getProfiles(); // Uses existing working method
+    
+    if (!gameProfiles || !gameProfiles.profiles) {
+      console.log('No profiles data found');
+      return null;
+    }
+    
+    // ✅ FIXED: Access profile directly from object (not array.find)
+    const activeProfile = gameProfiles.profiles[activeProfileId];
+    
+    if (!activeProfile) {
+      console.log(`Profile with ID ${activeProfileId} not found`);
+      return null;
+    }
+    
+    return activeProfile;
+  } catch (error) {
+    console.error('Error getting active profile:', error);
+    return null;
+  }
+}
+  
+   getActiveProfileName() {
+    const profile = this.getActiveProfile();
+    return profile?.name || 'little explorer';
+  }
+
+
 }
 
 // Create singleton instance

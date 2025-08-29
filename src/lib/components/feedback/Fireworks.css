@@ -186,8 +186,7 @@
   position: absolute;
   font-size: 20px;
   opacity: 0;
-  animation: floatSparkle 3s ease-in-out infinite;
-}
+animation: floatSparkle 3s ease-in-out forwards;  /* ← Remove infinite */}
 
 @keyframes floatSparkle {
   0% {

@@ -1,0 +1,593 @@
+/* SunCollectionGame.css - Standalone component styling */
+
+/* ✅ Component container */
+.sun-collection-game {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 100%);
+  border-radius: 15px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ✅ Game title */
+.game-title {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #DAA520;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(90deg, #DAA520, #CD853F, #DAA520);
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: -200% center; }
+  50% { background-position: 200% center; }
+}
+
+/* ✅ Game controls (like WordBalloonGame) */
+.game-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(218, 165, 32, 0.1);
+  border-radius: 10px;
+  border: 2px solid rgba(218, 165, 32, 0.3);
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat {
+  font-size: 14px;
+  color: #DAA520;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.game-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* ✅ Buttons */
+.btn {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+.btn-start {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.btn-start:hover {
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+.btn-stop {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btn-stop:hover {
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* ✅ Progress indicator */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background: rgba(218, 165, 32, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(218, 165, 32, 0.2);
+}
+
+.progress-label {
+  font-size: 14px;
+  color: #DAA520;
+  min-width: 120px;
+  font-weight: bold;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #DAA520, #CD853F);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 6px rgba(218, 165, 32, 0.4);
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShine 2s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-text {
+  color: #DAA520;
+  font-weight: bold;
+  font-size: 14px;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ✅ Enhanced Orb display with visual sun collection - REDUCED GLOW */
+.orb-container {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  width: 120px;
+  height: 120px;
+  z-index: 10;
+}
+
+.orb-visual {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.orb-background {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: all 0.5s ease;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 8px rgba(218, 165, 32, 0.3));
+}
+
+.orb-background.collecting {
+  animation: orbPulse 2s ease-in-out infinite;
+}
+
+.orb-background.complete {
+  filter: drop-shadow(0 0 12px rgba(218, 165, 32, 0.5)) brightness(1.1);
+  animation: orbComplete 1s ease-out;
+}
+
+/* Collected suns inside orb */
+.orb-suns {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.orb-sun {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%) 
+             rotate(var(--angle)) 
+             translateY(-20px) 
+             rotate(calc(-1 * var(--angle)));
+  animation: sunCollectAnimation 0.8s ease-out var(--delay) both;
+}
+
+.orb-sun img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(1.1) drop-shadow(0 0 3px rgba(218, 165, 32, 0.6));
+}
+
+@keyframes sunCollectAnimation {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) 
+               rotate(var(--angle)) 
+               translateY(-40px) 
+               rotate(calc(-1 * var(--angle)))
+               scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) 
+               rotate(var(--angle)) 
+               translateY(-30px) 
+               rotate(calc(-1 * var(--angle)))
+               scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) 
+               rotate(var(--angle)) 
+               translateY(-20px) 
+               rotate(calc(-1 * var(--angle)))
+               scale(1);
+  }
+}
+
+/* Orb glow effect - REDUCED INTENSITY */
+.orb-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(218, 165, 32, 0.1), transparent 60%);
+  border-radius: 50%;
+  z-index: 0;
+  transition: all 0.5s ease;
+}
+
+@keyframes orbPulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 3px rgba(218, 165, 32, 0.2));
+  }
+  50% { 
+    transform: scale(1.01);
+    filter: drop-shadow(0 0 4px rgba(218, 165, 32, 0.25));
+  }
+
+}
+
+@keyframes orbComplete {
+  0% { 
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 6px rgba(218, 165, 32, 0.4));
+  }
+  50% { 
+    transform: scale(1.1) rotate(180deg);
+    filter: drop-shadow(0 0 12px rgba(218, 165, 32, 0.6)) brightness(1.2);
+  }
+  100% { 
+    transform: scale(1) rotate(360deg);
+    filter: drop-shadow(0 0 8px rgba(218, 165, 32, 0.5)) brightness(1.1);
+  }
+}
+
+.orb-counter {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #DAA520, #CD853F);
+  color: #2c1810;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 2px solid #B8860B;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
+
+/* ✅ Game area (like WordBalloonGame) */
+.game-area {
+  position: relative;
+  height: 350px;
+  margin: 20px 0;
+  overflow: hidden;
+  border-radius: 15px;
+  border: 3px solid rgba(218, 165, 32, 0.3);
+  transition: background 0.5s ease;
+}
+
+/* ✅ Game messages */
+.game-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid rgba(218, 165, 32, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.game-message.victory {
+  background: linear-gradient(135deg, rgba(218, 165, 32, 0.9), rgba(205, 133, 63, 0.9));
+  color: #2c1810;
+  border-color: #B8860B;
+  animation: victoryPulse 2s ease-in-out infinite;
+}
+
+@keyframes victoryPulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 10px 30px rgba(218, 165, 32, 0.5);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.02);
+    box-shadow: 0 15px 40px rgba(218, 165, 32, 0.7);
+  }
+}
+
+.message-content h3 {
+  margin: 0 0 15px 0;
+  color: inherit;
+}
+
+.message-content p {
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.victory-orb {
+  font-size: 48px;
+  margin: 15px 0;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ✅ Floating objects with actual images - REDUCED GLOW */
+.floating-object {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  z-index: 8;
+  border: 2px solid transparent;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(2px);
+}
+
+.object-image {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+  transition: all 0.3s ease;
+}
+
+.floating-object.sun {
+  background: radial-gradient(circle, rgba(218, 165, 32, 0.1), rgba(205, 133, 63, 0.05));
+  border-color: #DAA520;
+  box-shadow: 0 0 4px rgba(218, 165, 32, 0.2);
+  cursor: pointer;
+}
+
+.floating-object.sun:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(218, 165, 32, 0.6);
+  border-color: #B8860B;
+}
+
+.floating-object.sun .object-image {
+  filter: drop-shadow(0 0 6px rgba(218, 165, 32, 0.6)) brightness(1.1);
+  animation: sunGlow 2s ease-in-out infinite;
+}
+
+.floating-object.sun:hover .object-image {
+  filter: drop-shadow(0 0 8px rgba(218, 165, 32, 0.8)) brightness(1.2);
+}
+
+@keyframes sunGlow {
+  0%, 100% { 
+    filter: drop-shadow(0 0 3px rgba(218, 165, 32, 0.3)) brightness(1.05);
+  }
+  50% { 
+    filter: drop-shadow(0 0 4px rgba(218, 165, 32, 0.4)) brightness(1.08);
+  }
+}
+
+/* Non-target objects */
+.floating-object.moon,
+.floating-object.star,
+.floating-object.balloon,
+.floating-object.cloud,
+.floating-object.butterfly {
+  background: radial-gradient(circle, rgba(200, 200, 200, 0.1), rgba(150, 150, 150, 0.2));
+  border-color: rgba(200, 200, 200, 0.5);
+  box-shadow: 0 0 8px rgba(200, 200, 200, 0.4);
+  cursor: default;
+  opacity: 0.8;
+}
+
+.floating-object.moon .object-image,
+.floating-object.star .object-image,
+.floating-object.balloon .object-image,
+.floating-object.cloud .object-image,
+.floating-object.butterfly .object-image {
+  filter: drop-shadow(0 0 3px rgba(150, 150, 150, 0.6)) brightness(0.9);
+}
+
+.floating-object.moon:hover,
+.floating-object.star:hover,
+.floating-object.balloon:hover,
+.floating-object.cloud:hover,
+.floating-object.butterfly:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.floating-object.moon:hover .object-image,
+.floating-object.star:hover .object-image,
+.floating-object.balloon:hover .object-image,
+.floating-object.cloud:hover .object-image,
+.floating-object.butterfly:hover .object-image {
+  filter: drop-shadow(0 0 5px rgba(200, 200, 200, 0.8)) brightness(1);
+}
+
+/* ✅ Debug info */
+.debug-info {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(218, 165, 32, 0.2);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.debug-title {
+  color: #DAA520;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.debug-stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.debug-stats span {
+  color: #CD853F;
+}
+
+.debug-object {
+  color: #87CEEB;
+  margin: 2px 0;
+}
+
+/* ✅ Instructions */
+.instructions {
+  background: rgba(218, 165, 32, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 20px;
+  border: 1px solid rgba(218, 165, 32, 0.3);
+}
+
+.instructions strong {
+  color: #DAA520;
+}
+
+/* ✅ Responsive design */
+@media (max-width: 768px) {
+  .sun-collection-game {
+    max-width: 100%;
+    padding: 15px;
+    margin: 10px;
+  }
+  
+  .game-title {
+    font-size: 20px;
+  }
+  
+  .game-controls {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .progress-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .progress-label {
+    min-width: auto;
+    text-align: center;
+  }
+  
+  .orb-container {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .game-area {
+    height: 280px;
+  }
+  
+  .floating-object .object-emoji {
+    font-size: 24px !important;
+  }
+  
+  .debug-info {
+    font-size: 10px;
+  }
+  
+  .debug-stats {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+/* ✅ Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .sun-collection-game *,
+  .floating-object,
+  .orb,
+  .progress-fill {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .floating-object.sun:hover {
+    transform: scale(1.05);
+  }
+  
+  .game-message.victory {
+    background: rgba(218, 165, 32, 0.9);
+  }
+}

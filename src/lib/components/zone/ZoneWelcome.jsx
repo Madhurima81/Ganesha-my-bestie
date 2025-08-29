@@ -4,7 +4,56 @@
 import React, { useState, useEffect } from 'react';
 import './ZoneWelcome.css';
 import GameStateManager from '../../services/GameStateManager';
-import ProgressManager from '../../services/ProgressManager';
+import CulturalProgressExtractor from '../../services/CulturalProgressExtractor'; // ← ADD THIS LINE
+import GameCoachSessionManager from '../../services/GameCoachSessionManager';
+import SparkleAnimation from '../../components/animation/SparkleAnimation'; // ✅ ADD THIS
+
+
+//import ProgressManager from '../../services/ProgressManager';
+// In ZoneWelcome.jsx
+import { useGameCoach } from '../coach/GameCoach';
+
+// ✅ ZONE CONTENT CONFIGURATION
+const ZONE_CONTENT_TYPES = {
+  'symbol-mountain': ['symbols'],
+  'shloka-river': ['chants'],
+  'story-treehouse': ['stories'], 
+  'festival-square': ['symbols', 'stories', 'chants'],
+  'about-me-hut': ['stories'],
+  'cave-of-secrets': ['chants'],
+  'obstacle-forest': ['symbols']
+};
+
+// ✅ ENHANCED: More specific color mapping
+const getZoneMessageType = (messageType, trigger, data = {}) => {
+  switch(messageType) {
+    case 'welcome': 
+      return 'welcome';
+      
+    case 'celebration':
+      // Different celebration colors based on what was completed
+      if (data.progressData?.newCompletions?.includes('pond')) {
+        return 'celebration-pond';    // Blue-teal for pond
+      } else if (data.progressData?.newCompletions?.includes('modak')) {
+        return 'celebration-modak';   // Orange-gold for modak
+      } else {
+        return 'celebration';         // Default gold
+      }
+      
+    case 'mastery': 
+      return 'mastery';
+      
+    case 'encouragement': 
+      return 'encouragement';
+      
+    case 'cultural': 
+      return 'cultural';
+      
+    default: 
+      return 'welcome';
+  }
+};
+
 
 const ZoneWelcome = ({ 
   zoneData,           // Zone configuration object
@@ -14,11 +63,23 @@ const ZoneWelcome = ({
 }) => {
   const [sceneProgress, setSceneProgress] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [culturalData, setCulturalData] = useState(null); // ← ADD THIS LINE
 
   console.log('🏔️ ZoneWelcome rendered for zone:', zoneData?.name);
 
   // Add this near the top of ZoneWelcome component:
   const [highlightedScene, setHighlightedScene] = useState(null);
+  const [showSparkle, setShowSparkle] = useState(null); // ✅ ADD THIS
+
+
+// ✅ ADD THIS: Track zone entry time for quick navigation detection
+  useEffect(() => {
+    if (zoneData?.id) {
+      const entryTime = Date.now();
+      sessionStorage.setItem(`zone_entry_${zoneData.id}`, entryTime.toString());
+      console.log(`📍 Zone entry tracked: ${zoneData.id} at ${entryTime}`);
+    }
+  }, [zoneData?.id]);
 
   // Add this useEffect to detect context:
   useEffect(() => {
@@ -44,139 +105,231 @@ const ZoneWelcome = ({
     setIsLoading(false);
   }, [zoneData]);
 
-  // ✅ DISNEY ENHANCED: Load scene progress with multiple data sources
- /* const loadSceneProgress = () => {
-    if (!zoneData || !zoneData.scenes) return;
-    
-    try {
-      const progressData = {};
-      
-      zoneData.scenes.forEach(scene => {
-        // ✅ DISNEY SOURCE 1: GameStateManager scene progress
-        const progress = GameStateManager.getSceneProgress(zoneData.id, scene.id);
-        
-        // ✅ DISNEY SOURCE 2: Direct scene state
-        const sceneState = GameStateManager.getSceneState(zoneData.id, scene.id);
-        
-        // ✅ DISNEY SOURCE 3: Game progress (for unlock flags)
-        const gameProgress = GameStateManager.getGameProgress();
-        const gameSceneData = gameProgress.zones?.[zoneData.id]?.scenes?.[scene.id];
-        
-        // ✅ DISNEY MAGIC: Combine all sources for complete picture
-        const isCompleted = (progress && progress.completed) || 
-                           (sceneState && sceneState.completed) ||
-                           (gameSceneData && gameSceneData.completed);
-        
-        const stars = (progress && progress.stars) || 
-                     (sceneState && sceneState.stars) || 
-                     (gameSceneData && gameSceneData.stars) || 0;
-        
-        const isUnlocked = (gameSceneData && gameSceneData.unlocked) || 
-                          (scene.order === 1); // First scene always unlocked
-        
-        progressData[scene.id] = {
-          completed: isCompleted,
-          stars: stars,
-          unlocked: isUnlocked
-        };
-        
-        // 🧪 DISNEY DEBUG: Log comprehensive data
-        console.log(`🔍 DISNEY ${scene.id} progress analysis:`, {
-          'Scene Order': scene.order,
-          'Progress Source': progress,
-          'State Source': sceneState,
-          'Game Source': gameSceneData,
-          'Final Result': progressData[scene.id],
-          'Explicit Unlock': gameSceneData?.unlocked,
-          'Is First Scene': scene.order === 1
-        });
-      });
-      
-      setSceneProgress(progressData);
-      console.log('📊 DISNEY: Final scene progress loaded:', progressData);
-    } catch (error) {
-      console.log('Error loading scene progress:', error);
-      // Initialize with empty progress
-      const emptyProgress = {};
-      zoneData.scenes.forEach(scene => {
-        emptyProgress[scene.id] = { 
-          completed: false, 
-          stars: 0, 
-          unlocked: scene.order === 1 
-        };
-      });
-      setSceneProgress(emptyProgress);
-    }
-  };*/
+  // Add this line:
+const { showMessage, hideCoach, clearManualCloseTracking } = useGameCoach();
 
-  // ✅ ENHANCED: Load scene progress with better completion detection
-/*const loadSceneProgress = () => {
+const [welcomeMessageShown, setWelcomeMessageShown] = useState(false);
+
+// Import the session manager at the top
+
+useEffect(() => {
+  if (!zoneData || Object.keys(sceneProgress).length === 0) return;
+  
+  let timeouts = [];
+  let isComponentMounted = true; // ✅ Track component mount status
+  
+  const handleSmartGameCoach = () => {
+    if (!isComponentMounted) return; // ✅ Early exit if unmounted
+    
+    // Clear any scene messages when entering zone welcome
+    const clearEvent = new CustomEvent('clearGameCoach', {
+      detail: { source: 'zone-welcome', zoneId: zoneData.id }
+    });
+    window.dispatchEvent(clearEvent);
+    
+    // Get current profile
+    const profileId = localStorage.getItem('activeProfileId');
+    if (!profileId) return;
+    
+    // Check if GameCoach should show
+    const decision = GameCoachSessionManager.shouldShowMessage(
+      profileId, 
+      zoneData.id, 
+      sceneProgress,
+      {
+        totalScenes: zoneData.scenes?.length || 4,
+        quickNavigation: false
+      }
+    );
+    
+    console.log('🎭 ZoneWelcome GameCoach Decision:', decision);
+    
+    if (decision.shouldShow && isComponentMounted) {
+      const activeProfile = GameStateManager.getActiveProfile();
+      const profileName = activeProfile?.name || '';
+      
+      const message = GameCoachSessionManager.getMessage(
+        decision.messageType, 
+        decision.trigger, 
+        decision,
+        profileName
+      );
+      
+      console.log('🎭 ZoneWelcome will show message:', message);
+      
+      // ✅ STEP 1: Show sparkle effect first
+      const sparkleTimeout = setTimeout(() => {
+        if (!isComponentMounted) return; // ✅ Check mount status
+        
+        let sparkleType = 'divine-light';
+        switch(decision.messageType) {
+          case 'welcome': sparkleType = 'divine-light-welcome'; break;
+          case 'celebration': sparkleType = 'divine-light-celebration'; break;
+          case 'encouragement': sparkleType = 'divine-light-encourage'; break;
+          case 'mastery': sparkleType = 'divine-light-mastery'; break;
+          default: sparkleType = 'divine-light';
+        }
+        
+        setShowSparkle(sparkleType);
+        
+        // ✅ STEP 2: Show GameCoach message after sparkle
+        const messageTimeout = setTimeout(() => {
+          if (!isComponentMounted) return; // ✅ Check mount status again
+          
+          setShowSparkle(null);
+          
+          console.log('🎭 ZoneWelcome showing GameCoach message now');
+          
+          showMessage(message, {
+            duration: 8000,
+            animation: 'bounce',
+            source: 'zone',
+            priority: 5,
+            messageType: getZoneMessageType(decision.messageType, decision.trigger, decision)
+          });
+          
+          // Mark as shown
+          GameCoachSessionManager.markMessageShown(
+            profileId, 
+            zoneData.id, 
+            decision.messageType
+          );
+          
+        }, 2000); // 2 seconds for sparkle
+        
+        timeouts.push(messageTimeout);
+        
+      }, 1500); // Initial delay
+      
+      timeouts.push(sparkleTimeout);
+    }
+  };
+  
+  const initialTimer = setTimeout(handleSmartGameCoach, 500);
+  timeouts.push(initialTimer);
+  
+  // ✅ CLEANUP: Only clear timeouts, don't hide active messages
+  return () => {
+    isComponentMounted = false; // ✅ Mark as unmounted
+    console.log('🧹 ZoneWelcome: Clearing timeouts but preserving active messages');
+    timeouts.forEach(timeout => clearTimeout(timeout));
+    
+    // ✅ ONLY hide coach if navigating away (not during normal operation)
+    // The actual cleanup will happen in navigation handlers
+  };
+  
+}, [zoneData, sceneProgress, showMessage]);
+
+
+// ✨ DISNEY PATTERN: Load cultural progress data
+useEffect(() => {
+  const loadCulturalData = () => {
+    try {
+      const data = CulturalProgressExtractor.getCulturalProgressData();
+      setCulturalData(data);
+      console.log('🎒 Cultural data loaded for zone:', data);
+    } catch (error) {
+      console.error('Error loading cultural data:', error);
+      setCulturalData(null);
+    }
+  };
+  
+  // Load initially and when scene progress changes
+  if (Object.keys(sceneProgress).length > 0) {
+    loadCulturalData();
+  }
+}, [sceneProgress, zoneData?.id]); // Reload when scenes update
+
+// Debug useEffect to check scene statuses
+useEffect(() => {
+  if (!zoneData?.scenes || !sceneProgress || Object.keys(sceneProgress).length === 0) return;
+  
+  console.log('🔍 SCENE STATUS DEBUG - Each Scene:');
+  zoneData.scenes.forEach(scene => {
+    const progress = sceneProgress[scene.id];
+    const status = getSceneStatus(scene);
+    
+    console.log(`${scene.id}:`, {
+      'Status': status.status,
+      'Stars': status.stars,
+      'Raw Progress': progress,
+      'Completed Flag': progress?.completed,
+      'Progress Percentage': progress?.progress?.percentage
+    });
+  });
+}, [sceneProgress, zoneData]); // Triggers when sceneProgress updates
+
+// ✅ FIXED: Check BOTH permanent AND temporary storage
+const loadSceneProgress = () => {
   if (!zoneData || !zoneData.scenes) return;
   
   try {
-    const progressData = {};
     const activeProfileId = localStorage.getItem('activeProfileId');
+    console.log('🔍 COMBINED: Loading progress for profile:', activeProfileId);
     
-    console.log('🔍 ENHANCED: Loading progress for profile:', activeProfileId);
+    // ✅ Get permanent completion data from GameStateManager
+    const gameProgress = GameStateManager.getGameProgress();
+    const zoneProgress = gameProgress.zones?.[zoneData.id] || { scenes: {} };
+    
+    console.log('📊 PERMANENT: Zone progress loaded:', zoneProgress);
+    
+    const progressData = {};
+    let completedScenes = 0;
+    let totalStars = 0;
     
     zoneData.scenes.forEach(scene => {
-      // ✅ METHOD 1: Check scene state directly (most reliable)
-      const sceneStateKey = `${activeProfileId}_${zoneData.id}_${scene.id}_state`;
-      const sceneStateData = JSON.parse(localStorage.getItem(sceneStateKey) || '{}');
+      const sceneData = zoneProgress.scenes?.[scene.id] || {};
+      const isCompleted = sceneData.completed || false;
+      const stars = sceneData.stars || 0;
       
-      // ✅ METHOD 2: GameStateManager scene progress
-      const progress = GameStateManager.getSceneProgress(zoneData.id, scene.id);
+      // ✅ NEW: Check SceneManager's temporary storage for in-progress
+      const tempKey = `temp_session_${activeProfileId}_${zoneData.id}_${scene.id}`;
+      const tempData = localStorage.getItem(tempKey);
+      let hasInProgressData = false;
+      let progressPercentage = 0;
+      let tempStars = 0;
       
-      // ✅ METHOD 3: Game progress (for unlock flags)
-      const gameProgress = GameStateManager.getGameProgress();
-      const gameSceneData = gameProgress.zones?.[zoneData.id]?.scenes?.[scene.id];
+      if (tempData && !isCompleted) {
+        try {
+          const tempState = JSON.parse(tempData);
+
+          // Check if scene has meaningful progress
+          hasInProgressData = (
+            tempState.stars > 0 || 
+            tempState.mooshikaFound || 
+            tempState.collectedModaks?.length > 0 ||
+            tempState.lotusStates?.some(state => state === 1) ||
+            (tempState.phase && tempState.phase !== 'mooshika_search' && tempState.phase !== 'initial')
+          );
+          progressPercentage = tempState.progress?.percentage || 0;
+          tempStars = tempState.stars || 0;
+          console.log(`🔍 TEMP CHECK: ${scene.id} has progress:`, hasInProgressData, 'percentage:', progressPercentage, 'tempStars:', tempStars);
+        } catch (e) {
+          console.error('Error parsing temp data:', e);
+        }
+      }
       
-      // ✅ ENHANCED: Multiple completion detection methods
-      const isCompleted = 
-        (sceneStateData && sceneStateData.completed === true) ||           // Scene state
-        (sceneStateData && sceneStateData.phase === 'complete') ||         // Scene phase
-        (progress && progress.completed === true) ||                       // GameState progress
-        (gameSceneData && gameSceneData.completed === true);               // Game progress
-      
-      // ✅ ENHANCED: Multiple star detection methods  
-      const stars = 
-        (sceneStateData && sceneStateData.stars) ||                       // Scene state stars
-        (progress && progress.stars) ||                                   // GameState stars
-        (gameSceneData && gameSceneData.stars) ||                         // Game progress stars
-        0;
-      
-      // ✅ ENHANCED: Unlock detection
-      const isUnlocked = 
-        (gameSceneData && gameSceneData.unlocked === true) ||             // Explicit unlock
-        (scene.order === 1);                                              // First scene
+      if (isCompleted) completedScenes++;
+      totalStars += stars;
       
       progressData[scene.id] = {
         completed: isCompleted,
-        stars: stars,
-        unlocked: isUnlocked
+        stars: isCompleted ? stars : tempStars, // Use temp stars if not completed
+        unlocked: sceneData.unlocked || scene.order === 1,
+        // ✅ NEW: Add progress structure that getSceneStatus expects
+        progress: {
+          percentage: isCompleted ? 100 : progressPercentage,
+          hasInProgress: hasInProgressData
+        }
       };
-      
-      // 🧪 ENHANCED DEBUG: Show all data sources
-      console.log(`🔍 ENHANCED ${scene.id} progress analysis:`, {
-        'Scene Order': scene.order,
-        'Scene State Key': sceneStateKey,
-        'Scene State Data': sceneStateData,
-        'GameState Progress': progress,
-        'Game Progress': gameSceneData,
-        'Final Completed': isCompleted,
-        'Final Stars': stars,
-        'Final Unlocked': isUnlocked
-      });
     });
     
     setSceneProgress(progressData);
-    
-    // ✅ CALCULATE TOTALS FOR DEBUG
-    const totalCompleted = Object.values(progressData).filter(p => p.completed).length;
-    const totalStars = Object.values(progressData).reduce((sum, p) => sum + (p.stars || 0), 0);
-    
-    console.log('📊 ENHANCED: Final progress totals:', {
-      'Completed Scenes': totalCompleted,
+    console.log('🔍 COMBINED PROGRESS DATA:', progressData);
+
+    // ✅ ENHANCED DEBUG with combined data
+    console.log('📊 COMBINED: Final progress totals:', {
+      'Completed Scenes': completedScenes,
       'Total Scenes': zoneData.scenes.length,
       'Total Stars': totalStars,
       'Progress Data': progressData
@@ -190,81 +343,233 @@ const ZoneWelcome = ({
       emptyProgress[scene.id] = { 
         completed: false, 
         stars: 0, 
-        unlocked: scene.order === 1 
-      };
-    });
-    setSceneProgress(emptyProgress);
-  }
-};*/
-
-// ✅ NEW: Use ProgressManager for consistent data
-const loadSceneProgress = () => {
-  if (!zoneData || !zoneData.scenes) return;
-  
-  try {
-    const activeProfileId = localStorage.getItem('activeProfileId');
-    console.log('🔍 PROGRESS MANAGER: Loading progress for profile:', activeProfileId);
-    
-    // ✅ Use ProgressManager instead of manual calculation
-    const zoneProgress = ProgressManager.calculateZoneProgress(activeProfileId, zoneData.id);
-    console.log('📊 PROGRESS MANAGER: Zone progress calculated:', zoneProgress);
-    
-    // Convert ProgressManager format to current format
-    const progressData = {};
-    
-    zoneProgress.sceneProgress.forEach(scene => {
-      progressData[scene.sceneId] = {
-        completed: scene.completed,
-        stars: scene.stars,
-        unlocked: scene.unlocked
-      };
-    });
-    
-    setSceneProgress(progressData);
-    
-    // ✅ ENHANCED DEBUG with ProgressManager data
-    console.log('📊 PROGRESS MANAGER: Final progress totals:', {
-      'Completed Scenes': zoneProgress.completedScenes,
-      'Total Scenes': zoneProgress.totalScenes,
-      'Total Stars': zoneProgress.totalStars,
-      'Progress Data': progressData
-    });
-    
-  } catch (error) {
-    console.log('Error loading scene progress:', error);
-    // Initialize with empty progress
-    const emptyProgress = {};
-    zoneData.scenes.forEach(scene => {
-      emptyProgress[scene.id] = { 
-        completed: false, 
-        stars: 0, 
-        unlocked: scene.order === 1 
+        unlocked: scene.order === 1,
+        progress: { percentage: 0, hasInProgress: false }
       };
     });
     setSceneProgress(emptyProgress);
   }
 };
 
-  const getSceneStatus = (scene) => {
+// ✅ NEW: Get relevant cards for current zone
+const getRelevantCards = () => {
+  const zoneId = zoneData?.id || 'symbol-mountain';
+  const contentTypes = ZONE_CONTENT_TYPES[zoneId] || ['symbols'];
+  
+  const cards = [];
+  
+  // Add content-specific cards
+  contentTypes.forEach(type => {
+    cards.push(type);
+  });
+  
+  // Always add universal cards
+  cards.push('level', 'progress');
+  
+  return cards;
+};
+
+const getZoneStats = () => {
+  if (!sceneProgress || !zoneData?.scenes) {
+    return { symbols: 0, stories: 0, chants: 0, completed: 0, total: zoneData?.scenes?.length || 4 };
+  }
+
+  let completed = 0;
+
+  zoneData.scenes.forEach(scene => {
     const progress = sceneProgress[scene.id];
-    
-    // ✅ DISNEY: Check unlock status first
-    const isUnlocked = checkSceneUnlocked(scene);
-    
-    if (!isUnlocked) {
-      return { status: 'locked', stars: 0 };
+    if (progress?.completed) {
+      completed++;
     }
+  });
+
+  // ✅ NEW: Get actual cultural data for this zone
+  const culturalData = CulturalProgressExtractor.getCulturalProgressData();
+  
+  // For Symbol Mountain, show actual symbols collected
+  const zoneId = zoneData?.id || 'symbol-mountain';
+  let symbols = 0;
+  let stories = 0;
+  let chants = 0;
+
+  if (zoneId === 'symbol-mountain') {
+    symbols = culturalData?.symbolsCount || 0;
+  } else if (zoneId === 'story-treehouse') {
+    stories = culturalData?.storiesCount || 0;
+} else if (zoneId === 'shloka-river' || zoneId === 'cave-of-secrets') {
+    chants = culturalData?.chantsCount || 0;
+  }
+
+  return { symbols, stories, chants, completed, total: zoneData.scenes.length };
+};
+
+// ✅ NEW: Render individual card
+const renderStatCard = (cardType, stats) => {
+  switch (cardType) {
+    case 'symbols':
+      return (
+        <div key="symbols" className="stat-card symbols">
+          <div className="stat-icon">🕉️</div>
+          <div className="stat-number">{stats.symbols}</div>
+          <div className="stat-label">Symbols</div>
+        </div>
+      );
+      
+    case 'stories':
+      return (
+        <div key="stories" className="stat-card stories">
+          <div className="stat-icon">📜</div>
+          <div className="stat-number">{stats.stories}</div>
+          <div className="stat-label">Stories</div>
+        </div>
+      );
+      
+    case 'chants':
+      return (
+        <div key="chants" className="stat-card chants">
+          <div className="stat-icon">🎵</div>
+          <div className="stat-number">{stats.chants}</div>
+          <div className="stat-label">Chants</div>
+        </div>
+      );
+      
+    case 'level':
+      return (
+        <div key="level" className="stat-card level">
+          <div className="stat-icon">🔍</div>
+          <div className="stat-text">Wisdom Seeker</div>
+        </div>
+      );
+      
+    case 'progress':
+      return (
+        <div key="progress" className="stat-card progress">
+          <div className="stat-icon">🎒</div>
+          <div className="stat-number">{stats.completed}/{stats.total}</div>
+          <div className="stat-label">Adventures</div>
+        </div>
+      );
+      
+    default:
+      return null;
+  }
+};
+
+const getSceneStatus = (scene) => {
+  const progress = sceneProgress[scene.id];
+  const isUnlocked = checkSceneUnlocked(scene);
+  
+  if (!isUnlocked) {
+    return { status: 'locked', stars: 0 };
+  }
+  
+  if (!progress) return { status: 'available', stars: 0 };
+
+  
+  
+  const activeProfileId = localStorage.getItem('activeProfileId');
+  const tempKey = `temp_session_${activeProfileId}_${zoneData.id}_${scene.id}`;
+  const tempData = localStorage.getItem(tempKey);
+  
+
+  
+ // ✅ ADD THIS NEW CHECK at the top of temp data parsing:
+if (tempData) {
+  try {
+    const tempState = JSON.parse(tempData);
     
-    if (!progress) return { status: 'available', stars: 0 };
-    
-    if (progress.completed) {
-      return { status: 'completed', stars: progress.stars || 0 };
-    } else if (progress.stars > 0) {
-      return { status: 'in-progress', stars: progress.stars };
-    } else {
-      return { status: 'available', stars: 0 };
+    // ✅ NEW: Check for completion screen showing (still in-progress)
+    if (tempState.showingCompletionScreen === true) {
+      console.log(`🎬 COMPLETION SCREEN: ${scene.id} showing completion screen`);
+      return { status: 'in-progress', stars: tempState.stars || 0 };
     }
-  };
+      
+      // ✅ SCENE-SPECIFIC COMPLETION DETECTION
+      let isCompleteInTemp = false;
+      
+      if (scene.id === 'modak') {
+        // Modak is complete if: phase is complete OR rockTransformed OR completed flag
+        isCompleteInTemp = (
+          tempState.completed === true ||
+          tempState.phase === 'complete' 
+          //tempState.rockTransformed === true
+        );
+      } else if (scene.id === 'pond') {
+        // Pond is complete if: phase is complete OR (elephantTransformed AND goldenLotusBloom) OR completed flag
+        isCompleteInTemp = (
+          tempState.completed === true ||
+          tempState.phase === 'complete' ||
+          (tempState.elephantTransformed === true && tempState.goldenLotusBloom === true)
+        );
+        } else if (scene.id === 'symbol') {
+  // Symbol is complete if: phase is all_complete OR ganeshaComplete OR completed flag  
+  isCompleteInTemp = (
+    tempState.completed === true ||
+    //tempState.phase === 'complete' ||
+    tempState.phase === 'all_complete' ||      // ← KEY: Symbol uses 'all_complete'
+    tempState.ganeshaComplete === true         // ← KEY: Symbol completion flag
+  );
+  } else if (scene.id === 'final-scene' || scene.id === 'sacred-assembly') {
+  // ✅ Sacred Assembly completion detection
+  isCompleteInTemp = (
+    tempState.completed === true ||
+    tempState.phase === 'complete' ||
+    tempState.phase === 'zone-complete' ||
+    tempState.showingZoneCompletion === true ||
+    (tempState.placedSymbols && Object.keys(tempState.placedSymbols).length === 8) ||
+    tempState.stars === 8
+  );
+      } else {
+        // Generic completion check
+        isCompleteInTemp = (
+          tempState.completed === true ||
+          tempState.phase === 'complete'
+        );
+      }
+      
+      if (isCompleteInTemp) {
+        console.log(`🎯 TEMP COMPLETED: ${scene.id} temp session shows completion`);
+        return { status: 'completed', stars: tempState.stars || progress.stars || 0 };
+      }
+      
+      // ✅ NOW check for partial progress (more restrictive)
+      const hasPartialProgress = (
+  tempState.stars > 0 ||
+  tempState.phase && !['initial', 'mooshika_search'].includes(tempState.phase) ||
+  tempState.discoveredSymbols && Object.keys(tempState.discoveredSymbols).length > 0 ||
+  tempState.mooshikaFound ||
+  tempState.collectedModaks?.length > 0 ||
+  tempState.rockFeedCount > 0 ||
+  tempState.rockTransformed ||  // ✅ INCLUDE rock transformed as progress
+  tempState.lotusStates?.some(state => state === 1) ||
+  tempState.elephantVisible ||
+  tempState.basketFull
+);
+      
+      if (hasPartialProgress) {
+        console.log(`🎮 TEMP PROGRESS: ${scene.id} has partial progress`);
+        return { status: 'in-progress', stars: tempState.stars || 0 };
+      }
+      
+      console.log(`🔄 TEMP EMPTY: ${scene.id} has empty temp session`);
+      
+    } catch (e) {
+      console.error('Error parsing temp data:', e);
+    }
+  }
+  
+  // ✅ Fall back to permanent data
+  if (progress.completed === true) {
+    console.log(`💾 PERMANENT: ${scene.id} is permanently completed`);
+    return { status: 'completed', stars: progress.stars || 0 };
+  }
+  
+  if (progress.stars > 0) {
+    return { status: 'in-progress', stars: progress.stars || 0 };
+  }
+  
+  return { status: 'available', stars: 0 };
+};
 
   // ✅ DISNEY SYSTEM: Enhanced unlock detection with multiple paths
   const checkSceneUnlocked = (scene) => {
@@ -334,20 +639,91 @@ const loadSceneProgress = () => {
     return null;
   };
 
-  const handleSceneClick = (scene) => {
-    const status = getSceneStatus(scene);
-    
-    if (status.status === 'locked') {
-      console.log('🔒 DISNEY: Scene locked, showing feedback:', scene.name);
-      // You could show a tooltip or message here
-      return;
-    }
-    
-    console.log('🎯 DISNEY: Scene selected:', scene.id);
-    if (onSceneSelect) {
-      onSceneSelect(scene.id);
-    }
-  };
+ const handleSceneClick = (scene, action = 'default') => {
+
+   // ✅ SIMPLE: Clean GameCoach before navigation (same as TocaBocaNav)
+  console.log('🧹 ZONE: Cleaning GameCoach before scene navigation');
+  // ✅ NOW we aggressively clean because we're actually navigating
+  if (hideCoach) {
+    hideCoach();
+    console.log('✅ ZoneWelcome: GameCoach hidden for navigation');
+  }
+  if (clearManualCloseTracking) {
+    clearManualCloseTracking();
+  }
+
+  // ✅ ADD THIS: Track quick navigation for GameCoach
+  const profileId = localStorage.getItem('activeProfileId');
+  const clickTime = Date.now();
+  
+  // Check if this is a quick click (within 3 seconds of zone entry)
+  const zoneEntryTime = sessionStorage.getItem(`zone_entry_${zoneData.id}`);
+  const isQuickClick = zoneEntryTime && (clickTime - parseInt(zoneEntryTime)) < 3000;
+  
+  if (isQuickClick) {
+    console.log('⚡ Quick navigation detected - GameCoach will stay silent');
+    // Store this info for GameCoach decision
+    sessionStorage.setItem(`quick_nav_${profileId}_${zoneData.id}`, clickTime.toString());
+  }
+  
+  // ✅ KEEP ALL EXISTING LOGIC BELOW:
+  const status = getSceneStatus(scene);
+  
+  if (status.status === 'locked') {
+    console.log('🔒 DISNEY: Scene locked, showing feedback:', scene.name);
+    showMessage(`Complete "${getPreviousSceneName(scene)}" first to unlock this scene!`, {
+      duration: 3000,
+      animation: 'bounce',
+      priority: 5
+    });
+    return;
+  }
+  
+  console.log('🎯 DISNEY: Scene clicked:', scene.id, 'Action:', action);
+  
+  // Handle specific actions from buttons
+  switch (action) {
+    case 'continue':
+      console.log('↶ CONTINUE: Loading scene with progress');
+      if (onSceneSelect) {
+        onSceneSelect(scene.id, { mode: 'continue' });
+      }
+      break;
+      
+    case 'replay':
+      console.log('🎮 REPLAY: Loading scene fresh (clear progress)');
+      if (onSceneSelect) {
+        onSceneSelect(scene.id, { mode: 'replay' });
+      }
+      break;
+      
+    case 'start':
+      console.log('🚀 START: Loading scene for first time');
+      if (onSceneSelect) {
+        onSceneSelect(scene.id, { mode: 'start' });
+      }
+      break;
+      
+    default:
+      // Legacy fallback for scenes clicked without specific action
+      if (status.status === 'completed') {
+        console.log('🎮 DEFAULT: Completed scene - starting replay');
+        if (onSceneSelect) {
+          onSceneSelect(scene.id, { mode: 'replay' });
+        }
+      } else if (status.status === 'in-progress') {
+        console.log('↶ DEFAULT: In-progress scene - continuing');
+        if (onSceneSelect) {
+          onSceneSelect(scene.id, { mode: 'continue' });
+        }
+      } else {
+        console.log('🚀 DEFAULT: New scene - starting fresh');
+        if (onSceneSelect) {
+          onSceneSelect(scene.id, { mode: 'start' });
+        }
+      }
+  }
+};
 
   const handleBackToMap = () => {
     console.log('⬅️ Back to map clicked');
@@ -384,419 +760,240 @@ const loadSceneProgress = () => {
         backgroundRepeat: 'no-repeat'
       }}
     >
+
+      {/* 🔍 TEMPORARY DEBUG BUTTON */}
+<button 
+  onClick={() => {
+    console.log('🔍 MANUAL DEBUG - Scene Progress Check:');
+    console.log('zoneData?.scenes:', zoneData?.scenes);
+    console.log('sceneProgress:', sceneProgress);
+    console.log('Object.keys(sceneProgress):', Object.keys(sceneProgress || {}));
+    
+    if (zoneData?.scenes) {
+      zoneData.scenes.forEach(scene => {
+        const progress = sceneProgress[scene.id];
+        const status = getSceneStatus(scene);
+        
+        console.log(`${scene.id}:`, {
+          'Status': status.status,
+          'Stars': status.stars,
+          'Raw Progress': progress,
+          'Completed Flag': progress?.completed,
+          'Progress Percentage': progress?.progress?.percentage
+        });
+      });
+    }
+  }}
+  style={{
+    position: 'fixed',
+    top: '10px',
+    right: '10px',
+    background: 'orange',
+    color: 'white',
+    padding: '10px',
+    borderRadius: '5px',
+    zIndex: 9999
+  }}
+>
+  🔍 DEBUG STATUS
+</button>
+
+{/* Add this after your existing debug button */}
+<button 
+  onClick={() => {
+    const profileId = localStorage.getItem('activeProfileId');
+    if (profileId && zoneData?.id) {
+      const session = GameCoachSessionManager.debugSession(profileId, zoneData.id);
+      console.log('🎭 Current GameCoach Session:', session);
+      
+      // Force reset for testing
+      if (confirm('Reset GameCoach session for testing?')) {
+        GameCoachSessionManager.resetSession(profileId, zoneData.id);
+        window.location.reload();
+      }
+    }
+  }}
+  style={{
+    position: 'fixed',
+    top: '50px',
+    right: '10px',
+    background: 'purple',
+    color: 'white',
+    padding: '10px',
+    borderRadius: '5px',
+    zIndex: 9999
+  }}
+>
+  🎭 DEBUG GC
+</button>
+
       {/* Back to Map Button */}
       <button className="zone-back-button" onClick={handleBackToMap}>
         ← Back to Map
       </button>
 
-      {/* Zone Title (Optional - can be hidden for cleaner look) */}
-      <div className="zone-title-badge">
-        <div className="zone-icon">{zoneData.icon}</div>
-        <h1 className="zone-name">{zoneData.name}</h1>
-      </div>
-
-      {/* ✅ DISNEY DEBUG: Enhanced debug panel with unlock analysis */}
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        background: 'rgba(0,0,0,0.9)',
-        color: 'white',
-        padding: '12px',
-        borderRadius: '8px',
-        fontSize: '11px',
-        maxWidth: '350px',
-        maxHeight: '80vh',
-        overflow: 'auto',
-        zIndex: 1000,
-        border: '2px solid #4CAF50'
-      }}>
-        <div style={{ color: '#4CAF50', fontWeight: 'bold', marginBottom: '8px' }}>
-          🧪 DISNEY UNLOCK ANALYSIS
-        </div>
-        {zoneData.scenes.map(scene => {
-          const progress = sceneProgress[scene.id];
-          const status = getSceneStatus(scene);
-          const gameProgress = GameStateManager.getGameProgress();
-          const explicitUnlock = gameProgress.zones?.[zoneData.id]?.scenes?.[scene.id]?.unlocked;
-          
-          return (
-            <div key={scene.id} style={{ 
-              margin: '4px 0', 
-              padding: '4px', 
-              border: '1px solid #333',
-              borderRadius: '4px',
-              backgroundColor: status.status === 'locked' ? '#ffebee' : '#e8f5e8',
-              color: status.status === 'locked' ? '#c62828' : '#2e7d32'
-            }}>
-              <div style={{ fontWeight: 'bold' }}>
-                {scene.id} (Order: {scene.order})
-              </div>
-              <div style={{ fontSize: '10px' }}>
-                Status: {status.status} {progress?.completed ? ' ✅' : ' ❌'} ({progress?.stars || 0}⭐)
-              </div>
-              <div style={{ fontSize: '10px' }}>
-                Auto-Unlock: {explicitUnlock === true ? '🔓 YES' : explicitUnlock === false ? '🔒 NO' : '❓ UNSET'}
-              </div>
-              {scene.order > 1 && (
-                <div style={{ fontSize: '10px' }}>
-                  Prev Complete: {(() => {
-                    const prevScene = zoneData.scenes.find(s => s.order === scene.order - 1);
-                    const prevProgress = sceneProgress[prevScene?.id];
-                    return prevProgress?.completed ? '✅ YES' : '❌ NO';
-                  })()}
-                </div>
-              )}
-            </div>
-          );
-        })}
-        
-        {/* ✅ DISNEY: Show localStorage debug */}
-        <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #666' }}>
-          <div style={{ color: '#FFC107', fontWeight: 'bold', fontSize: '10px' }}>
-            STORAGE DEBUG:
-          </div>
-          <div style={{ fontSize: '9px' }}>
-            Active Profile: {localStorage.getItem('activeProfileId')?.slice(-8) || 'None'}
-          </div>
-          <div style={{ fontSize: '9px' }}>
-            Progress Key: {localStorage.getItem('activeProfileId') ? `${localStorage.getItem('activeProfileId')}_gameProgress` : 'None'}
-          </div>
-        </div>
-      </div>
+    {/* Centered Zone Title */}
+<div className="zone-title-centered">
+  <div className="zone-icon-large">{zoneData.icon}</div>
+  <h1 className="zone-name-centered">{zoneData.name}</h1>
+</div>
+ 
 
       {/* Scene Icons Grid */}
       <div className="zone-scenes-container">
-        {zoneData.scenes.map((scene, index) => {
-          const status = getSceneStatus(scene);
-          
-          return (
-            <div
-              key={scene.id}
-              className={`zone-scene-card ${status.status} ${
-                highlightedScene === scene.id ? 'highlighted' : ''
-              } ${status.status === 'locked' ? 'locked-scene' : 'unlocked-scene'}`}
-              style={{
-                top: `${scene.position.top}%`,
-                left: `${scene.position.left}%`,
-                cursor: status.status === 'locked' ? 'not-allowed' : 'pointer',
-                filter: status.status === 'locked' ? 'grayscale(100%) brightness(0.5)' : 'none',
-                transform: status.status === 'locked' ? 'scale(0.9)' : 'scale(1)',
-                transition: 'all 0.3s ease'
-              }}
-              onClick={() => handleSceneClick(scene)}
-            >
-              {/* Order indicator */}
-              <div className="scene-order-indicator" style={{
-                backgroundColor: status.status === 'locked' ? '#666' : '#4CAF50'
-              }}>
-                {scene.order}
-              </div>
-              
-              {/* Main scene icon container */}
-              <div className="scene-icon-container">
-                <div className={`scene-status-ring ${status.status}`}></div>
-                <div className="scene-emoji" style={{
-                  filter: status.status === 'locked' ? 'grayscale(100%)' : 'none'
-                }}>
-                  {scene.emoji}
-                </div>
-                
-                {/* Lock overlay for locked scenes */}
-                {status.status === 'locked' && (
-                  <div className="scene-lock-overlay">
-                    <span className="scene-lock-icon">🔒</span>
+        {/* ✨ NEW: Horizontal Container */}
+        <div className="scenes-horizontal-container">
+          {zoneData.scenes.map((scene, index) => {
+            const status = getSceneStatus(scene);
+            
+            return (
+              <div
+                key={scene.id}
+                className={`zone-scene-card ${status.status} ${
+                  highlightedScene === scene.id ? 'highlighted' : ''
+                } ${status.status === 'locked' ? 'locked-scene' : 'unlocked-scene'}`}
+                style={{
+                  cursor: status.status === 'locked' ? 'not-allowed' : 'pointer'
+                }}
+                onClick={() => handleSceneClick(scene)}
+              >
+                {/* ✨ Divine Light Effect for GameCoach Entrance - Different Colors */}
+                {showSparkle?.includes('divine-light') && (
+                  <div style={{
+                    position: 'fixed',
+                    top: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '400px',
+                    height: '200px',
+                    zIndex: 199,
+                    pointerEvents: 'none'
+                  }}>
+                    <SparkleAnimation
+                      type="glitter"
+                      count={80}
+                      color={
+                        showSparkle === 'divine-light-welcome' ? '#FF6B6B' :     // Coral for welcome
+                        showSparkle === 'divine-light-celebration' ? '#FFD700' : // Gold for celebration
+                        showSparkle === 'divine-light-encourage' ? '#87CEEB' :   // Sky blue for encouragement
+                        showSparkle === 'divine-light-mastery' ? '#9370DB' :     // Purple for mastery
+                        '#FFD700' // Default gold
+                      }
+                      size={3}
+                      duration={2000}
+                      fadeOut={true}
+                      area="full"
+                    />
                   </div>
                 )}
+
+                {/* Order indicator */}
+                <div className="scene-order-indicator">
+                  {scene.order}
+                </div>
                 
-                {/* ✅ DISNEY: Unlock animation for recently unlocked scenes */}
-                {status.status !== 'locked' && highlightedScene === scene.id && (
-                  <div className="scene-unlock-animation">
-                    <span className="unlock-sparkle">✨</span>
+                {/* Stars display */}
+                {status.stars > 0 && (
+                  <div className="scene-stars-display">
+                    {status.stars}⭐
                   </div>
                 )}
-              </div>
-              
-              {/* Stars display */}
-              {status.stars > 0 && (
-                <div className="scene-stars-display">
-                  {status.stars}⭐
+
+                {/* ✨ NEW: Scene Icon Area (Top) */}
+                <div className="scene-icon-area">
+                  <div className="scene-emoji" style={{
+                    filter: status.status === 'locked' ? 'grayscale(100%)' : 'none'
+                  }}>
+                    {scene.emoji}
+                  </div>
+                  
+                  {/* Lock overlay for locked scenes */}
+                  {status.status === 'locked' && (
+                    <div className="scene-lock-overlay">
+                      <span className="scene-lock-icon">🔒</span>
+                    </div>
+                  )}
                 </div>
-              )}
-              
-              {/* Scene name badge */}
-              <div className="scene-name-badge" style={{
-                backgroundColor: status.status === 'locked' ? '#666' : 'rgba(76, 175, 80, 0.9)',
-                color: status.status === 'locked' ? '#999' : 'white'
-              }}>
-                {scene.name}
+
+                {/* ✨ NEW: Scene Name Area (Middle) */}
+                <div className="scene-name-area">
+                  <div className="scene-name">
+                    {scene.name}
+                  </div>
+                </div>
+
+                {/* ✨ NEW: Integrated Action Area (Bottom) */}
+                <div className="scene-action-integrated">
+                  {status.status === 'in-progress' ? (
+                    <div className="action-split-container">
+                      <button 
+                        className="action-button-split continue"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSceneClick(scene, 'continue');
+                        }}
+                      >
+Continue                            
+                      </button>
+                      <button 
+                        className="action-button-split replay"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSceneClick(scene, 'replay');
+                        }}
+                      >
+                        🎮
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      className={`action-button-integrated ${status.status}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                            console.log('Button clicked!', scene.id); // ✨ DEBUG LOG
+                        handleSceneClick(scene);
+                      }}
+                    >
+                      {status.status === 'available' && '🚀 Start Adventure'}
+                      {status.status === 'completed' && '🎮 Play Again'}
+                      {status.status === 'locked' && '🔒 Complete Previous'}
+                    </button>
+                  )}
+                </div>
+
               </div>
-              
-              {/* Status indicator */}
-              <div className="scene-status-indicator">
-                {status.status === 'completed' && (
-                  <span className="status-completed" style={{ color: '#4CAF50' }}>✅ Complete</span>
-                )}
-                {status.status === 'in-progress' && (
-                  <span className="status-progress" style={{ color: '#FF9800' }}>🎯 Continue</span>
-                )}
-                {status.status === 'available' && (
-                  <span className="status-available" style={{ color: '#2196F3' }}>🚀 Start</span>
-                )}
-                {status.status === 'locked' && (
-                  <span className="status-locked" style={{ color: '#666' }}>🔒 Locked</span>
-                )}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
-      {/* ✅ DISNEY: Debug button to test auto-unlock manually */}
-      <button 
-        style={{
-          position: 'fixed', 
-          top: '150px', 
-          right: '10px', 
-          background: '#4CAF50', 
-          color: 'white', 
-          padding: '8px 12px',
-          borderRadius: '5px',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '12px',
-          fontWeight: 'bold',
-          zIndex: 9999
-        }}
-        onClick={() => {
-          console.log('🧪 DISNEY TEST: Manual unlock trigger');
-          
-          // Test auto-unlock for pond scene
-          const unlocked = GameStateManager.unlockNextScene('symbol-mountain', 'modak');
-          console.log('🧪 Manual unlock result:', unlocked);
-          
-          // Refresh the progress display
-          loadSceneProgress();
-        }}
-      >
-        🧪 Test Unlock
-      </button>
-
-      {/* ✅ DISNEY: localStorage debug button */}
-      <button 
-        style={{
-          position: 'fixed', 
-          top: '190px', 
-          right: '10px', 
-          background: '#2196F3', 
-          color: 'white', 
-          padding: '8px 12px',
-          borderRadius: '5px',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '12px',
-          fontWeight: 'bold',
-          zIndex: 9999
-        }}
-        onClick={() => {
-          console.log('🧪 DISNEY STORAGE DEBUG:');
-          console.log('🔍 All localStorage keys:');
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            const value = localStorage.getItem(key);
-            if (key.includes('gameProgress') || key.includes('gameProfiles')) {
-              console.log(`${key}:`, JSON.parse(value));
-            } else {
-              console.log(`${key}:`, value);
-            }
-          }
-          
-          console.log('🔍 Current game progress:');
-          console.log(GameStateManager.getGameProgress());
-        }}
-      >
-        🧪 Debug Storage
-      </button>
-
-      {/* Add these buttons to ZoneWelcome.jsx for testing */}
-
-{/* Direct Modak Completion */}
-<button 
-  style={{
-    position: 'fixed',
-    top: '80px',
-    right: '10px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    padding: '10px',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    zIndex: 1000,
-    fontSize: '12px',
-    fontWeight: 'bold'
-  }}
-  onClick={async () => {
-    console.log('🧪 DIRECT MODAK COMPLETION');
-    
-    const { default: GameStateManager } = await import('../../services/GameStateManager');
-    
-    GameStateManager.saveGameState('symbol-mountain', 'modak', {
-      completed: true,
-      stars: 8,
-      symbols: { basket: true, mooshika: true, belly: true },
-      phase: 'complete'
-    });
-    
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
-  }}
->
-  ✅ COMPLETE MODAK
-</button>
-
-{/* Direct Pond Completion */}
-<button 
-  style={{
-    position: 'fixed',
-    top: '120px',
-    right: '10px',
-    backgroundColor: '#2196F3',
-    color: 'white',
-    padding: '10px',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    zIndex: 1000,
-    fontSize: '12px',
-    fontWeight: 'bold'
-  }}
-  onClick={async () => {
-    console.log('🧪 DIRECT POND COMPLETION');
-    
-    const { default: GameStateManager } = await import('../../services/GameStateManager');
-    
-    GameStateManager.saveGameState('symbol-mountain', 'pond', {
-      completed: true,
-      stars: 5,
-      symbols: { lotus: true, trunk: true, golden: true },
-      phase: 'complete'
-    });
-    
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
-  }}
->
-  ✅ COMPLETE POND
-</button>
-
-{/* Test Both Button */}
-<button 
-  style={{
-    position: 'fixed',
-    top: '160px',
-    right: '10px',
-    backgroundColor: 'gold',
-    color: 'black',
-    padding: '10px',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    zIndex: 1000,
-    fontSize: '12px',
-    fontWeight: 'bold'
-  }}
-  onClick={async () => {
-    console.log('🧪 TESTING BOTH SCENES DIRECT');
-    
-    const { default: GameStateManager } = await import('../../services/GameStateManager');
-    
-    // Complete modak first
-    GameStateManager.saveGameState('symbol-mountain', 'modak', {
-      completed: true,
-      stars: 8,
-      symbols: { basket: true, mooshika: true, belly: true },
-      phase: 'complete'
-    });
-    
-    // Then complete pond
-    setTimeout(() => {
-      GameStateManager.saveGameState('symbol-mountain', 'pond', {
-        completed: true,
-        stars: 5,
-        symbols: { lotus: true, trunk: true, golden: true },
-        phase: 'complete'
-      });
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 300);
-    }, 200);
-  }}
->
-  ✅ COMPLETE BOTH
-</button>
-
-{/* Zone Progress Summary - Using ProgressManager */}
-<div className="zone-progress-summary">
-  <div className="progress-info">
-    <span className="zone-progress-text">
-      Progress: {(() => {
-        const activeProfileId = localStorage.getItem('activeProfileId');
-        const zoneProgress = ProgressManager.calculateZoneProgress(activeProfileId, zoneData.id);
-        return `${zoneProgress.completedScenes} / ${zoneProgress.totalScenes} scenes`;
-      })()}
-    </span>
-    <div className="zone-stars-total">
-      Total Stars: {(() => {
-        const activeProfileId = localStorage.getItem('activeProfileId');
-        const zoneProgress = ProgressManager.calculateZoneProgress(activeProfileId, zoneData.id);
-        return zoneProgress.totalStars;
+{/* ✨ DYNAMIC ZONE-SPECIFIC STATS BAR */}
+<div className="stats-bottom-bar">
+  {Object.keys(sceneProgress).length > 0 ? (
+    <div className={`stats-cards stats-${getRelevantCards().length}-cards`}>
+      {(() => {
+        const relevantCards = getRelevantCards();
+        const zoneStats = getZoneStats();
+        
+        return relevantCards.map(cardType => 
+          renderStatCard(cardType, zoneStats)
+        );
       })()}
     </div>
-  </div>
+  ) : (
+    <div className="stats-loading">
+      🎒 Loading zone progress...
+    </div>
+  )}
 </div>
 
       {/* ✅ DISNEY: Add CSS for unlock animations */}
       {/* ✅ FIXED: Regular CSS styles instead of jsx */}
-<style>{`
-  .scene-unlock-animation {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    animation: unlockSparkle 2s ease-in-out infinite;
-  }
-  
-  @keyframes unlockSparkle {
-    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
-    50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
-  }
-  
-  .locked-scene {
-    pointer-events: none;
-  }
-  
-  .unlocked-scene:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-  }
-  
-  .scene-status-ring.completed {
-    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
-  }
-  
-  .scene-status-ring.available {
-    box-shadow: 0 0 15px rgba(33, 150, 243, 0.6);
-  }
-  
-  .scene-status-ring.locked {
-    box-shadow: 0 0 15px rgba(102, 102, 102, 0.6);
-  }
-`}</style>
+
     </div>
   );
 };
+
+
 
 export default ZoneWelcome;

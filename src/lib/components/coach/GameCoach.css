@@ -1,7 +1,7 @@
-/* Updated Disney-Style GameCoach.css - Child-Friendly Design */
+/* GameCoach.css - Final 4-Color System + Magical Effects */
 .game-coach {
   position: fixed;
-  z-index: 200; /* Higher z-index for visibility */
+  z-index: 200;
   pointer-events: none;
   transition: all 0.3s ease;
 }
@@ -17,10 +17,10 @@
 }
 
 .game-coach.top-right {
-  top: 20px; /* Moved closer to top */
-  left: 50%; /* Center horizontally */
-  transform: translateX(-50%); /* Perfect centering */
-  right: auto; /* Override right positioning */
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  right: auto;
 }
 
 .game-coach.visible {
@@ -29,12 +29,13 @@
 
 .coach-container {
   display: flex;
-  align-items: center; /* Changed from flex-end to center */
-  justify-content: center; /* Center content */
-  gap: 15px; /* Slightly larger gap */
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
   opacity: 0;
   transform: translateY(50px);
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .game-coach.visible .coach-container {
@@ -57,26 +58,26 @@
 
 @keyframes enchantedBounce {
   0% { 
-    transform: translateY(30px) scale(0.8); 
+    transform: translateY(30px); 
     opacity: 0; 
   }
   60% { 
-    transform: translateY(-15px) scale(1.05); 
+    transform: translateY(-15px); 
     opacity: 1; 
   }
   100% { 
-    transform: translateY(0) scale(1); 
+    transform: translateY; 
     opacity: 1; 
   }
 }
 
 @keyframes magicalSlideIn {
   0% { 
-    transform: translateX(-100px) scale(0.8); 
+    transform: translateX(-100px); 
     opacity: 0; 
   }
   100% { 
-    transform: translateX(0) scale(1); 
+    transform: translateX(0); 
     opacity: 1; 
   }
 }
@@ -96,9 +97,11 @@
   }
 }
 
+/* ✨ MAGICAL EFFECTS - Enhanced Character */
 .coach-character {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
+  position: relative;
   animation: gentleFloat 4s ease-in-out infinite;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
 }
@@ -109,127 +112,360 @@
   object-fit: contain;
 }
 
+
+/* 🕊️ ENHANCED FLOAT - More magical movement */
 @keyframes gentleFloat {
   0%, 100% { 
-    transform: translateY(0) scale(1); 
+    transform: translateY(0) scale(1) rotate(0deg); 
+  }
+  25% { 
+    transform: translateY(-8px) scale(1.02) rotate(1deg); 
   }
   50% { 
-    transform: translateY(-8px) scale(1.02); 
+    transform: translateY(-12px) scale(1.03) rotate(0deg); 
+  }
+  75% { 
+    transform: translateY(-6px) scale(1.01) rotate(-1deg); 
+  }
+}
+
+/* ✨ MAGICAL ENTRANCE - Slide in with sparkly trail 
+.coach-container.magical-entrance {
+  animation: magicalEntrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes magicalEntrance {
+  0% { 
+    transform: translateX(-200px) translateY(50px) scale(0.3);
+    opacity: 0;
+  }
+  40% {
+    transform: translateX(-50px) translateY(-10px) scale(0.8);
+    opacity: 0.7;
+  }
+  70% {
+    transform: translateX(10px) translateY(-5px) scale(1.1);
+    opacity: 0.9;
+  }
+  100% { 
+    transform: translateX(0) translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* 🌟 MAGICAL DISAPPEAR - Star burst fade 
+.coach-container.magical-exit {
+  animation: starBurstExit 0.8s ease-out forwards;
+}
+
+@keyframes starBurstExit {
+  0% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+  100% { 
+    transform: scale(0.1);
+    opacity: 0;
+  }
+}*/
+
+/* 🎪 BOUNCE ON SPEAK - When new message appears */
+
+
+@keyframes excitedBounce {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+/* 💖 HEART PARTICLES - For positive messages */
+.heart-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+    z-index: -1;  /* ← ADD THIS LINE - puts hearts behind character */
+
+}
+
+.heart {
+  position: absolute;
+  color: #ff69b4;
+  font-size: 12px;
+  animation: floatHeart 3s ease-out forwards;
+  opacity: 0;
+  bottom: 20%;      /* ← ADD: Start from bottom of character */
+  left: 50%;        /* ← ADD: Start from center of character */
+  transform: translateX(-50%);  /* ← ADD: Center the hearts */
+}
+
+@keyframes floatHeart {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-40px) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-80px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* ✨ SPARKLE TRAIL - Behind character during entrance */
+.sparkle-trail {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #FFD700;
+  border-radius: 50%;
+  animation: trailSparkle 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes trailSparkle {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
   }
 }
 
 .coach-message {
   position: relative;
-  max-width: 320px; /* Slightly wider for better text */
+  max-width: 320px;
 }
 
+/* DEFAULT MESSAGE BUBBLE - Coral Pink (Welcome) */
 .message-bubble {
-  background: linear-gradient(135deg, #FFF8DC, #FFEBCD) !important; /* Cream to light peach */
-  border: 4px solid #FF6347 !important; /* Tomato red instead of pink */
-  border-radius: 25px !important;
-  padding: 20px 25px !important;
-  position: relative !important;
-  box-shadow: 
-    0 8px 20px rgba(255, 99, 71, 0.3), /* Orange-red shadow */
-    inset 0 2px 10px rgba(255, 255, 255, 0.5) !important;
-  font-size: 18px !important;
-  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', cursive, sans-serif !important;
-  color: #8B4513 !important; /* Saddle brown - Ganesha colors */
-  font-weight: bold !important;
-  text-align: center !important;
-  line-height: 1.4 !important;
-  animation: gentleBubbleBounce 0.6s ease-out !important;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E85);
+  border: 3px solid #E55A5A;
+  border-radius: 25px;
+  padding: 15px 18px;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+  font-size: 15px;
+  font-family: 'Georgia', serif;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.4;
+  transition: all 0.3s ease;
+  max-width: 250px;
 }
 
-/* Remove the ugly triangle completely */
-.message-bubble::before {
-  content: '✨' !important;
-  position: absolute !important;
-  top: -12px !important;
-  left: -12px !important;
-  font-size: 22px !important;
-  animation: sparkleRotate 3s infinite !important;
-  display: block !important;
-  z-index: 10 !important;
+/* 4 COLOR VARIATIONS FOR MESSAGE TYPES */
+
+/* Welcome Message - Coral Pink (warm, inviting) */
+.message-bubble.welcome {
+  background: linear-gradient(135deg, #FF6B6B, #FF8E85);
+  border-color: #E55A5A;
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
 }
 
-.message-bubble::after {
-  content: '⭐' !important;
-  position: absolute !important;
-  bottom: -12px !important;
-  right: -12px !important;
-  font-size: 18px !important;
-  animation: sparkleRotate 3s infinite 1.5s !important;
-  display: block !important;
-  z-index: 10 !important;
+/* Wisdom Message 1 - Teal (cool, learning) */
+.message-bubble.wisdom1 {
+  background: linear-gradient(135deg, #4ECDC4, #45B7D1);
+  border-color: #3CBCCF;
+  box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
 }
 
-/* Gentle bubble bounce animation */
-@keyframes gentleBubbleBounce {
+/* Wisdom Message 2 - Peach (warm, encouraging) */
+.message-bubble.wisdom2 {
+  background: linear-gradient(135deg, #FFB347, #FFA500);
+  border-color: #FF9500;
+  box-shadow: 0 8px 20px rgba(255, 179, 71, 0.3);
+}
+
+/* Wisdom Message 3 - Soft Violet (special, completion) */
+.message-bubble.wisdom3 {
+  background: linear-gradient(135deg, #B19CD9, #9B7FDB);
+  border-color: #8E6BC7;
+  box-shadow: 0 8px 20px rgba(177, 156, 217, 0.3);
+}
+
+/* 🎭 MESSAGE TYPE SPECIFIC GLOWS */
+.message-bubble.welcome + .coach-character {
+  animation: gentleFloat 4s ease-in-out infinite, warmGlow 3s ease-in-out infinite;
+}
+
+.message-bubble.wisdom1 + .coach-character {
+  animation: gentleFloat 4s ease-in-out infinite, coolGlow 3s ease-in-out infinite;
+}
+
+.message-bubble.wisdom2 + .coach-character {
+  animation: gentleFloat 4s ease-in-out infinite, peachGlow 3s ease-in-out infinite;
+}
+
+.message-bubble.wisdom3 + .coach-character {
+  animation: gentleFloat 4s ease-in-out infinite, violetGlow 3s ease-in-out infinite;
+}
+
+@keyframes warmGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(255, 107, 107, 0.7); }
+}
+
+@keyframes coolGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(78, 205, 196, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(78, 205, 196, 0.7); }
+}
+
+@keyframes peachGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 179, 71, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(255, 179, 71, 0.7); }
+}
+
+@keyframes violetGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(177, 156, 217, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(177, 156, 217, 0.7); }
+}
+
+/*@keyframes simpleFadeIn {
   0% { 
-    transform: scale(0.5) translateY(30px);
     opacity: 0;
-  }
-  60% { 
-    transform: scale(1.05) translateY(-5px);
-    opacity: 1;
+    transform: translateY(10px);
   }
   100% { 
-    transform: scale(1) translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
-}
+}*/
 
-/* Magical sparkle animation */
-@keyframes sparkleRotate {
-  0%, 100% { 
-    transform: scale(1) rotate(0deg);
-    opacity: 0.8;
-  }
-  25% { 
-    transform: scale(1.3) rotate(90deg);
-    opacity: 1;
-  }
-  50% { 
-    transform: scale(1.1) rotate(180deg);
-    opacity: 0.9;
-  }
-  75% { 
-    transform: scale(1.2) rotate(270deg);
-    opacity: 1;
-  }
-}
-
-/* Child-friendly close button */
 .close-btn {
-  position: absolute !important;
-  top: -8px !important;
-  right: -8px !important;
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 50% !important;
-  border: 3px solid white !important;
-  background: linear-gradient(135deg, #FF6347, #FF4500) !important; /* Orange-red gradient */
-  color: white !important;
-  font-size: 20px !important;
-  font-weight: bold !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.4) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 15 !important;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: linear-gradient(135deg, #4CAF50, #45A049);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+}
+
+.close-btn::before {
+  content: '×';
 }
 
 .close-btn:hover {
-  background: linear-gradient(135deg, #FF4500, #DC143C) !important;
-  transform: scale(1.15) rotate(90deg) !important;
-  box-shadow: 0 6px 16px rgba(255, 105, 180, 0.6) !important;
+  background: linear-gradient(135deg, #45A049, #3D8B40);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.6);
 }
 
 .close-btn:active {
-  transform: scale(0.95) !important;
+  transform: scale(0.95);
+}
+
+/* ✅ ADD THESE: Zone Welcome Message Types */
+
+/* Welcome Messages - Warm Coral Pink */
+.message-bubble.welcome {
+  background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+  border: 3px solid #FF9999;
+  color: white;
+}
+
+.message-bubble.welcome::before {
+  border-right-color: #FF8E8E;
+}
+
+/* Celebration Messages - Joyful Gold */
+.message-bubble.celebration {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border: 3px solid #FFCC00;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Scene-Specific Celebration Colors */
+.message-bubble.celebration-pond {
+  background: linear-gradient(135deg, #00CED1, #48CAE4);
+  border: 3px solid #5DADE2;
+  color: white;
+}
+
+.message-bubble.celebration-modak {
+  background: linear-gradient(135deg, #FF8C00, #FFA500);
+  border: 3px solid #FFB84D;
+  color: white;
+}
+
+.message-bubble.celebration::before {
+  border-right-color: #FFA500;
+}
+
+/* Mastery Messages - Majestic Purple */
+.message-bubble.mastery {
+  background: linear-gradient(135deg, #9370DB, #BA55D3);
+  border: 3px solid #DDA0DD;
+  color: white;
+}
+
+.message-bubble.mastery::before {
+  border-right-color: #BA55D3;
+}
+
+/* Encouragement Messages - Gentle Sky Blue */
+.message-bubble.encouragement {
+  background: linear-gradient(135deg, #87CEEB, #98D8E8);
+  border: 3px solid #B0E0E6;
+  color: #333;
+}
+
+.message-bubble.encouragement::before {
+  border-right-color: #98D8E8;
+}
+
+/* Cultural Messages - Wise Teal */
+.message-bubble.cultural {
+  background: linear-gradient(135deg, #20B2AA, #48CAE4);
+  border: 3px solid #5DADE2;
+  color: white;
+}
+
+.message-bubble.cultural::before {
+  border-right-color: #48CAE4;
+}
+
+/* Smooth fade transitions */
+.game-coach.fade-out {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.game-coach {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.3s ease-in, transform 0.3s ease-in;
 }
 
 /* Mobile responsive - child-friendly sizing */
@@ -240,9 +476,9 @@
   }
   
   .message-bubble {
-    font-size: 16px !important;
-    padding: 18px 20px !important;
-    max-width: 280px !important;
+    font-size: 16px;
+    padding: 18px 20px;
+    max-width: 280px;
   }
   
   .coach-message {
@@ -250,38 +486,29 @@
   }
   
   .close-btn {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 18px !important;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+  
+  .heart {
+    font-size: 10px;
+  }
+  
+  .sparkle-trail {
+    width: 3px;
+    height: 3px;
   }
 }
 
 /* Portrait orientation adjustments */
 @media (orientation: portrait) {
   .game-coach.top-right {
-    top: 60px; /* Closer to top on mobile */
+    top: 60px;
   }
   
   .message-bubble {
-    font-size: 16px !important;
-    padding: 16px 18px !important;
-  }
-}
-
-/* Extra magical touch - subtle glow effect */
-.message-bubble {
-  animation: gentleBubbleBounce 0.6s ease-out, subtleGlow 4s ease-in-out infinite 2s !important;
-}
-
-@keyframes subtleGlow {
-  0%, 100% { 
-    box-shadow: 
-      0 8px 20px rgba(255, 105, 180, 0.3),
-      inset 0 2px 10px rgba(255, 255, 255, 0.5);
-  }
-  50% { 
-    box-shadow: 
-      0 12px 30px rgba(255, 105, 180, 0.5),
-      inset 0 2px 15px rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    padding: 16px 18px;
   }
 }

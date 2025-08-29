@@ -1,577 +1,496 @@
-// App.jsx - Updated with Centralized Unlock System
-
+// Combined App.jsx - Test Both Sacred Assembly Scene (Final) and Symbol Mountain Scene (Scene 3)
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import PondScene from './zones/symbol-mountain/scenes/pond/PondSceneSimplified';
-import ModakScene from './zones/symbol-mountain/scenes/modak/NewModakScene';
-import MainWelcomeScreen from './lib/components/navigation/MainWelcomeScreen';
-import CleanGameWelcomeScreen from './lib/components/navigation/CleanGameWelcomeScreen';
-import CleanMapZone from './pages/CleanMapZone';
-import ZoneWelcome from './lib/components/zone/ZoneWelcome with unlock';
-import { getZoneConfig } from './lib/components/zone/ZoneConfig';
-import GameStateManager from './lib/services/GameStateManager';
-import { GameCoachProvider } from './lib/components/coach/GameCoach';
-import { useZoneUnlocks } from './lib/hooks/useZoneUnlocks';
 
-const GameStateManagerClass = GameStateManager.constructor;
+// Import both scenes
+import SacredAssemblyScene from './zones/symbol-mountain/scenes/final scene/SacredAssemblyScene';
+import SymbolMountainSceneV2 from './zones/symbol-mountain/scenes/tusk/SymbolMountainSceneV2.jsx';
+
+// Import GameCoach Provider
+import { GameCoachProvider } from './lib/components/coach/GameCoach';
+
+// Mock GameStateManager for testing
+const MockGameStateManager = {
+  getActiveProfile: () => ({
+    id: 'test-profile',
+    name: 'Alex',
+    avatar: '👧',
+    color: '#FF6B9D'
+  }),
+  
+  saveGameState: (zoneId, sceneId, data) => {
+    console.log('🎮 Mock Save:', { zoneId, sceneId, data });
+    localStorage.setItem(`game_${zoneId}_${sceneId}`, JSON.stringify(data));
+  },
+  
+  loadGameState: (zoneId, sceneId) => {
+    const saved = localStorage.getItem(`game_${zoneId}_${sceneId}`);
+    return saved ? JSON.parse(saved) : null;
+  }
+};
+
+// Mock ProgressManager for testing
+const MockProgressManager = {
+  updateSceneCompletion: (profileId, zoneId, sceneId, data) => {
+    console.log('📊 Mock Progress Update:', { profileId, zoneId, sceneId, data });
+  },
+  
+  updateZoneCompletion: (profileId, zoneId, data) => {
+    console.log('🏆 Mock Zone Completion:', { profileId, zoneId, data });
+  }
+};
+
+// Mock SimpleSceneManager for testing
+const MockSimpleSceneManager = {
+  setCurrentScene: (zoneId, sceneId, completed, isReplay) => {
+    console.log('🎯 Mock Scene Set:', { zoneId, sceneId, completed, isReplay });
+  },
+  
+  clearCurrentScene: () => {
+    console.log('🧹 Mock Scene Clear');
+  }
+};
+
+// Add mocks to window for the scenes to use
+window.MockGameStateManager = MockGameStateManager;
+window.MockProgressManager = MockProgressManager; 
+window.MockSimpleSceneManager = MockSimpleSceneManager;
 
 function App() {
-  const [currentView, setCurrentView] = useState('loading');
-  const [currentZone, setCurrentZone] = useState(null);
-  const [currentScene, setCurrentScene] = useState(null);
-  const [currentProfile, setCurrentProfile] = useState(null);
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  // ✅ NEW: Get active profile ID for unlock system
-  const [activeProfileId, setActiveProfileId] = useState(null);
-  
-  // ✅ NEW: Use the unlock system
-  const {
-    isSceneUnlocked,
-    refreshUnlocks,
-    getNextScene,
-    debugUnlocks,
-    getSceneStatus
-  } = useZoneUnlocks(activeProfileId);
-  
-  console.log('🌟 Clean App rendering - current view:', currentView);
-  console.log('🎯 Current zone:', currentZone, 'Current scene:', currentScene);
-  
-  // ✅ NEW: Load active profile on app start
+  const [currentScene, setCurrentScene] = useState('assembly'); // 'assembly' or 'mountain'
+  const [currentView, setCurrentView] = useState('scene');
+  const [completionData, setCompletionData] = useState(null);
+
+  // Set up active profile for testing
   useEffect(() => {
-    const savedProfileId = localStorage.getItem('activeProfileId');
-    if (savedProfileId) {
-      setActiveProfileId(savedProfileId);
-    }
+    localStorage.setItem('activeProfileId', 'test-profile');
+    console.log('🎭 Test profile set up');
   }, []);
-  
-  // Initialize app and check for profiles/saves
-  useEffect(() => {
-    console.log('🌟 Clean App mounting, initializing...');
-    initializeApp();
-    
-    // Cleanup function
-    return () => {
-      console.log('🧹 Clean App cleanup');
-      // Clean up any persistent styles when app unmounts
-      document.body.style.cssText = '';
-      const root = document.getElementById('root');
-      if (root) root.style.cssText = '';
-    };
-  }, []);
-  
-  const initializeApp = () => {
-    try {
-      if (!GameStateManager) {
-        console.error('GameStateManager is not imported correctly');
-        setCurrentView('error');
-        return;
-      }
-      
-      console.log('🌟 GameStateManager initialized successfully');
-      
-      // Always start with main welcome screen
-      // Let CleanGameWelcomeScreen handle profile selection internally
-      console.log('🌟 Starting with main welcome');
-      setCurrentView('main-welcome');
-      
-      setIsInitialized(true);
-    } catch (error) {
-      console.error('Error initializing app:', error);
-      setCurrentView('error');
-    }
-  };
-  
-  // Clean style restoration helper
-  const restoreDefaultStyles = () => {
-    document.body.style.cssText = '';
-    const root = document.getElementById('root');
-    if (root) root.style.cssText = '';
-  };
-  
-  // Handle main welcome "New Adventure" click
-  const handleStartAdventure = () => {
-    console.log('🌟 Start Adventure clicked from main welcome');
-    restoreDefaultStyles();
-    
-    // Always go to CleanGameWelcomeScreen
-    // It will handle profile selection internally if needed
-    setCurrentView('profile-welcome');
-  };
-  
-  // Handle continuing from last save
-  const handleContinue = () => {
-    try {
-      console.log('🚀 Continuing game - clean handoff');
-      restoreDefaultStyles(); // Clean styles before navigation
-      
-      const lastLocation = GameStateManager.getLastPlayedLocation();
-      console.log('🌟 Last location:', lastLocation);
-      
-      if (lastLocation && lastLocation.zone && lastLocation.scene) {
-        setCurrentZone(lastLocation.zone);
-        setCurrentScene(lastLocation.scene);
-        setCurrentView('scene');
-      } else {
-        setCurrentView('map');
-      }
-    } catch (error) {
-      console.error('Error continuing game:', error);
-      handleNewGame();
-    }
-  };
-  
-  // Handle new game - Start with map for zone selection
-  const handleNewGame = () => {
-    console.log('🚀 Choose scene clicked - clean handoff');
-    restoreDefaultStyles(); // Clean styles before navigation
-    
-    setCurrentZone(null);
-    setCurrentScene(null);
-    setCurrentView('map');
-  };
-  
-  // Handle zone selection from map
-  const handleZoneSelect = (zoneId, sceneId = null) => {
-    console.log('🎯 Zone selected:', zoneId, sceneId ? `Scene: ${sceneId}` : 'No scene');
-    restoreDefaultStyles();
-    
-    setCurrentZone(zoneId);
-    
-    if (sceneId) {
-      // ✅ IMPROVED: Check if scene is unlocked before allowing access
-      if (isSceneUnlocked(zoneId, sceneId)) {
-        console.log('🎯 Going directly to scene:', sceneId);
-        setCurrentScene(sceneId);
-        setCurrentView('scene');
-        
-        // Save current location
-        GameStateManager.saveGameState(zoneId, sceneId, {
-          currentZone: zoneId,
-          currentScene: sceneId,
-          enteredAt: Date.now()
-        });
-      } else {
-        console.log('🔒 Scene is locked:', sceneId);
-        alert('Complete previous scenes first!');
-        setCurrentView('zone-welcome');
-      }
-    } else {
-      // Zone selected - go to zone welcome page
-      console.log('🎯 Going to zone welcome page for:', zoneId);
-      setCurrentView('zone-welcome');
-    }
-  };
-  
-  // Handle scene selection from zone welcome page
-  const handleSceneSelect = (sceneId) => {
-    console.log('🎯 Scene selected from zone welcome:', sceneId);
-    restoreDefaultStyles();
-    
-    // ✅ IMPROVED: Check if scene is unlocked
-    if (isSceneUnlocked(currentZone, sceneId)) {
-      setCurrentScene(sceneId);
-      setCurrentView('scene');
-      
-      // Save current location
-      GameStateManager.saveGameState(currentZone, sceneId, {
-        currentZone: currentZone,
-        currentScene: sceneId,
-        enteredAt: Date.now()
-      });
-    } else {
-      console.log('🔒 Scene is locked:', sceneId);
-      alert('Complete previous scenes first!');
-    }
-  };
-  
-  // ✅ UPDATED: Handle navigation with unlock checking
+
+  // Mock navigation handler
   const handleNavigate = (destination) => {
-    console.log('🎯 Navigate to:', destination);
-    restoreDefaultStyles(); // Always restore styles when navigating
+    console.log('🧭 Navigation called:', destination);
     
-    // Save current location before navigating away
-    if (currentZone && currentScene) {
-      GameStateManager.saveGameState(currentZone, currentScene, {
-        currentZone: currentZone,
-        currentScene: currentScene,
-        lastNavigated: Date.now()
-      });
-    }
-    
-    switch (destination) {
+    switch(destination) {
       case 'home':
-        setCurrentZone(null);
-        setCurrentScene(null);
-        setCurrentView('main-welcome');
+        setCurrentView('home');
         break;
       case 'zones':
-      case 'map':
-        setCurrentZone(null);
-        setCurrentScene(null);
-        setCurrentView('map');
+        setCurrentView('zones');
         break;
-      case 'zone-welcome':
-        // Go back to current zone's welcome page
-        setCurrentScene(null);
-        setCurrentView('zone-welcome');
+      case 'zone-complete':
+        setCurrentView('zone-complete');
         break;
-      case 'profile':
-        setCurrentView('profile-welcome');
+      case 'scene-complete-continue':
+        setCurrentView('next-adventure');
         break;
-        
-      // ✅ NEW: Scene navigation with unlock checking
-      case 'pond-scene':
-        if (isSceneUnlocked('symbol-mountain', 'pond')) {
-          setCurrentZone('symbol-mountain');
-          setCurrentScene('pond');
-          setCurrentView('scene');
-        } else {
-          console.log('🔒 Pond scene is locked');
-          alert('Complete previous scenes first!');
-        }
-        break;
-        
-      case 'modak-scene':
-        if (isSceneUnlocked('symbol-mountain', 'modak')) {
-          setCurrentZone('symbol-mountain');
-          setCurrentScene('modak');
-          setCurrentView('scene');
-        } else {
-          console.log('🔒 Modak scene is locked');
-          alert('Complete previous scenes first!');
-        }
-        break;
-        
-      case 'temple-scene':
-        if (isSceneUnlocked('symbol-mountain', 'temple')) {
-          setCurrentZone('symbol-mountain');
-          setCurrentScene('temple');
-          setCurrentView('scene');
-        } else {
-          console.log('🔒 Temple scene is locked');
-          alert('Complete the Modak scene first!');
-        }
-        break;
-        
-      case 'garden-scene':
-        if (isSceneUnlocked('symbol-mountain', 'garden')) {
-          setCurrentZone('symbol-mountain');
-          setCurrentScene('garden');
-          setCurrentView('scene');
-        } else {
-          console.log('🔒 Garden scene is locked');
-          alert('Complete the Temple scene first!');
-        }
-        break;
-        
-      case 'next-scene':
-        // ✅ IMPROVED: Use unlock system to find next scene
-        const nextScene = getNextScene();
-        if (nextScene) {
-          console.log('🎮 Continue adventure to:', nextScene);
-          setCurrentZone(nextScene.zoneId);
-          setCurrentScene(nextScene.sceneId);
-          setCurrentView('scene');
-        } else {
-          setCurrentView('zone-welcome');
-        }
-        break;
-        
       default:
         console.log('Unknown navigation:', destination);
-        setCurrentView('map');
     }
   };
-  
-  // ✅ UPDATED: Centralized scene completion handler
-  const handleSceneComplete = (sceneId, result) => {
-    console.log(`🎯 Scene ${sceneId} completed:`, result);
-    restoreDefaultStyles(); // Restore styles after completion
-    
-    if (!activeProfileId) {
-      console.error('❌ No active profile for scene completion');
-      return;
-    }
 
-    try {
-      // Save to GameStateManager (keep existing logic)
-      GameStateManager.saveGameState(currentZone, sceneId, {
-        completed: true,
-        stars: result.stars,
-        completedAt: Date.now()
-      });
+  // Mock completion handler
+  const handleComplete = (sceneId, data) => {
+    console.log('🎉 Scene completion called:', { sceneId, data });
+    setCompletionData(data);
+    setCurrentView('completed');
+  };
 
-      // Update zone progress (bulletproof version)
-      const progressKey = `${activeProfileId}_gameProgress`;
-      const progressData = JSON.parse(localStorage.getItem(progressKey) || '{}');
-      
-      // Initialize structure if needed
-      if (!progressData.zones) progressData.zones = {};
-      if (!progressData.zones[currentZone]) {
-        progressData.zones[currentZone] = { scenes: {} };
-      }
-      
-      // Save scene completion
-      progressData.zones[currentZone].scenes[sceneId] = {
-        completed: true,
-        stars: result.stars || 0,
-        symbols: result.symbols || {},
-        lastPlayed: Date.now(),
-        totalStars: result.totalStars || result.stars || 0
-      };
-      
-      // Recalculate totals
-      let totalStars = 0;
-      let completedScenes = 0;
-      
-      Object.values(progressData.zones).forEach(zone => {
-        if (zone.scenes) {
-          Object.values(zone.scenes).forEach(scene => {
-            totalStars += scene.stars || 0;
-            if (scene.completed) completedScenes++;
-          });
-        }
-      });
-      
-      progressData.totalStars = totalStars;
-      progressData.completedScenes = completedScenes;
-      progressData.lastPlayed = Date.now();
-      
-      // Save updated progress
-      localStorage.setItem(progressKey, JSON.stringify(progressData));
-      
-      // Update profile stats
-      const gameProfiles = JSON.parse(localStorage.getItem('gameProfiles') || '{"profiles":{}}');
-      if (gameProfiles.profiles && gameProfiles.profiles[activeProfileId]) {
-        gameProfiles.profiles[activeProfileId].totalStars = totalStars;
-        gameProfiles.profiles[activeProfileId].completedScenes = completedScenes;
-        gameProfiles.profiles[activeProfileId].lastPlayed = Date.now();
-        localStorage.setItem('gameProfiles', JSON.stringify(gameProfiles));
-      }
-      
-      console.log('✅ Scene completion saved successfully');
-      
-      // ✅ NEW: Refresh unlock calculations
-      setTimeout(() => {
-        refreshUnlocks();
-      }, 100);
-      
-    } catch (error) {
-      console.error('❌ Error saving scene completion:', error);
-    }
-    
-    // Navigate based on completion (keep existing logic)
-    if (currentZone === 'symbol-mountain') {
-      if (sceneId === 'modak') {
-        setCurrentScene(null);
-        setCurrentView('zone-welcome');
-      } else if (sceneId === 'pond') {
-        setCurrentScene(null);
-        setCurrentView('zone-welcome');
-      } else {
-        setCurrentView('zone-welcome');
-      }
-    } else {
-      setCurrentScene(null);
-      setCurrentView('zone-welcome');
-    }
+  // Scene reload handlers
+  const reloadScene3 = () => {
+    console.log('🔄 Reloading Scene 3 (Musical Tusk)');
+    // Clear only Scene 3 data
+    localStorage.removeItem('game_symbol-mountain_symbol');
+    setCurrentScene('mountain');
+    setCurrentView('scene');
+    setCompletionData(null);
+    // Force component remount
+    window.location.reload();
   };
-  
-  // Handle profile changes
-  const handleProfileChange = () => {
-    const activeProfile = GameStateManager.getCurrentProfile();
-    setCurrentProfile(activeProfile);
-    // ✅ NEW: Update activeProfileId when profile changes
-    const newProfileId = localStorage.getItem('activeProfileId');
-    setActiveProfileId(newProfileId);
-    initializeApp();
+
+  const reloadFinalScene = () => {
+    console.log('🔄 Reloading Final Scene (Sacred Assembly)');
+    // Clear only Final Scene data
+    localStorage.removeItem('game_symbol-mountain_final-scene');
+    setCurrentScene('assembly');
+    setCurrentView('scene');
+    setCompletionData(null);
+    // Force component remount
+    window.location.reload();
   };
-  
-  // Apply scene-specific styles only when rendering scenes
-  const applySceneStyles = () => {
-    document.body.className = '';
-    document.body.style.cssText = 'margin: 0; padding: 0; overflow: hidden; width: 100vw; height: 100vh;';
-    
-    const root = document.getElementById('root');
-    if (root) {
-      root.className = '';
-      root.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; margin: 0; padding: 0;';
-    }
+
+  const clearAllAndReload = () => {
+    console.log('🗑️ Clearing all data and reloading');
+    localStorage.clear();
+    window.location.reload();
   };
-  
-  // Get zone data for current zone
-  const getCurrentZoneData = () => {
-    if (!currentZone) return null;
-    return getZoneConfig(currentZone);
-  };
-  
-  // Render different views - wrapped with GameCoachProvider
-  return (
-    <GameCoachProvider defaultConfig={{
-      name: 'Ganesha',
-      image: 'images/ganesha-character.png',
-      position: 'top-right'
+
+  // Scene selector component - With individual reload buttons
+  const SceneSelector = () => (
+    <div className="scene-selector" style={{
+      position: 'fixed',
+      top: '5px',
+      left: '10px',
+      zIndex: 9999,
+      display: 'flex',
+      gap: '6px',
+      flexWrap: 'wrap',
+      maxWidth: '300px'
     }}>
-      {currentView === 'loading' && (
-        <div className="loading-screen">
-          <div className="loading-spinner">🌟 Loading magical adventure...</div>
-        </div>
-      )}
-      
-      {currentView === 'error' && (
-        <div className="error-screen">
-          <h1>Initialization Error</h1>
-          <p>Failed to load game resources. Please refresh the page.</p>
-          <button onClick={() => window.location.reload()}>Refresh</button>
-        </div>
-      )}
-      
-      {currentView === 'main-welcome' && (
-        <MainWelcomeScreen
-          onStartAdventure={handleStartAdventure}
-        />
-      )}
-      
-      {currentView === 'profile-welcome' && (
-        <CleanGameWelcomeScreen
-          onContinue={handleContinue}
-          onNewGame={handleNewGame}
-        />
-      )}
-      
-      {currentView === 'map' && (
-        <CleanMapZone 
-          onZoneSelect={handleZoneSelect}
-          currentZone={currentZone}
-          highlightedScene={currentScene}
-        />
-      )}
-      
-      {currentView === 'zone-welcome' && currentZone && (
-        <ZoneWelcome 
-          zoneData={getCurrentZoneData()}
-          onSceneSelect={handleSceneSelect}
-          onBackToMap={() => setCurrentView('map')}
-          onNavigate={handleNavigate}
-        />
-      )}
-      
-      {currentView === 'scene' && (() => {
-        console.log('🎯 Rendering scene view');
-        console.log('🎯 Zone:', currentZone, 'Scene:', currentScene);
-        
-        // Apply scene-specific styles
-        applySceneStyles();
-        
-        // Render appropriate scene based on zone and scene
-        if (currentZone === 'symbol-mountain') {
-          if (currentScene === 'modak') {
-            console.log('🎯 Rendering ModakScene');
-            return (
-              <ModakScene 
-                onNavigate={handleNavigate}
-                onComplete={handleSceneComplete}
-                onSceneSelect={handleSceneSelect}
-                zoneId={currentZone}
-                sceneId={currentScene}
-              />
-            );
-          } else if (currentScene === 'pond') {
-            console.log('🎯 Rendering PondScene');
-            return (
-              <PondScene 
-                onNavigate={handleNavigate}
-                onComplete={handleSceneComplete}
-                onSceneSelect={handleSceneSelect}
-                zoneId={currentZone}
-                sceneId={currentScene}
-              />
-            );
-          } else if (currentScene === 'temple') {
-            // Placeholder for temple scene
-            return (
-              <div className="scene-placeholder">
-                <h2>🛕 Ancient Temple</h2>
-                <p>This scene is coming soon!</p>
-                <button onClick={() => handleNavigate('zone-welcome')}>
-                  Back to Symbol Mountain
-                </button>
-              </div>
-            );
-          } else if (currentScene === 'garden') {
-            // Placeholder for garden scene
-            return (
-              <div className="scene-placeholder">
-                <h2>🌸 Sacred Garden</h2>
-                <p>This scene is coming soon!</p>
-                <button onClick={() => handleNavigate('zone-welcome')}>
-                  Back to Symbol Mountain
-                </button>
-              </div>
-            );
-          }
-        }
-        
-        // Fallback for other zones or unknown scenes
-        return (
-          <div className="scene-placeholder">
-            <h2>Scene: {currentScene} in {currentZone}</h2>
-            <p>This scene is not yet available.</p>
-            <button onClick={() => handleNavigate('zone-welcome')}>
-              Back to Zone Welcome
-            </button>
-            <button onClick={() => handleNavigate('map')}>
-              Back to Map
-            </button>
-          </div>
-        );
-      })()}
-      
-      {/* ✅ NEW: Debug Panel (remove in production) */}
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        background: 'rgba(0, 0, 0, 0.8)',
-        color: 'white',
-        padding: '10px',
-        borderRadius: '5px',
-        fontSize: '12px',
-        zIndex: 9999,
-        fontFamily: 'monospace'
-      }}>
-        <div>🔧 <strong>DEBUG PANEL</strong></div>
-        <div>Current View: {currentView}</div>
-        <div>Profile: {activeProfileId || 'None'}</div>
-        <div>Zone: {currentZone || 'None'}</div>
-        <div>Scene: {currentScene || 'None'}</div>
-        <button 
-          onClick={debugUnlocks}
+      {/* Scene 3 Buttons */}
+      <div style={{ display: 'flex', gap: '2px' }}>
+        <button
+          onClick={() => {
+            setCurrentScene('mountain');
+            setCurrentView('scene');
+            setCompletionData(null);
+          }}
           style={{
-            background: 'purple',
-            color: 'white',
-            border: 'none',
-            padding: '4px 8px',
-            borderRadius: '3px',
-            fontSize: '10px',
+            padding: '6px 10px',
+            background: currentScene === 'mountain' ? '#4CAF50' : 'rgba(255,255,255,0.9)',
+            color: currentScene === 'mountain' ? 'white' : '#333',
+            border: '1px solid #ccc',
+            borderRadius: '12px 0 0 12px',
             cursor: 'pointer',
-            marginTop: '5px'
+            fontWeight: 'bold',
+            fontSize: '11px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
           }}
         >
-          Debug Unlocks
+          🏔️ Scene 3
+        </button>
+        <button
+          onClick={reloadScene3}
+          style={{
+            padding: '6px 8px',
+            background: '#ff9800',
+            color: 'white',
+            border: '1px solid #ff9800',
+            borderRadius: '0 12px 12px 0',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '11px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+          }}
+          title="Reload Scene 3"
+        >
+          🔄
         </button>
       </div>
       
-      {/* Fallback view */}
-      {!['loading', 'error', 'main-welcome', 'profile-welcome', 'map', 'zone-welcome', 'scene'].includes(currentView) && (
-        <div className="unknown-view-error">
-          <h2>Error: Unknown view state</h2>
-          <p>Current view: {currentView}</p>
-          <button onClick={() => setCurrentView('map')}>Go to Map</button>
+      {/* Final Scene Buttons */}
+      <div style={{ display: 'flex', gap: '2px' }}>
+        <button
+          onClick={() => {
+            setCurrentScene('assembly');
+            setCurrentView('scene');
+            setCompletionData(null);
+          }}
+          style={{
+            padding: '6px 10px',
+            background: currentScene === 'assembly' ? '#4CAF50' : 'rgba(255,255,255,0.9)',
+            color: currentScene === 'assembly' ? 'white' : '#333',
+            border: '1px solid #ccc',
+            borderRadius: '12px 0 0 12px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '11px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+          }}
+        >
+          🕉️ Final
+        </button>
+        <button
+          onClick={reloadFinalScene}
+          style={{
+            padding: '6px 8px',
+            background: '#ff9800',
+            color: 'white',
+            border: '1px solid #ff9800',
+            borderRadius: '0 12px 12px 0',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '11px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+          }}
+          title="Reload Final Scene"
+        >
+          🔄
+        </button>
+      </div>
+      
+      {/* Clear All Button */}
+      <button
+        onClick={clearAllAndReload}
+        style={{
+          padding: '6px 10px',
+          background: 'rgba(244,67,54,0.9)',
+          color: 'white',
+          border: '1px solid #f44336',
+          borderRadius: '12px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          fontSize: '11px',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+        }}
+        title="Clear All Data & Reload"
+      >
+        🗑️ All
+      </button>
+    </div>
+  );
+
+  // Render current scene
+  const renderCurrentScene = () => {
+    if (currentView !== 'scene') return null;
+    
+    if (currentScene === 'assembly') {
+      return (
+        <SacredAssemblyScene
+          onComplete={handleComplete}
+          onNavigate={handleNavigate}
+          zoneId="symbol-mountain"
+          sceneId="final-scene"
+        />
+      );
+    } else {
+      return (
+        <SymbolMountainSceneV2
+          onComplete={handleComplete}
+          onNavigate={handleNavigate}
+          zoneId="symbol-mountain"
+          sceneId="symbol"
+        />
+      );
+    }
+  };
+
+  // Render different views for testing
+  const renderCurrentView = () => {
+    switch(currentView) {
+      case 'scene':
+        return renderCurrentScene();
+        
+      case 'completed':
+        return (
+          <div className="test-view" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+            textAlign: 'center',
+            padding: '20px'
+          }}>
+            <h2 style={{ fontSize: '2.5em', marginBottom: '20px' }}>🎉 Scene Completed!</h2>
+            <div style={{
+              background: 'rgba(255,255,255,0.1)',
+              padding: '20px',
+              borderRadius: '15px',
+              marginBottom: '20px',
+              maxWidth: '500px'
+            }}>
+              <p style={{ fontSize: '1.2em', marginBottom: '15px' }}>
+                <strong>{currentScene === 'assembly' ? '🕉️ Sacred Assembly' : '🏔️ Musical Tusk'}</strong> scene completed!
+              </p>
+              <pre style={{
+                background: 'rgba(0,0,0,0.3)',
+                padding: '15px',
+                borderRadius: '8px',
+                textAlign: 'left',
+                fontSize: '12px',
+                overflow: 'auto',
+                maxHeight: '200px'
+              }}>
+                {JSON.stringify(completionData, null, 2)}
+              </pre>
+            </div>
+            <button 
+              onClick={() => setCurrentView('scene')}
+              style={{
+                padding: '12px 24px',
+                background: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              🔄 Play Again
+            </button>
+          </div>
+        );
+        
+      case 'zone-complete':
+        return (
+          <div className="test-view" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            color: 'white',
+            textAlign: 'center'
+          }}>
+            <h2 style={{ fontSize: '3em' }}>🏆 Zone Completed!</h2>
+            <p style={{ fontSize: '1.5em', marginBottom: '30px' }}>
+              Congratulations! You've completed the Symbol Mountain zone!
+            </p>
+            <button 
+              onClick={() => setCurrentView('scene')}
+              style={{
+                padding: '12px 24px',
+                background: '#fff',
+                color: '#f5576c',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              🔄 Play Scene Again
+            </button>
+          </div>
+        );
+        
+      case 'home':
+        return (
+          <div className="test-view" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white'
+          }}>
+            <h2 style={{ fontSize: '2.5em' }}>🏠 Home Screen</h2>
+            <button 
+              onClick={() => setCurrentView('scene')}
+              style={{
+                padding: '12px 24px',
+                background: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              ▶️ Back to Scene
+            </button>
+          </div>
+        );
+        
+      case 'zones':
+        return (
+          <div className="test-view" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white'
+          }}>
+            <h2 style={{ fontSize: '2.5em' }}>🗺️ Zones Screen</h2>
+            <button 
+              onClick={() => setCurrentView('scene')}
+              style={{
+                padding: '12px 24px',
+                background: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              ▶️ Back to Scene
+            </button>
+          </div>
+        );
+        
+      case 'next-adventure':
+        return (
+          <div className="test-view" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+            color: '#333'
+          }}>
+            <h2 style={{ fontSize: '2.5em' }}>🚀 Next Adventure</h2>
+            <p style={{ fontSize: '1.3em', marginBottom: '30px' }}>Ready for the next zone!</p>
+            <button 
+              onClick={() => setCurrentView('scene')}
+              style={{
+                padding: '12px 24px',
+                background: '#ff6b6b',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              🔄 Play Scene Again
+            </button>
+          </div>
+        );
+        
+      default:
+        return (
+          <div className="test-view">
+            <h2>❓ Unknown View</h2>
+            <button onClick={() => setCurrentView('scene')}>
+              🏠 Back to Scene
+            </button>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="App">
+      {/* Scene Selector - Always visible */}
+      <SceneSelector />
+
+      {/* Main Content */}
+      <div className="main-content">
+        <GameCoachProvider>
+          {renderCurrentView()}
+        </GameCoachProvider>
+      </div>
+
+      {/* Debug Console Info - Minimal */}
+      {currentView === 'scene' && (
+        <div style={{
+          position: 'fixed',
+          bottom: '5px',
+          right: '5px',
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '6px',
+          fontSize: '10px',
+          zIndex: 9998
+        }}>
+          {currentScene === 'assembly' ? '🕉️ Final' : '🏔️ Scene 3'}
         </div>
       )}
-    </GameCoachProvider>
+    </div>
   );
 }
 

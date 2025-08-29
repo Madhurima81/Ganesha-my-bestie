@@ -8,14 +8,20 @@ class ProgressManager {
   static ZONE_CONFIG = {
     'symbol-mountain': {
       name: 'Symbol Mountain',
-      scenes: ['modak', 'pond', 'temple', 'garden'],
+      scenes: ['modak', 'pond', 'symbol', 'final-scene'],
       totalScenes: 4,
       order: 1
     },
     'cave-of-secrets': {
       name: 'Cave of Secrets',
-      scenes: ['crystal-cave', 'treasure-chamber'],
-      totalScenes: 2,
+      scenes: [
+      'vakratunda-mahakaya', 
+      'suryakoti-samaprabha', 
+      'nirvighnam-kurumedeva',
+      'sarvakaryeshu-sarvada',    // ✅ Scene 4
+      'mantra-assembly'           // ✅ Scene 5 (final)
+    ],    
+      totalScenes: 5,
       order: 2
     },
     'obstacle-forest': {
@@ -54,8 +60,8 @@ class ProgressManager {
   static SCENE_METADATA = {
     'modak': { name: 'Modak Forest Adventure', maxStars: 8, order: 1 },
     'pond': { name: 'Sacred Pond Discovery', maxStars: 5, order: 2 },
-    'temple': { name: 'Ancient Temple Mystery', maxStars: 6, order: 3 },
-    'garden': { name: 'Magical Garden Quest', maxStars: 7, order: 4 },
+    'symbol': { name: 'Ancient Temple Mystery', maxStars: 6, order: 3 },
+    'final-scene': { name: 'Magical Garden Quest', maxStars: 7, order: 4 },
     'crystal-cave': { name: 'Crystal Cave Exploration', maxStars: 5, order: 1 },
     'treasure-chamber': { name: 'Treasure Chamber Adventure', maxStars: 6, order: 2 }
     // Add more scene metadata as needed
@@ -247,6 +253,14 @@ class ProgressManager {
         completed: completionData.completed || true,
         stars: completionData.stars || 0,
         symbols: completionData.symbols || {},
+
+
+  // ✅ ADD THESE LINES - Save chant data for all zones
+  chants: completionData.chants || {},           // Generic chants
+  mantras: completionData.mantras || {},         // Symbol Mountain mantras
+  sanskritWords: completionData.sanskritWords || {}, // Cave Sanskrit words
+  learnedChants: completionData.learnedChants || {}, // Alternative format
+
         completedAt: timestamp,
         lastPlayed: timestamp
       };
@@ -324,6 +338,13 @@ profileProgress.zones[zoneId].scenes[sceneId] = {
   completed: completionData.completed || true,
   stars: completionData.stars || 0,
   symbols: completionData.symbols || {},
+
+    // ✅ ADD THESE LINES - Dual save for chant data
+  chants: completionData.chants || {},
+  mantras: completionData.mantras || {},
+  sanskritWords: completionData.sanskritWords || {},
+  learnedChants: completionData.learnedChants || {},
+  
   completedAt: Date.now(),
   lastPlayed: Date.now(),
   unlocked: true

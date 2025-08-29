@@ -1,0 +1,476 @@
+/* zones/symbol-mountain/scenes/symbol/SymbolMountainSceneV2.css */
+/* 🎵 Clean Musical Mountain Scene Styles - CURSOR OFFSET FIXED */
+
+/* === MAIN SCENE CONTAINER === */
+.symbol-mountain-scene-v2-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.mountain-background {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === ERROR BOUNDARY === */
+.error-boundary {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  z-index: 9999;
+  max-width: 500px;
+}
+
+.error-boundary h2 {
+  color: #d32f2f;
+  margin-bottom: 15px;
+}
+
+.error-boundary button {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+/* === LOADING STATE === */
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: #01579b;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+@keyframes clickPulse {
+  0%, 100% { 
+    opacity: 0.7;
+    transform: translateX(-50%) scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+/* === SYMBOL CONTAINERS === */
+.eyes-symbol-container {
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.ears-symbol-container {
+  position: absolute;
+  top: 30%;
+  right: 20%;
+  width: 80px;
+  height: 80px;
+  transform: translate(50%, -50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.eyes-symbol-container:hover,
+.ears-symbol-container:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  filter: brightness(1.2);
+}
+
+.ears-symbol-container:hover {
+  transform: translate(50%, -50%) scale(1.1);
+}
+
+/* Symbol completion states */
+.eyes-symbol-container.completed,
+.ears-symbol-container.completed {
+  filter: brightness(1.3) saturate(1.4);
+  animation: symbolComplete 2s infinite;
+}
+
+.ears-symbol-container.materialized {
+  animation: symbolMaterialize 2s ease-out;
+}
+
+/* === MUSICAL NOTES - FIXED CURSOR OFFSET VERSION === */
+/* ✅ REMOVED: .musical-notes-container (no longer used) */
+
+/* ✅ FIXED: Individual note positioning like ModakScene */
+.musical-note {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  user-select: none;
+  transition: all 0.5s ease;
+  z-index: 45;
+  /* ✅ NO TRANSFORMS - just positioned like ModakScene */
+}
+
+.musical-note-note1 {
+  top: 17vh;
+  left: 27vw;
+}
+
+.musical-note-note2 {
+  top: 22vh;
+  left: 47vw;
+}
+
+.musical-note-note3 {
+  top: 19vh;
+  left: 67vw;
+}
+
+/* ✅ NEW: Emoji styling exactly like ModakScene image styling */
+.musical-note-emoji {
+  width: 100%;
+  height: 100%;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  /* ✅ NO POSITIONING STYLES - let parent handle positioning */
+}
+
+/* Musical note states */
+.musical-note.gray {
+  filter: grayscale(100%) brightness(0.7);
+  opacity: 0.6;
+}
+
+.musical-note.golden {
+  filter: brightness(2) drop-shadow(0 0 25px #ffd700) drop-shadow(0 0 35px #ffeb3b);
+  animation: noteGoldenFixed 3s infinite;
+  cursor: grab;
+}
+
+.musical-note.golden:hover {
+  /* ✅ REMOVED: transform scale to prevent cursor conflicts */
+  filter: brightness(2.2) drop-shadow(0 0 30px #ffd700) drop-shadow(0 0 40px #ffeb3b);
+}
+
+.musical-note.used {
+  opacity: 0.3;
+  filter: grayscale(100%) brightness(0.5);
+  pointer-events: none;
+}
+
+.musical-note.current-note {
+  filter: brightness(1.2) drop-shadow(0 0 15px #2196f3);
+  animation: notePulseFixed 1s ease-in-out infinite;
+}
+@keyframes goldenGlow {
+  0%, 100% { 
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  }
+  50% { 
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+  }
+}
+
+
+/* ✅ FIXED: Musical note animations without transforms */
+@keyframes noteGoldenFixed {
+  0%, 100% { 
+    filter: brightness(2) drop-shadow(0 0 25px #ffd700) drop-shadow(0 0 35px #ffeb3b);
+  }
+  33% { 
+    filter: brightness(2.5) drop-shadow(0 0 35px #ffd700) drop-shadow(0 0 45px #ffeb3b);
+  }
+  66% { 
+    filter: brightness(2.2) drop-shadow(0 0 30px #ffd700) drop-shadow(0 0 40px #ffeb3b);
+  }
+}
+
+@keyframes notePulseFixed {
+  0%, 100% { 
+    filter: brightness(1.2) drop-shadow(0 0 15px #2196f3);
+  }
+  50% { 
+    filter: brightness(1.4) drop-shadow(0 0 20px #2196f3);
+  }
+}
+
+@keyframes goldenPulse {
+  0%, 100% { 
+    opacity: 0.3;
+  }
+  50% { 
+    opacity: 0.7;
+  }
+}
+
+/* ✅ REMOVED: Old conflicting animations that used transforms */
+
+/* === SYMBOL ANIMATIONS === */
+@keyframes symbolComplete {
+  0%, 100% { 
+    filter: brightness(1.3) saturate(1.4);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    filter: brightness(1.5) saturate(1.6);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+@keyframes symbolMaterialize {
+  0% { 
+    opacity: 0; 
+    transform: translate(50%, -50%) scale(0.5) rotate(-180deg); 
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: translate(50%, -50%) scale(1.2) rotate(-90deg); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translate(50%, -50%) scale(1) rotate(0deg); 
+  }
+}
+
+/* === CONFETTI ANIMATION === */
+@keyframes confettiFall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+  }
+}
+
+/* === SPARKLE CONTAINERS === */
+.sparkle-container {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* === GAME COMPONENT CONTAINERS === */
+.eyes-telescope-game-inline,
+.ears-rhythm-game-inline,
+.tusk-assembly-game-inline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+  .eyes-symbol-container,
+  .ears-symbol-container {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .musical-note {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .musical-note-note1 {
+    top: 15vh;
+    left: 25vw;
+  }
+  
+  .musical-note-note2 {
+    top: 20vh;
+    left: 45vw;
+  }
+  
+  .musical-note-note3 {
+    top: 17vh;
+    left: 65vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .eyes-symbol-container,
+  .ears-symbol-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .musical-note {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .musical-note-note1 {
+    top: 12vh;
+    left: 20vw;
+  }
+  
+  .musical-note-note2 {
+    top: 17vh;
+    left: 40vw;
+  }
+  
+  .musical-note-note3 {
+    top: 14vh;
+    left: 60vw;
+  }
+}
+
+/* === ACCESSIBILITY === */
+@media (prefers-reduced-motion: reduce) {
+  .musical-note.golden,
+  .musical-note.current-note,
+  .eyes-symbol-container.completed,
+  .ears-symbol-container.completed,
+  .ears-symbol-container.materialized {
+    animation: none;
+  }
+  
+  .musical-note.golden {
+    filter: brightness(1.5) drop-shadow(0 0 15px #ffd700);
+  }
+}
+
+/* === FOCUS STATES FOR ACCESSIBILITY === */
+.eyes-symbol-container:focus,
+.ears-symbol-container:focus {
+  outline: 3px solid #2196f3;
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+.musical-note:focus {
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* === HIGH CONTRAST MODE === */
+@media (prefers-contrast: high) {
+  .musical-note.gray {
+    filter: grayscale(100%) brightness(0.5);
+    opacity: 0.8;
+  }
+  
+  .musical-note.golden {
+    filter: brightness(1.8) drop-shadow(0 0 20px #ffd700);
+  }
+}
+
+/* === PERFORMANCE OPTIMIZATIONS === */
+.mountain-background {
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.musical-note {
+  will-change: filter, opacity;
+  backface-visibility: hidden;
+  /* ✅ REMOVED: transform from will-change to prevent conflicts */
+}
+
+.eyes-symbol-container,
+.ears-symbol-container {
+  will-change: transform, filter;
+  backface-visibility: hidden;
+}
+
+/* === DRAGGING STATES - FIXED === */
+.musical-note.dragging {
+  z-index: 1000;
+  /* ✅ REMOVED: transform scale to prevent cursor offset */
+  filter: brightness(1.3) drop-shadow(0 0 20px currentColor);
+  cursor: grabbing;
+}
+
+/* === GAME STATE OVERLAYS === */
+.game-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.game-content {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* === TRANSITION EFFECTS === */
+.scene-transition {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.scene-transition.active {
+  opacity: 1;
+}
+
+/* === Z-INDEX MANAGEMENT === */
+.mountain-background { z-index: 1; }
+.eyes-symbol-container,
+.ears-symbol-container { z-index: 10; }
+.eyes-telescope-game-inline { z-index: 15; }
+.tusk-assembly-game-inline { z-index: 20; }
+.ears-rhythm-game-inline { z-index: 25; }
+.musical-note { z-index: 45; }
+.musical-note.golden { z-index: 45; }
+.sparkle-container { z-index: 100; }
+.game-overlay { z-index: 50; }
+
+/* === PRINT STYLES === */
+@media print {
+  .symbol-mountain-scene-v2-container {
+    background: white;
+    color: black;
+  }
+  
+  .musical-note.golden {
+    filter: none;
+    background: #ffd700;
+    color: black;
+  }
+}

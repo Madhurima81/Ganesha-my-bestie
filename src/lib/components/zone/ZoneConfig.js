@@ -20,7 +20,7 @@ export const ZONE_CONFIGS = {
         description: 'Help Mooshika collect sweet modaks',
         unlocked: true,
         order: 1,  // ✅ FIRST SCENE
-        position: { top: 35, left: 25 }
+        position: { top: 25, left: 25 }
       },
       {
         id: 'pond',
@@ -29,70 +29,88 @@ export const ZONE_CONFIGS = {
         description: 'Find lotus flowers and meet the elephant',
         unlocked: false,  // Will be unlocked after modak
         order: 2,  // ✅ SECOND SCENE
-        position: { top: 65, left: 75 }
+        position: { top: 25, left: 75 }
       },
+      
       {
-        id: 'temple',
-        name: 'Ancient Temple',
-        emoji: '🛕',
-        description: 'Discover hidden symbols in the temple',
-        unlocked: false,  // ✅ Will be unlocked after pond
-        order: 3,  // ✅ THIRD SCENE
-        position: { top: 45, left: 50 }
-      },
-      {
-        id: 'garden',
-        name: 'Sacred Garden',
-        emoji: '🌸',
-        description: 'Plant and grow magical flowers',
-        unlocked: false,  // Will be unlocked after temple
-        order: 4,  // ✅ FOURTH SCENE
-        position: { top: 75, left: 30 }
-      }
+  id: 'symbol',
+  name: 'Sacred Tusk',
+  emoji: '🐘',
+  description: 'Master the musical tusk assembly',
+  unlocked: false,
+  order: 3,
+  position: { top: 25, left: 50 }
+},
+    {
+  id: 'final-scene',
+  name: 'Sacred Assembly',
+  emoji: '🕉️', 
+  description: 'Assemble all sacred symbols to awaken Ganesha',
+  unlocked: false,
+  order: 4,
+  position: { top: 75, left: 30 }
+}
     ]
   },
 
-  // ... rest of your zones remain the same
-  'cave-of-secrets': {
-    id: 'cave-of-secrets',
-    name: 'Cave of Secrets',
-    icon: '🌈',
-    background: '/images/cave-of-secrets.png',
-    description: 'Discover hidden treasures and ancient wisdom.',
-    unlocked: false,
-    totalStars: 15,
-    requiredStars: 15,
-    sequence: 4,
-    scenes: [
-      {
-        id: 'crystal-cave',
-        name: 'Crystal Cave',
-        emoji: '💎',
-        description: 'Find glowing crystals in the darkness',
-        unlocked: false,
-        order: 1,
-        position: { top: 40, left: 30 }
-      },
-      {
-        id: 'treasure-chamber',
-        name: 'Treasure Chamber',
-        emoji: '💰',
-        description: 'Unlock the ancient treasure chest',
-        unlocked: false,
-        order: 2,
-        position: { top: 60, left: 70 }
-      },
-      {
-        id: 'wisdom-hall',
-        name: 'Wisdom Hall',
-        emoji: '📜',
-        description: 'Learn ancient secrets from scrolls',
-        unlocked: false,
-        order: 3,
-        position: { top: 30, left: 60 }
-      }
-    ]
-  },
+'cave-of-secrets': {
+  id: 'cave-of-secrets',
+  name: 'Cave of Secrets',
+  icon: '🕳️',
+  background: '/images/cave-of-secrets-background.png',
+  description: 'Discover the complete Vakratunda Mahakaya mantra through mystical cave adventures.',
+  unlocked: false,
+  totalStars: 40,  // 5 scenes × 8 stars each
+  requiredStars: 12, // Unlock after completing Symbol Mountain
+  sequence: 4,
+  scenes: [
+    {
+      id: 'vakratunda-mahakaya',
+      name: 'Vakratunda Mahakaya',
+      emoji: '🐘',
+      description: 'Learn about Ganesha\'s curved trunk and mighty form',
+      unlocked: false,
+      order: 1,
+      position: { top: 25, left: 20 }
+    },
+    {
+      id: 'suryakoti-samaprabha', 
+      name: 'Surya Koti Samaprabha',
+      emoji: '☀️',
+      description: 'Awaken a million suns and discover divine brilliance',
+      unlocked: false,
+      order: 2,
+      position: { top: 35, left: 45 }
+    },
+    {
+      id: 'nirvighnam-kurumedeva',
+      name: 'Nirvighnam Kurume Deva',
+      emoji: '🛤️', 
+      description: 'Clear obstacles with divine power and build bridges',
+      unlocked: false,
+      order: 3,
+      position: { top: 60, left: 25 }
+    },
+    {
+      id: 'sarvakaryeshu-sarvada',
+      name: 'Sarvakaryeshu Sarvada',
+      emoji: '🌟',
+      description: 'Experience divine presence in all daily activities',
+      unlocked: false,
+      order: 4,
+      position: { top: 70, left: 55 }
+    },
+    {
+      id: 'mantra-assembly',
+      name: 'Sacred Mantra Assembly',
+      emoji: '🕉️',
+      description: 'Assemble the complete Vakratunda Mahakaya mantra',
+      unlocked: false,
+      order: 5,
+      position: { top: 45, left: 75 }
+    }
+  ]
+},
 
   'obstacle-forest': {
     id: 'obstacle-forest',

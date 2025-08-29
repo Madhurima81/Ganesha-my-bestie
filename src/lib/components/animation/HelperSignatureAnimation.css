@@ -1,0 +1,1000 @@
+/* HelperSignatureAnimation.css */
+/* Signature animations for all 24 helpers across 6 missions */
+
+/* ===================================
+   BASE ANIMATION CONTAINER
+   =================================== */
+
+.signature-animation-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 22;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.signature-animation-container.starting {
+  opacity: 0;
+  animation: containerStart 0.5s ease-out forwards;
+}
+
+.signature-animation-container.flowing {
+  opacity: 1;
+}
+
+.signature-animation-container.effecting {
+  opacity: 1;
+}
+
+.signature-animation-container.completing {
+  opacity: 1;
+  animation: containerComplete 0.5s ease-out forwards;
+}
+
+@keyframes containerStart {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes containerComplete {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ===================================
+   SIGNATURE PARTICLES BASE
+   =================================== */
+
+.signature-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--particle-color, #FFD700);
+  opacity: 1;
+  z-index: 23;
+  animation: particleFlow var(--animation-duration, 3000ms) ease-out forwards;
+  animation-delay: var(--animation-delay, 0ms);
+}
+
+@keyframes particleFlow {
+  0% {
+    left: var(--start-x, 20%);
+    top: var(--start-y, 20%);
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    left: var(--end-x, 50%);
+    top: var(--end-y, 50%);
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+/* ===================================
+   GRANDPARENTS MISSION PARTICLES
+   =================================== */
+
+/* Timmy Time - Golden Sand */
+.signature-particle.golden-sand {
+  background: radial-gradient(circle, #FFD700, #DAA520);
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  animation: gentleSandFlow var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes gentleSandFlow {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.3) rotate(360deg);
+  }
+}
+
+/* Clearo Lens - Blue Clarity Ripples */
+.signature-particle.blue-clarity-ripples {
+  background: radial-gradient(circle, #87CEEB, #4682B4);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(135, 206, 235, 0.6);
+  animation: clarityRipple var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes clarityRipple {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.8;
+    transform: scale(0.5);
+    border-width: 1px;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(2);
+    border-width: 3px;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(3);
+    border-width: 0px;
+  }
+}
+
+/* Memo Leaf - Floating Green Leaves */
+.signature-particle.floating-green-leaves {
+  background: linear-gradient(45deg, #90EE90, #32CD32);
+  width: 10px;
+  height: 6px;
+  border-radius: 50% 10% 50% 10%;
+  animation: leafFlutter var(--animation-duration) ease-in-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes leafFlutter {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: rotate(0deg) translateY(0px);
+  }
+  25% {
+    transform: rotate(90deg) translateY(-10px);
+  }
+  50% {
+    transform: rotate(180deg) translateY(5px);
+  }
+  75% {
+    transform: rotate(270deg) translateY(-5px);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: rotate(360deg) translateY(0px);
+  }
+}
+
+/* Snuggy Shawl - Pink Warmth Wisps */
+.signature-particle.pink-warmth-wisps {
+  background: radial-gradient(ellipse, #FFB6C1, #FF69B4);
+  width: 14px;
+  height: 8px;
+  border-radius: 50%;
+  animation: warmthWisp var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes warmthWisp {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.6;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  70% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* ===================================
+   DOG MISSION PARTICLES
+   =================================== */
+
+/* Snuggy Blanket - Purple Comfort Clouds */
+.signature-particle.purple-comfort-clouds {
+  background: radial-gradient(circle, #DDA0DD, #9370DB);
+  width: 16px;
+  height: 12px;
+  border-radius: 50%;
+  animation: comfortCloud var(--animation-duration) ease-in-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes comfortCloud {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.4;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 0.9;
+    transform: scale(1.8);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* Aqua Buddy - Blue Water Droplets */
+.signature-particle.blue-water-droplets {
+  background: radial-gradient(ellipse, #00CED1, #008B8B);
+  width: 8px;
+  height: 12px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: waterDrop var(--animation-duration) ease-in forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes waterDrop {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(1) translateY(0px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1) translateY(10px);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.6) translateY(20px);
+  }
+}
+
+/* Happy Tail - Golden Joy Sparks */
+.signature-particle.golden-joy-sparks {
+  background: radial-gradient(star, #F4A460, #DAA520);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: joySpark var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes joySpark {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 8px #F4A460;
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.5);
+    box-shadow: 0 0 16px #DAA520;
+  }
+  70% {
+    opacity: 0.7;
+    transform: scale(1.2);
+    box-shadow: 0 0 12px #F4A460;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.3);
+    box-shadow: 0 0 4px #DAA520;
+  }
+}
+
+/* Bright Torch - Yellow Light Rays */
+.signature-particle.yellow-light-rays {
+  background: linear-gradient(90deg, transparent, #FFFF00, transparent);
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  animation: lightRay var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes lightRay {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(2) rotate(360deg);
+  }
+}
+
+/* ===================================
+   CONSTRUCTION MISSION PARTICLES
+   =================================== */
+
+/* Melody Mug - Brown Music Notes */
+.signature-particle.brown-music-notes {
+  background: #8B4513;
+  width: 8px;
+  height: 12px;
+  border-radius: 50% 0 50% 0;
+  animation: musicNote var(--animation-duration) ease-in-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes musicNote {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.2);
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.2);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: rotate(360deg) scale(0.5);
+  }
+}
+
+/* Rhythmo Radio - Red Sound Waves */
+.signature-particle.red-sound-waves {
+  background: none;
+  border: 2px solid #FF6347;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  animation: soundWave var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes soundWave {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(0.2);
+    border-width: 3px;
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.5);
+    border-width: 2px;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(3);
+    border-width: 1px;
+  }
+}
+
+/* Silver Power Sparks */
+.signature-particle.silver-power-sparks {
+  background: radial-gradient(circle, #C0C0C0, #808080);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  animation: powerSpark var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes powerSpark {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 6px #C0C0C0;
+  }
+  30% {
+    opacity: 1;
+    transform: scale(2);
+    box-shadow: 0 0 12px #808080;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.2);
+    box-shadow: 0 0 3px #C0C0C0;
+  }
+}
+
+/* Orange Sun Rays */
+.signature-particle.orange-sun-rays {
+  background: linear-gradient(45deg, #FFA500, #FF8C00);
+  width: 15px;
+  height: 4px;
+  border-radius: 2px;
+  animation: sunRay var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes sunRay {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(0.5) rotate(var(--ray-angle, 0deg));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5) rotate(calc(var(--ray-angle, 0deg) + 180deg));
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(2.5) rotate(calc(var(--ray-angle, 0deg) + 360deg));
+  }
+}
+
+/* ===================================
+   MOM MISSION PARTICLES
+   =================================== */
+
+/* Pink Steam Swirls */
+.signature-particle.pink-steam-swirls {
+  background: radial-gradient(ellipse, #FF69B4, rgba(255, 105, 180, 0.4));
+  width: 12px;
+  height: 18px;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: steamSwirl var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes steamSwirl {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.8;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: rotate(180deg) scale(1.5);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: rotate(360deg) scale(0.3);
+  }
+}
+
+/* Green Energy Bubbles */
+.signature-particle.green-energy-bubbles {
+  background: radial-gradient(circle, #00FF7F, #32CD32);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 255, 127, 0.6);
+  animation: energyBubble var(--animation-duration) ease-in forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes energyBubble {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.8;
+    transform: scale(0.5) translateY(0px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.2) translateY(-30px);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+}
+
+/* Gold Giggle Stars */
+.signature-particle.gold-giggle-stars {
+  background: #FFD700;
+  width: 8px;
+  height: 8px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: giggleStar var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes giggleStar {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.3);
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.3);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: rotate(360deg) scale(0.4);
+  }
+}
+
+/* Light Green Peace */
+.signature-particle.light-green-peace {
+  background: radial-gradient(circle, #98FB98, #90EE90);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: peacefulGlow var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes peacefulGlow {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.6;
+    transform: scale(0.8);
+    box-shadow: 0 0 8px #98FB98;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+    box-shadow: 0 0 20px #90EE90;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.5);
+    box-shadow: 0 0 4px #98FB98;
+  }
+}
+
+/* ===================================
+   SIBLINGS MISSION PARTICLES
+   =================================== */
+
+/* Rainbow Confetti */
+.signature-particle.rainbow-confetti {
+  width: 6px;
+  height: 12px;
+  border-radius: 2px;
+  animation: confettiFall var(--animation-duration) ease-in forwards;
+  animation-delay: var(--animation-delay);
+}
+
+.signature-particle.rainbow-confetti:nth-child(odd) {
+  background: linear-gradient(45deg, #FF1493, #FF69B4);
+}
+
+.signature-particle.rainbow-confetti:nth-child(even) {
+  background: linear-gradient(45deg, #00CED1, #40E0D0);
+}
+
+@keyframes confettiFall {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: rotate(0deg) translateY(0px);
+  }
+  50% {
+    opacity: 1;
+    transform: rotate(180deg) translateY(20px);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: rotate(360deg) translateY(40px);
+  }
+}
+
+/* Blue Peace Bubbles */
+.signature-particle.blue-peace-bubbles {
+  background: radial-gradient(circle, #87CEFA, #4169E1);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(135, 206, 250, 0.4);
+  animation: peaceFloat var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes peaceFloat {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.7;
+    transform: scale(0.6) translateY(0px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.2) translateY(-40px);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.4) translateY(-80px);
+  }
+}
+
+/* Tan Comfort Puffs */
+.signature-particle.tan-comfort-puffs {
+  background: radial-gradient(circle, #DEB887, #D2B48C);
+  width: 16px;
+  height: 12px;
+  border-radius: 50%;
+  animation: comfortPuff var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes comfortPuff {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0.5;
+    transform: scale(0.7);
+  }
+  40% {
+    opacity: 0.9;
+    transform: scale(1.6);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(1.1);
+  }
+}
+
+/* Brown Heart Sparkles */
+.signature-particle.brown-heart-sparkles {
+  background: #CD853F;
+  width: 8px;
+  height: 7px;
+  clip-path: path('M12,21.35l-1.45-1.32C5.4,15.36,2,12.28,2,8.5 C2,5.42,4.42,3,7.5,3c1.74,0,3.41,0.81,4.5,2.09C13.09,3.81,14.76,3,16.5,3 C19.58,3,22,5.42,22,8.5c0,3.78-3.4,6.86-8.55,11.54L12,21.35z');
+  animation: heartSparkle var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes heartSparkle {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5) rotate(180deg);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.3) rotate(360deg);
+  }
+}
+
+/* ===================================
+   PARK MISSION PARTICLES
+   =================================== */
+
+/* Green Growth Spirals */
+.signature-particle.green-growth-spirals {
+  background: linear-gradient(45deg, #228B22, #32CD32);
+  width: 4px;
+  height: 15px;
+  border-radius: 2px;
+  animation: growthSpiral var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes growthSpiral {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(360deg);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(2) rotate(720deg);
+  }
+}
+
+/* Blue Clean Sparkles */
+.signature-particle.blue-clean-sparkles {
+  background: #4169E1;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: cleanSparkle var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes cleanSparkle {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 8px #4169E1;
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.5);
+    box-shadow: 0 0 16px #1E90FF;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.2);
+    box-shadow: 0 0 4px #4169E1;
+  }
+}
+
+/* Pink Flower Petals */
+.signature-particle.pink-flower-petals {
+  background: radial-gradient(ellipse, #FF69B4, #FFB6C1);
+  width: 8px;
+  height: 12px;
+  border-radius: 50% 0 50% 0;
+  animation: petalSwirl var(--animation-duration) ease-in-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes petalSwirl {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: rotate(0deg) translateY(0px);
+  }
+  25% {
+    transform: rotate(90deg) translateY(-10px);
+  }
+  50% {
+    transform: rotate(180deg) translateY(5px);
+  }
+  75% {
+    transform: rotate(270deg) translateY(-5px);
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: rotate(360deg) translateY(0px);
+  }
+}
+
+/* Gold Star Bursts */
+.signature-particle.gold-star-bursts {
+  background: #FFD700;
+  width: 10px;
+  height: 10px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: starBurst var(--animation-duration) ease-out forwards;
+  animation-delay: var(--animation-delay);
+}
+
+@keyframes starBurst {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 1;
+    transform: scale(0.5) rotate(0deg);
+    box-shadow: 0 0 10px #FFD700;
+  }
+  30% {
+    opacity: 1;
+    transform: scale(2) rotate(120deg);
+    box-shadow: 0 0 20px #FFA500;
+  }
+  70% {
+    opacity: 0.8;
+    transform: scale(1.5) rotate(240deg);
+    box-shadow: 0 0 15px #FFD700;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+    transform: scale(0.3) rotate(360deg);
+    box-shadow: 0 0 5px #FFD700;
+  }
+}
+
+/* ===================================
+   SIGNATURE EFFECTS AT TARGET
+   =================================== */
+
+.signature-effect {
+  position: absolute;
+  z-index: 24;
+  pointer-events: none;
+}
+
+.signature-effect.time-slow-glow {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent);
+  border-radius: 50%;
+  animation: timeSlowEffect 2s ease-out forwards;
+}
+
+@keyframes timeSlowEffect {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.signature-effect.screen-clarify {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(135, 206, 235, 0.4), transparent);
+  border-radius: 50%;
+  animation: clarifyEffect 2s ease-out forwards;
+}
+
+@keyframes clarifyEffect {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+/* Add more signature effects as needed... */
+
+/* ===================================
+   DEBUG MODE (Development Only)
+   =================================== */
+
+.animation-debug {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  z-index: 50;
+  max-width: 200px;
+}
+
+.animation-debug p {
+  margin: 2px 0;
+  line-height: 1.2;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+  .signature-particle {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .signature-particle.blue-clarity-ripples,
+  .signature-particle.purple-comfort-clouds,
+  .signature-particle.green-energy-bubbles {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .signature-particle.yellow-light-rays,
+  .signature-particle.orange-sun-rays {
+    width: 15px;
+    height: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .signature-particle {
+    width: 4px;
+    height: 4px;
+  }
+  
+  .signature-particle.blue-clarity-ripples,
+  .signature-particle.purple-comfort-clouds {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .signature-particle,
+  .signature-effect {
+    animation: none !important;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+  
+  .signature-animation-container.flowing .signature-particle {
+    opacity: 1;
+  }
+  
+  .signature-animation-container.completing .signature-particle {
+    opacity: 0;
+  }
+}

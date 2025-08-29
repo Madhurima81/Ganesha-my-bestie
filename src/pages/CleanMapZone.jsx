@@ -162,7 +162,7 @@ const CleanMapZone = ({ onZoneSelect, currentZone, highlightedScene }) => {
     }
   };
 
-  const isZoneUnlocked = (zone) => {
+  /*const isZoneUnlocked = (zone) => {
     // For now, keep the simple unlock logic
     if (zone.id === 'about-me-hut' || zone.id === 'story-treehouse' || zone.id === 'symbol-mountain') {
       return true;
@@ -170,7 +170,12 @@ const CleanMapZone = ({ onZoneSelect, currentZone, highlightedScene }) => {
     
     // Check if zone meets star requirements
     return overallProgress.earnedStars >= (zone.requiredStars || 0);
-  };
+  };*/
+
+  const isZoneUnlocked = (zone) => {
+  // All zones unlocked for child exploration
+  return true;
+};
 
   const getZoneStars = (zoneId) => {
     const progress = zoneProgress[zoneId];

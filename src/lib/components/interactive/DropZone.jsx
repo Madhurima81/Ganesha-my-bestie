@@ -159,7 +159,7 @@ const DropZone = ({
   const dropZoneStyle = {
     // Don't mix border and borderColor - use one or the other
     border: isOver ? '3px solid #4CAF50' : '3px solid transparent',
-    backgroundColor: isOver ? 'rgba(76, 175, 80, 0.1)' : 'transparent',
+background: isOver ? 'rgba(76, 175, 80, 0.1)' : 'transparent',
     transition: 'all 0.3s ease',
     ...style // Apply user styles after defaults
   };

@@ -1,0 +1,436 @@
+/* CleanZoneCompletionCelebration.css - Epic portal effects + Scene completion overrides */
+
+/* ===== CONTAINER ===== */
+.clean-zone-completion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* ===== PHASE 1: EPIC PORTAL EFFECTS ===== */
+
+/* Mystical Portal Background */
+.mystical-portal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255,215,0,0.2) 0%, rgba(138,43,226,0.4) 40%, rgba(25,25,112,0.8) 100%);
+  animation: portalOpenFade 3s ease-out forwards;
+}
+
+@keyframes portalOpenFade {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* Portal Ring System */
+.portal-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  height: 350px;
+  border: 6px solid rgba(255, 215, 0, 0.9);
+  border-radius: 50%;
+  animation: portalRotate 8s linear infinite;
+  box-shadow: 
+    0 0 60px rgba(255, 215, 0, 0.7),
+    inset 0 0 40px rgba(255, 215, 0, 0.3);
+  z-index: 100;
+}
+
+@keyframes portalRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.portal-inner {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border: 4px solid rgba(255, 20, 147, 0.6);
+  border-radius: 50%;
+  animation: portalRotate 6s linear infinite reverse;
+}
+
+.portal-core {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  right: 25px;
+  bottom: 25px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 215, 0, 0.4) 30%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(15px);
+}
+
+/* Divine Ganesha Center */
+.divine-ganesha-silhouette {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 140, 0, 0.7));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: ganeshaGlow 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  z-index: 10;
+}
+
+.ganesha-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+.ganesha-placeholder {
+  font-size: 3rem;
+  color: rgba(75, 0, 130, 0.8);
+}
+
+@keyframes ganeshaGlow {
+  0%, 100% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  }
+  50% { 
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 30px rgba(255, 20, 147, 1));
+  }
+}
+
+/* Cosmic Sound Waves */
+.cosmic-sound-waves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+.cosmic-sound-wave {
+  position: absolute;
+  border: 3px solid rgba(255, 215, 0, 0.6);
+  border-radius: 50%;
+  animation: cosmicSoundWaveExpand 2.5s ease-out infinite;
+}
+
+.wave-1 { animation-delay: 0s; }
+.wave-2 { animation-delay: 0.5s; }
+.wave-3 { animation-delay: 1s; }
+.wave-4 { animation-delay: 1.5s; }
+
+@keyframes cosmicSoundWaveExpand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+    border-color: rgba(255, 215, 0, 0.8);
+  }
+  50% {
+    border-color: rgba(255, 140, 0, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+    border-color: rgba(255, 215, 0, 0.2);
+  }
+}
+
+/* Orbital Symbols System */
+.orbital-symbols-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  animation: orbitalRotate 12s linear infinite;
+  pointer-events: none;
+  z-index: 8;
+}
+
+@keyframes orbitalRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.orbital-symbol {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 215, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  animation: symbolPulse 2s ease-in-out infinite;
+}
+
+@keyframes symbolPulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  }
+  50% { 
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(255, 20, 147, 0.8);
+  }
+}
+
+.orbital-symbol-image {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.orbital-symbol-placeholder {
+  font-size: 1.2rem;
+  color: rgba(255, 215, 0, 0.9);
+}
+
+/* Orbital Symbol Positions (8 symbols = 45° apart) */
+.orbital-symbol-0 { 
+  top: 0; 
+  left: 50%; 
+  transform: translateX(-50%); 
+}
+.orbital-symbol-1 { 
+  top: 15%; 
+  right: 15%; 
+  transform: translate(50%, -50%); 
+}
+.orbital-symbol-2 { 
+  top: 50%; 
+  right: 0; 
+  transform: translateY(-50%); 
+}
+.orbital-symbol-3 { 
+  bottom: 15%; 
+  right: 15%; 
+  transform: translate(50%, 50%); 
+}
+.orbital-symbol-4 { 
+  bottom: 0; 
+  left: 50%; 
+  transform: translateX(-50%); 
+}
+.orbital-symbol-5 { 
+  bottom: 15%; 
+  left: 15%; 
+  transform: translate(-50%, 50%); 
+}
+.orbital-symbol-6 { 
+  top: 50%; 
+  left: 0; 
+  transform: translateY(-50%); 
+}
+.orbital-symbol-7 { 
+  top: 15%; 
+  left: 15%; 
+  transform: translate(-50%, -50%); 
+}
+
+/* Divine Aura Rings */
+.divine-aura-rings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.aura-ring {
+  position: absolute;
+  border: 3px solid rgba(255, 215, 0, 0.4);
+  border-radius: 50%;
+  animation: auraExpand 4s ease-out infinite;
+}
+
+.ring-1 {
+  width: 160px;
+  height: 160px;
+  margin: -80px 0 0 -80px;
+  animation-delay: 0s;
+}
+
+.ring-2 {
+  width: 220px;
+  height: 220px;
+  margin: -110px 0 0 -110px;
+  animation-delay: 1s;
+}
+
+.ring-3 {
+  width: 280px;
+  height: 280px;
+  margin: -140px 0 0 -140px;
+  animation-delay: 2s;
+}
+
+.ring-4 {
+  width: 340px;
+  height: 340px;
+  margin: -170px 0 0 -170px;
+  animation-delay: 3s;
+}
+
+@keyframes auraExpand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* ===== PHASE 2: SCENE COMPLETION OVERRIDES ===== */
+
+/* Scene completion styles are imported in JSX file */
+
+/* Override button colors for zone completion */
+.continue-btn {
+  background: linear-gradient(135deg, #20B2AA, #008B8B) !important;
+  color: white !important;
+}
+
+.continue-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3) !important;
+}
+
+.replay-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+  color: #8B4513 !important;
+}
+
+.replay-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3) !important;
+}
+
+.map-btn {
+  background: linear-gradient(135deg, #1e3a5f, #2F4F4F) !important;
+  color: white !important;
+}
+
+.map-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(47, 79, 79, 0.4) !important;
+}
+
+/* Ensure proper z-index for zone completion */
+.celebration-backdrop {
+  z-index: 100 !important;
+}
+
+.celebration-card {
+  z-index: 101 !important;
+}
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+  .portal-ring {
+    width: 280px;
+    height: 280px;
+  }
+  
+  .orbital-symbols-container {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .orbital-symbol {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .orbital-symbol-image {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cosmic-sound-wave {
+    border-width: 2px;
+  }
+
+  .divine-ganesha-silhouette {
+    width: 100px;
+    height: 100px;
+  }
+
+  .ganesha-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ganesha-placeholder {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .portal-ring {
+    width: 220px;
+    height: 220px;
+  }
+  
+  .orbital-symbols-container {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .orbital-symbol {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .orbital-symbol-image {
+    width: 16px;
+    height: 16px;
+  }
+
+  .divine-ganesha-silhouette {
+    width: 80px;
+    height: 80px;
+  }
+
+  .ganesha-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .ganesha-placeholder {
+    font-size: 2rem;
+  }
+}

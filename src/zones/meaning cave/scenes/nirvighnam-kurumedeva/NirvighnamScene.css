@@ -1,0 +1,1114 @@
+/* NirvighnamScene.css - Premium Obstacle Remover Chamber Styling */
+/* Enhanced with Disney/Pixar-level polish for children's apps */
+
+/* ✅ PROVEN FOUNDATION: Keep pond container structure that makes SymbolSceneIntegration work */
+.pond-scene-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.pond-background {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+  /* ✅ CAVE THEME: Dark cave background color as fallback */
+  background-color: #1a1208;
+}
+
+/* ✅ PREMIUM DESIGN: Enhanced CSS Variables for elegant obstacle remover chamber */
+:root {
+  --cave-brown-dark: #2c1810;
+  --cave-brown-medium: #4a2c1a;
+  --cave-brown-light: #8b4513;
+  --cave-gold: #ffd700;
+  --cave-gold-dark: #daa520;
+  --cave-amber: #ffb347;
+  --cave-crystal: #e6e6fa;
+  --sanskrit-saffron: #ff9933;
+  --premium-cream: #FFF8DC;
+  --soft-gold: #DAA520;
+  --elegant-brown: rgba(139, 69, 19, 0.85);
+  --crystal-glow: 0 0 8px rgba(218, 165, 32, 0.4);
+  --fog-glow: 0 0 6px rgba(255, 255, 255, 0.3);
+  --rock-glow: 0 0 10px rgba(139, 69, 19, 0.3);
+  --bridge-glow: 0 0 12px rgba(255, 165, 0, 0.5);
+}
+
+/* 🔮 PREMIUM CRYSTAL FOG CLEARING GAME STYLES */
+.crystal-fog-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* Crystal Tools Selection Area - ENHANCED NATURAL CAVE POSITIONING */
+.crystal-tools-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+/* PREMIUM CRYSTAL POSITIONING - LARGER SIZE & ELEGANT LAYOUT */
+.crystal-anger {
+  position: absolute;
+  top: 18%;
+  left: 12%;
+  z-index: 15;
+  transition: all 0.3s ease;
+}
+
+.crystal-confusion {
+  position: absolute;
+  top: 15%;
+  left: 35%;
+  z-index: 15;
+  transition: all 0.3s ease;
+}
+
+.crystal-fear {
+  position: absolute;
+  top: 22%;
+  right: 18%;
+  z-index: 15;
+  transition: all 0.3s ease;
+}
+
+.crystal-lonely {
+  position: absolute;
+  top: 45%;
+  right: 12%;
+  z-index: 15;
+  transition: all 0.3s ease;
+}
+
+.crystal-sad {
+  position: absolute;
+  bottom: 35%;
+  left: 15%;
+  z-index: 15;
+  transition: all 0.3s ease;
+}
+
+/* PREMIUM CRYSTAL TOOL INTERACTIONS - LARGER & MORE ELEGANT */
+.crystal-tool {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
+  border: none;
+  /* LARGER SIZE FOR BETTER TOUCH TARGETS */
+  width: 85px;
+  height: 85px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.crystal-tool img {
+  /* LARGER IMAGE SIZE */
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50%;
+  transition: filter 0.3s ease;
+  filter: brightness(1.1) contrast(1.1) drop-shadow(0 2px 8px rgba(255,215,0,0.3));
+  /* PREMIUM: NO BORDERS, CLEAN LOOK */
+  border: none;
+  box-shadow: none;
+}
+
+.crystal-tool:hover {
+  transform: scale(1.15);
+  filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+.crystal-tool.selected {
+  transform: scale(1.3);
+  filter: brightness(1.4) drop-shadow(0 0 25px rgba(255, 215, 0, 0.9));
+  animation: crystalPulse 1.5s ease-in-out infinite;
+  box-shadow: 0 8px 20px rgba(255,215,0,0.3);
+}
+
+.crystal-tool:hover img {
+  filter: brightness(1.3) contrast(1.2) drop-shadow(0 2px 10px rgba(255,215,0,0.4));
+}
+
+.crystal-tool.selected img {
+  filter: brightness(1.5) contrast(1.3) drop-shadow(0 2px 12px rgba(255,215,0,0.5));
+}
+
+.crystal-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--premium-cream);
+  text-transform: capitalize;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  background: linear-gradient(135deg, var(--elegant-brown) 0%, rgba(160, 82, 45, 0.85) 100%);
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  backdrop-filter: blur(5px);
+  /* Show labels more prominently */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.crystal-tool:hover .crystal-label {
+  opacity: 1;
+}
+
+/* PREMIUM FOG ERASING AREAS - BETTER CENTERED POSITION */
+.fog-erasing-areas {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  z-index: 48;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ELEGANT FOG ERASING POSITIONING */
+.fog-erasing-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.fog-erasing-canvas {
+  position: relative;
+  background: transparent;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border: none;
+}
+
+/* PREMIUM CANVAS STYLING - ELEGANT ROUNDED BORDERS */
+.fog-erasing-canvas canvas {
+  border: 3px solid rgba(255, 215, 0, 0.4) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 4px 16px rgba(0,0,0,0.2),
+    inset 0 1px 2px rgba(255,255,255,0.1) !important;
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.05), 
+    rgba(255,255,255,0.02)) !important;
+  transition: all 0.3s ease;
+}
+
+.fog-erasing-canvas canvas:hover {
+  border-color: rgba(255, 215, 0, 0.6) !important;
+  box-shadow: 
+    0 6px 20px rgba(0,0,0,0.25),
+    0 0 20px rgba(255,215,0,0.2) !important;
+  transform: scale(1.02);
+}
+
+.fog-erasing-canvas canvas:active {
+  transform: scale(0.98);
+  box-shadow: 
+    0 2px 8px rgba(0,0,0,0.3),
+    0 0 25px rgba(255,215,0,0.3) !important;
+}
+
+/* PREMIUM INSTRUCTION TEXT - WARM CAVE COLORS INSTEAD OF HARSH BLACK-YELLOW */
+.canvas-instruction {
+  font-size: 12px;
+  color: var(--premium-cream);
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  max-width: 220px;
+  line-height: 1.3;
+  background: linear-gradient(135deg, var(--elegant-brown) 0%, rgba(160, 82, 45, 0.85) 100%);
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.erase-progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 200px;
+}
+
+.erase-progress-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(139, 69, 19, 0.4);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.erase-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(255,215,0,0.3);
+  transition: width 0.3s ease;
+}
+
+.erase-percentage {
+  font-size: 11px;
+  color: var(--premium-cream);
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, var(--elegant-brown) 0%, rgba(160, 82, 45, 0.85) 100%);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  backdrop-filter: blur(3px);
+}
+
+/* PREMIUM COMPLETED FOG AREA - CLEAN & BORDERLESS */
+.completed-fog-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.revealed-rock-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  border: none;
+
+}
+
+/* CLEAN ROCK STYLING - NO BORDERS LIKE IMAGE 4 */
+.revealed-rock-display img {
+  border: none !important;
+  /*background: transparent !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;*/
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+/* PREMIUM SUCCESS TEXT - WARM GOLD INSTEAD OF GREEN */
+.rock-blessing {
+  color: var(--soft-gold);
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: 
+    0 0 4px rgba(218, 165, 32, 0.6),
+    1px 1px 2px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, 
+    rgba(218, 165, 32, 0.1) 0%,
+    rgba(255, 215, 0, 0.1) 100%);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  animation: blessSparkle 2s ease-in-out infinite;
+}
+
+@keyframes blessSparkle {
+  0%, 100% { 
+    transform: scale(1);
+    text-shadow: 0 0 4px rgba(218, 165, 32, 0.6);
+  }
+  50% { 
+    transform: scale(1.05);
+    text-shadow: 0 0 8px rgba(218, 165, 32, 0.9);
+  }
+}
+
+@keyframes crystalPulse {
+  0%, 100% { 
+    transform: scale(1.3);
+    filter: brightness(1.4) drop-shadow(0 0 25px rgba(255, 215, 0, 0.9));
+  }
+  50% { 
+    transform: scale(1.35);
+    filter: brightness(1.5) drop-shadow(0 0 30px rgba(255, 215, 0, 1));
+  }
+}
+
+/* PREMIUM PROGRESS DISPLAY - ELEGANT BOTTOM OVERLAY */
+.crystal-fog-progress {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  height: auto;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 0, 0.7) 0%, 
+    rgba(39, 39, 39, 0.7) 100%);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  padding: 16px 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.progress-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--premium-cream);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.progress-bar-container {
+  width: 220px;
+  height: 8px;
+  background: rgba(139, 69, 19, 0.4);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 🌉 PREMIUM BRIDGE BUILDING GAME STYLES */
+.bridge-building-area {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 90%;
+  height: 85%;
+  z-index: 5;
+  background: none;
+  border: none;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Simple Gap Visual */
+.simple-gap {
+  position: relative;
+  width: 100%;
+  height: 8%;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*.gap-line {
+  width: 80%;
+  height: 4px;
+  background: linear-gradient(to right, transparent, rgba(30, 144, 255, 0.5), transparent);
+  border-radius: 2px;
+}
+
+/* PREMIUM ROCKS INVENTORY - ELEGANT BORDERLESS DESIGN */
+.bridge-rocks-inventory {
+  position: relative;
+  width: 100%;
+  height: 30%;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-rocks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+
+  border-radius: 16px;
+  padding: 20px;
+
+}
+
+.bridge-rock-inventory {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 10px;
+  border: none;
+  background: transparent;
+}
+
+.bridge-rock-inventory:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* CLEAN INVENTORY ROCK IMAGES - NO BORDERS */
+.bridge-rock-inventory img {
+  border-radius: 8px;
+  cursor: grab;
+  transition: all 0.3s ease;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+}
+
+.bridge-rock-inventory img:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.bridge-rock-inventory img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+/* PREMIUM BRIDGE CONSTRUCTION */
+.bridge-construction {
+  position: relative;
+  width: 100%;
+  height: 45%;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bridge-drop-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* NO gap - allow natural clustering */
+  background: linear-gradient(135deg, 
+    rgba(139, 69, 19, 0.15) 0%,
+    rgba(160, 82, 45, 0.15) 100%);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.bridge-progress-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--cave-gold);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.bridge-rock-placed {
+  pointer-events: none; /* Placed rocks aren't interactive */
+}
+
+/* ✅ Golden Bridge Container */
+.bridge-golden-container:hover {
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+.bridge-golden-container .drop-zone:hover {
+  border-color: #FFA500 !important;
+  background-color: rgba(255, 215, 0, 0.25) !important;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), inset 0 2px 4px rgba(255,255,255,0.3) !important;
+}
+
+/* ✅ Placed Rock Animations */
+.bridge-rock-placed {
+  animation: rockDrop 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@keyframes rockDrop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3) rotate(-45deg);
+    opacity: 0.5;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.bridge-slot {
+  transition: all 0.3s ease;
+}
+
+.bridge-slot:hover {
+  transform: scale(1.02);
+}
+
+/* ELEGANT DROP ZONE STYLING */
+.bridge-slot .drop-zone {
+  border: 2px dashed rgba(139, 69, 19, 0.3) !important;
+  background: rgba(139, 69, 19, 0.05) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+}
+
+.bridge-slot .drop-zone:hover {
+  border-color: rgba(255, 215, 0, 0.4) !important;
+  background: rgba(255, 215, 0, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(255,215,0,0.2);
+}
+
+.empty-slot {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(139, 69, 19, 0.4);
+  opacity: 0.6;
+  text-shadow: none;
+}
+
+/* CLEAN PLACED ROCKS - NO BORDERS */
+.bridge-slot img {
+  border: none !important;
+  background: transparent !important;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+/* HIDE BRIDGE COMPLETE TEXT - MORE ELEGANT SUCCESS INDICATION */
+.bridge-success,
+.success-glow {
+  display: none !important;
+}
+
+/* SUBTLE SUCCESS STATE - GENTLE GLOW INSTEAD OF TEXT */
+.bridge-complete {
+  background: radial-gradient(circle, 
+    rgba(144, 238, 144, 0.1) 0%, 
+    transparent 70%);
+  animation: gentleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes gentleGlow {
+  0% { 
+    background: radial-gradient(circle, rgba(144, 238, 144, 0.1) 0%, transparent 70%);
+  }
+  100% { 
+    background: radial-gradient(circle, rgba(144, 238, 144, 0.2) 0%, transparent 70%);
+  }
+}
+
+/* 🚪 DOOR POSITIONING - Same as proven foundation */
+
+/* Door 1 Area - Nirvighnam */
+.door1-area {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.nirvighnam-door .door-container {
+  transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.nirvighnam-door .door-container.completing {
+  opacity: 0;
+  transform: scale(0.8) translateY(-20px);
+}
+
+/* Door 2 Area - Kurume Deva */
+.door2-area {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.kurumedeva-door .door-container {
+  transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.kurumedeva-door .door-container.completing {
+  opacity: 0;
+  transform: scale(0.8) translateY(-20px);
+}
+
+/* ✅ SLEEK: Progress counter (same as pond scene) */
+.lotus-counter {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 25px;
+  padding: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 180px;
+  height: 40px;
+}
+
+.counter-progress {
+  flex: 1;
+  height: 6px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.counter-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #ff9ebd, #ff6b9d);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  box-shadow: none;
+}
+
+.counter-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.counter-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.counter-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ✅ PREMIUM: Loading state */
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: var(--cave-gold);
+  z-index: 1000;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ✅ PROVEN: Error boundary */
+.error-boundary {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  z-index: 9999;
+  max-width: 500px;
+}
+
+.error-boundary h2 {
+  color: var(--cave-brown-dark);
+  margin-bottom: 15px;
+}
+
+.error-boundary button {
+  background: var(--cave-gold);
+  color: var(--cave-brown-dark);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.error-boundary button:hover {
+  background: var(--cave-gold-dark);
+}
+
+/* ✅ PREMIUM SPARKLE EFFECTS */
+.cave-sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, var(--cave-crystal) 0%, var(--cave-gold) 100%);
+  border-radius: 50%;
+  animation: caveSparkle 2s ease-in-out infinite alternate;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+@keyframes caveSparkle {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+.crystal-sparkle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, var(--cave-crystal) 0%, var(--cave-gold) 100%);
+  border-radius: 50%;
+  animation: crystalSparkle 1.5s ease-in-out infinite alternate;
+  box-shadow: var(--crystal-glow);
+}
+
+@keyframes crystalSparkle {
+  0% { opacity: 0.5; transform: scale(0.8) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+}
+
+.bridge-sparkle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, var(--cave-amber) 0%, var(--cave-gold) 100%);
+  border-radius: 50%;
+  animation: bridgeSparkle 2s ease-in-out infinite alternate;
+  box-shadow: var(--bridge-glow);
+}
+
+@keyframes bridgeSparkle {
+  0% { opacity: 0.4; transform: scale(0.9) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1.1) rotate(360deg); }
+}
+
+/* ✅ PROVEN: Divine light effect */
+.divine-light-effect {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 200px;
+  z-index: 199;
+  pointer-events: none;
+}
+
+/* ✅ PREMIUM: Confetti animation */
+@keyframes confettiFall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+  }
+}
+
+/* ✅ PROVEN: Navigation z-index hierarchy */
+.pond-background {
+  position: relative;
+  z-index: 1;
+}
+
+.interactive-hint,
+.hint-bubble {
+  z-index: 90;
+}
+
+.scene-navigation-bar {
+  z-index: 100;
+}
+
+.popup-overlay,
+.scroll-animation-overlay,
+.celebration-overlay {
+  z-index: 1000;
+}
+
+/* ✅ PREMIUM: Enhanced rock animations */
+@keyframes rockReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-45deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes rockCollected {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(-90deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes bridgeRockPlace {
+  0% {
+    transform: scale(0.8) rotate(-10deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.bridge-slot.filled {
+  animation: bridgeRockPlace 0.8s ease-out;
+}
+
+/* ✅ PREMIUM: Progress animations */
+@keyframes progressFill {
+  0% { width: 0%; }
+  100% { width: var(--target-width); }
+}
+
+.progress-bar-fill,
+.erase-progress-fill {
+  animation: progressFill 0.8s ease-out;
+}
+
+.erase-progress-fill[style*="90EE90"] {
+  animation: completionGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes completionGlow {
+  0% { 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  100% { 
+    box-shadow: 0 0 10px rgba(144, 238, 144, 0.8);
+  }
+}
+
+/* ✅ PHASE-SPECIFIC VISIBILITY CONTROLS */
+.pond-scene-container[data-phase="door1_active"] .door1-area,
+.pond-scene-container[data-phase="door1_complete"] .door1-area {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pond-scene-container[data-phase="crystal_fog_intro"] .crystal-fog-area,
+.pond-scene-container[data-phase="crystal_fog_active"] .crystal-fog-area,
+.pond-scene-container[data-phase="crystal_fog_complete"] .crystal-fog-area,
+.pond-scene-container[data-phase="nirvighnam_learning"] .crystal-fog-area {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pond-scene-container[data-phase="door2_active"] .door2-area,
+.pond-scene-container[data-phase="door2_complete"] .door2-area {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pond-scene-container[data-phase="bridge_building_intro"] .bridge-building-area,
+.pond-scene-container[data-phase="bridge_building_active"] .bridge-building-area,
+.pond-scene-container[data-phase="bridge_building_complete"] .bridge-building-area,
+.pond-scene-container[data-phase="kurume_deva_learning"] .bridge-building-area {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ✅ PREMIUM: Emotional progress effects */
+.pond-scene-container[data-phase="crystal_fog_active"] .pond-background {
+  transition: filter 1s ease;
+}
+
+.emotion-clear-20 { filter: brightness(1.05) contrast(1.02); }
+.emotion-clear-40 { filter: brightness(1.1) contrast(1.05); }
+.emotion-clear-60 { filter: brightness(1.15) contrast(1.08); }
+.emotion-clear-80 { filter: brightness(1.2) contrast(1.1); }
+.emotion-clear-100 { filter: brightness(1.25) contrast(1.15); }
+
+/* ✅ PREMIUM: Scene transition effects */
+.door-completion-fade {
+  animation: doorFadeOut 3s ease-out forwards;
+}
+
+@keyframes doorFadeOut {
+  0% { opacity: 1; transform: scale(1); }
+  70% { opacity: 0.3; transform: scale(0.9); }
+  100% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+}
+
+.crystal-fog-complete {
+  animation: crystalFogComplete 2s ease-out;
+}
+
+@keyframes crystalFogComplete {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.3) saturate(1.2); }
+  100% { filter: brightness(1.1) saturate(1.05); }
+}
+
+/* ✅ PREMIUM: Responsive design */
+@media (max-width: 768px) {
+@media (max-width: 768px) {
+  .lotus-counter {
+    width: 160px;
+    height: 36px;
+    padding: 6px 12px;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .counter-display {
+    font-size: 13px;
+  }
+  
+  .counter-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+  .nirvighnam-door,
+  .kurumedeva-door {
+    transform: scale(0.6);
+  }
+  
+  .crystal-tool {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .crystal-tool img {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .fog-erasing-canvas {
+    padding: 8px;
+  }
+  
+  .bridge-building-area {
+    padding: 15px;
+    gap: 20px;
+  }
+  
+  .bridge-slots-container {
+    gap: 10px;
+    padding: 15px;
+  }
+}
+
+/* ✅ PREMIUM: Portrait orientation */
+@media (orientation: portrait) {
+  .door1-area,
+  .door2-area {
+    top: 15%;
+    left: 50%;
+  }
+  
+  .lotus-counter {
+    top: 5px;
+    left: 5px;
+    width: 180px;
+  }
+  
+  .crystal-fog-area {
+    top: 10%;
+    height: 85%;
+  }
+  
+  .bridge-building-area {
+    top: 15%;
+    height: 80%;
+  }
+}
+
+/* ✅ PREMIUM: Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .fog-erasing-canvas canvas {
+    touch-action: none;
+    cursor: crosshair;
+    border-width: 4px;
+  }
+  
+  .crystal-tool {
+    min-width: 85px;
+    min-height: 85px;
+    padding: 12px;
+  }
+  
+  .bridge-rock-inventory {
+    min-width: 80px;
+    min-height: 80px;
+    padding: 12px;
+  }
+}
+
+/* ✅ PREMIUM: Accessibility - high contrast mode */
+@media (prefers-contrast: high) {
+  .pond-scene-container {
+    background: #000000;
+  }
+  
+  .crystal-tool {
+    border: 3px solid #FFFFFF;
+  }
+  
+  .fog-erasing-canvas canvas {
+    border: 3px solid #FFFFFF !important;
+  }
+  
+  .bridge-rock-inventory,
+  .bridge-slot {
+    border: 3px solid #FFFFFF;
+    background: #000000;
+  }
+  
+  .progress-bar-fill,
+  .erase-progress-fill {
+    background: #FFFF00 !important;
+  }
+}
+
+/* ✅ PREMIUM: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .pond-scene-container *,
+  .crystal-sparkle,
+  .bridge-sparkle,
+  .cave-sparkle {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .crystal-tool:hover,
+  .bridge-rock-inventory:hover {
+    transform: none !important;
+    opacity: 0.8;
+  }
+}

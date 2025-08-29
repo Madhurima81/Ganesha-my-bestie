@@ -1,0 +1,517 @@
+/* Fixed Flipbook Effects - Visual Transition Only */
+
+/* Import Google Fonts for storybook feel */
+@import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap');
+
+/* Root variables for consistent theming */
+:root {
+  --flipbook-primary: #FF9933;
+  --flipbook-secondary: #FF5733;
+  --flipbook-accent: #FFC300;
+  --flipbook-light: #f5f7fa;
+  --flipbook-dark: #334d6e;
+  --flipbook-paper: #fef9e7;
+}
+
+/* FIXED: Visual overlay effects instead of content rotation */
+.page-turn-next {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-turn-prev {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-turn-up {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-turn-down {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Page Turn Overlay Effects - Creates visual impression without rotating content */
+.page-turn-next::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 195, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.1) 55%,
+    transparent 60%,
+    transparent 100%
+  );
+  z-index: 9999;
+  pointer-events: none;
+  animation: pageSwipeNext 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.page-turn-prev::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    -45deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 195, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.1) 55%,
+    transparent 60%,
+    transparent 100%
+  );
+  z-index: 9999;
+  pointer-events: none;
+  animation: pageSwipePrev 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.page-turn-up::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 195, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.1) 55%,
+    transparent 60%,
+    transparent 100%
+  );
+  z-index: 9999;
+  pointer-events: none;
+  animation: pageSwipeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.page-turn-down::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 195, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.1) 55%,
+    transparent 60%,
+    transparent 100%
+  );
+  z-index: 9999;
+  pointer-events: none;
+  animation: pageSwipeDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Page Swipe Animations - Visual effect only */
+@keyframes pageSwipeNext {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(0%);
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pageSwipePrev {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(0%);
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pageSwipeUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(0%);
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pageSwipeDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(0%);
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* Content fade during transition for smooth effect */
+.page-turn-next .main-content,
+.page-turn-prev .main-content,
+.page-turn-up .main-content,
+.page-turn-down .main-content {
+  animation: contentFade 0.8s ease-in-out;
+}
+
+@keyframes contentFade {
+  0% { opacity: 1; }
+  25% { opacity: 0.9; }
+  50% { opacity: 0.7; }
+  75% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+/* Special celebration effect - more dramatic but still no rotation */
+.scene-complete-flip::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 195, 0, 0.4) 0%,
+    rgba(255, 153, 51, 0.3) 30%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 195, 0, 0.2) 70%,
+    transparent 100%
+  );
+  z-index: 9999;
+  pointer-events: none;
+  animation: celebrationGlow 1.2s ease-in-out forwards;
+}
+
+@keyframes celebrationGlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+  70% {
+    opacity: 0.9;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Paper texture backgrounds */
+.paper-texture {
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(255, 195, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 153, 51, 0.08) 0%, transparent 50%),
+    linear-gradient(135deg, var(--flipbook-paper) 0%, #fdfbf0 100%);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    0 5px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.paper-texture::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.02) 2px,
+      rgba(0,0,0,0.02) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.01) 2px,
+      rgba(0,0,0,0.01) 4px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Book page styling */
+.book-page {
+  background: var(--flipbook-paper);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  box-shadow: 
+    0 10px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.book-page::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 2px;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
+  z-index: -1;
+  transform: translateZ(-3px);
+}
+
+/* Page corner curl effect */
+.page-corner-curl {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-corner-curl::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(-45deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+  z-index: 2;
+  transform: rotate(0deg);
+  transform-origin: bottom left;
+  transition: all 0.3s ease;
+}
+
+.page-corner-curl:hover::before {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(-45deg, transparent 45%, rgba(0,0,0,0.15) 50%, rgba(255,255,255,0.1) 55%);
+  transform: rotate(5deg);
+}
+
+/* Page glow hover effect */
+.page-glow {
+  box-shadow: 
+    0 0 20px rgba(255, 195, 0, 0.5),
+    0 0 30px rgba(255, 195, 0, 0.3),
+    0 10px 25px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Interactive elements */
+.flipbook-trigger {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.flipbook-trigger:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 15px 30px rgba(0, 0, 0, 0.2),
+    0 5px 15px rgba(255, 195, 0, 0.3);
+}
+
+.flipbook-trigger:active {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 
+    0 5px 15px rgba(0, 0, 0, 0.2),
+    0 0 10px rgba(255, 195, 0, 0.5);
+}
+
+/* Zone-specific backgrounds */
+.zone-symbol-mountain {
+  background: linear-gradient(135deg, #FFE1B3 0%, #FFC857 100%);
+}
+
+.zone-cave-secrets {
+  background: linear-gradient(135deg, #B8D4FF 0%, #7AA0FF 100%);
+}
+
+.zone-shloka-river {
+  background: linear-gradient(135deg, #B8FFEC 0%, #7AFFD4 100%);
+}
+
+.zone-festival-square {
+  background: linear-gradient(135deg, #FFB8F4 0%, #FF7AF0 100%);
+}
+
+.zone-story-treehouse {
+  background: linear-gradient(135deg, #B8FFB8 0%, #7AFFA0 100%);
+}
+
+.zone-obstacle-forest {
+  background: linear-gradient(135deg, #D4FFB8 0%, #9AFF7A 100%);
+}
+
+.zone-about-me-hut {
+  background: linear-gradient(135deg, #FFD4B8 0%, #FFA07A 100%);
+}
+
+/* Loading states */
+.flipbook-loading {
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.flipbook-ready {
+  opacity: 1;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .page-corner-curl::before {
+    width: 15px;
+    height: 15px;
+  }
+  
+  .page-corner-curl:hover::before {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .flipbook-trigger:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+/* Accessibility - Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .page-turn-next::before,
+  .page-turn-prev::before,
+  .page-turn-up::before,
+  .page-turn-down::before {
+    animation-duration: 0.3s;
+  }
+  
+  @keyframes pageSwipeNext {
+    0% { opacity: 0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+  }
+  
+  @keyframes pageSwipePrev {
+    0% { opacity: 0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+  }
+  
+  @keyframes pageSwipeUp {
+    0% { opacity: 0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+  }
+  
+  @keyframes pageSwipeDown {
+    0% { opacity: 0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+  }
+  
+  .flipbook-trigger:hover {
+    transform: none;
+  }
+  
+  .page-glow {
+    transform: none;
+  }
+}
+
+/* Subtle page turn sound indicator */
+.page-turn-next::after,
+.page-turn-prev::after,
+.page-turn-up::after,
+.page-turn-down::after {
+  content: '📖';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  z-index: 10000;
+  opacity: 0;
+  animation: pageTurnIcon 0.8s ease-in-out forwards;
+  pointer-events: none;
+}
+
+@keyframes pageTurnIcon {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

@@ -1,4 +1,4 @@
-// GameCoach.jsx - Reusable character guide for all scenes
+// GameCoach.jsx - Fixed version with all issues resolved
 import React, { useState, useEffect, useContext, createContext, useRef } from 'react';
 import './GameCoach.css';
 
@@ -10,6 +10,7 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
   const [coachVisible, setCoachVisible] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(null);
   const [messageQueue, setMessageQueue] = useState([]);
+  const [manuallyClosedMessages, setManuallyClosedMessages] = useState(new Set()); // ← FIXED: Track manual closes
   const [coachConfig, setCoachConfig] = useState(defaultConfig || {
     name: 'Mooshika',
     image: '/images/mooshika-coach.png',
@@ -27,16 +28,28 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
     visibilityState: false
   });
 
-  // Show a message
+  // 🎯 FIXED: Show a message with manual close tracking
   const showMessage = (message, options = {}) => {
-    console.log(`GameCoach: Request to show message: "${message}"`);
+    console.log(`GameCoach: Request to show message: "${message}" from source: ${options.source || 'unknown'}`);
+    
+    // Generate consistent message ID for tracking
+    const messageId = options.id || `${options.source || 'scene'}-${message.substring(0, 20)}`;
+    
+    // FIXED: Check if this message was manually closed
+    if (manuallyClosedMessages.has(messageId)) {
+      console.log(`🚫 GameCoach: Message "${message}" was manually closed, not showing again`);
+      return;
+    }
     
     const messageData = {
       text: message,
       duration: options.duration || 6000,
       priority: options.priority || 0,
       animation: options.animation || 'bounce',
-      id: Date.now()
+      source: options.source || 'scene',
+      id: messageId, // Use consistent ID for tracking
+        messageType: options.messageType || 'welcome'  // ← ADD THIS LINE
+
     };
 
     // Save debug info
@@ -48,7 +61,7 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
     clearAllTimers();
 
     if (options.immediate) {
-      console.log(`GameCoach: Showing message immediately: "${message}" for ${messageData.duration}ms`);
+      console.log(`GameCoach: Showing message immediately: "${message}" for ${messageData.duration}ms (source: ${messageData.source})`);
       setCurrentMessage(messageData);
       setCoachVisible(true);
       debugInfoRef.current.visibilityState = true;
@@ -56,7 +69,7 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
       // Set a timer for this immediate message
       scheduleMessageDismissal(messageData.duration);
     } else {
-      console.log(`GameCoach: Queueing message: "${message}"`);
+      console.log(`GameCoach: Queueing message: "${message}" (source: ${messageData.source})`);
       setMessageQueue(prev => [...prev, messageData]);
     }
   };
@@ -107,7 +120,15 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
         const sortedQueue = [...messageQueue].sort((a, b) => b.priority - a.priority);
         const nextMessage = sortedQueue[0];
         
-        console.log(`GameCoach: Processing queued message: "${nextMessage.text}" for ${nextMessage.duration}ms`);
+        // FIXED: Check if this queued message was manually closed
+        if (manuallyClosedMessages.has(nextMessage.id)) {
+          console.log(`🚫 GameCoach: Queued message "${nextMessage.text}" was manually closed, skipping`);
+          setMessageQueue(prev => prev.filter(msg => msg.id !== nextMessage.id));
+          isProcessingRef.current = false;
+          return;
+        }
+        
+        console.log(`GameCoach: Processing queued message: "${nextMessage.text}" for ${nextMessage.duration}ms (source: ${nextMessage.source})`);
         
         // Update state
         setCurrentMessage(nextMessage);
@@ -126,7 +147,7 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
     };
     
     processQueue();
-  }, [messageQueue, coachVisible]);
+  }, [messageQueue, coachVisible, manuallyClosedMessages]); // Added manuallyClosedMessages dependency
 
   // Component unmount cleanup
   useEffect(() => {
@@ -135,12 +156,134 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
     };
   }, []);
 
-  // Manual hide function
+  // 🎯 FIXED: SCREEN-AWARE CLEANUP with better navigation detection
+  useEffect(() => {
+    const handleNavigation = () => {
+      // Get current location to determine screen type
+      const currentPath = window.location.pathname + window.location.hash;
+      
+      // FIXED: More specific and accurate detection
+      const isScene = currentPath.includes('/pond') || 
+                     currentPath.includes('/modak') || 
+                     currentPath.includes('/temple') ||
+                     currentPath.includes('scene=') ||
+                     currentPath.includes('scenes/');
+      
+      const isZoneWelcome = currentPath.includes('/zone-welcome') || 
+                           currentPath.includes('symbol-mountain') ||
+                           currentPath.includes('zone=') ||
+                           currentPath.includes('zones/');
+      
+      const isMap = currentPath.includes('/map') || 
+                   currentPath === '/' || 
+                   currentPath.includes('home') ||
+                   currentPath.includes('welcome');
+      
+      console.log('🧹 GAMECOACH: Smart navigation detected', {
+        path: currentPath,
+        isScene,
+        isZoneWelcome,
+        isMap,
+        currentMessageSource: currentMessage?.source
+      });
+      
+      // FIXED: Better cleanup logic - only clear conflicting messages
+      if (currentMessage && currentMessage.source) {
+        let shouldClear = false;
+        let reason = '';
+        
+        if (isScene && currentMessage.source === 'zone') {
+          shouldClear = true;
+          reason = 'In scene, clearing zone messages';
+        } else if (isZoneWelcome && currentMessage.source === 'scene') {
+          shouldClear = true;
+          reason = 'In zone welcome, clearing scene messages';
+        } else if (isMap && (currentMessage.source === 'zone' || currentMessage.source === 'scene')) {
+          shouldClear = true;
+          reason = 'In map, clearing zone/scene messages';
+        }
+        
+        if (shouldClear) {
+          console.log(`🧹 GAMECOACH: ${reason}`);
+          gracefulHide();
+        }
+      }
+    };
+
+    // FIXED: Graceful hide function - immediate cleanup
+    const gracefulHide = () => {
+      if (coachVisible) {
+        console.log('🌅 GAMECOACH: Graceful hide initiated');
+        
+        // Immediate cleanup to prevent re-showing
+        setCoachVisible(false);
+        setCurrentMessage(null);
+        setMessageQueue([]);
+        clearAllTimers();
+        isProcessingRef.current = false;
+      }
+    };
+
+    // FIXED: Better navigation detection
+    const checkNavigation = () => {
+      setTimeout(handleNavigation, 100);
+    };
+    
+    // Listen to various navigation events
+    window.addEventListener('hashchange', checkNavigation);
+    window.addEventListener('popstate', checkNavigation);
+    
+    // Intercept programmatic navigation
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+    
+    window.history.pushState = function(...args) {
+      originalPushState.apply(window.history, args);
+      checkNavigation();
+    };
+    
+    window.history.replaceState = function(...args) {
+      originalReplaceState.apply(window.history, args);
+      checkNavigation();
+    };
+    
+    return () => {
+      window.removeEventListener('hashchange', checkNavigation);
+      window.removeEventListener('popstate', checkNavigation);
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
+    };
+  }, [coachVisible, currentMessage]);
+
+  // FIXED: Manual hide function with tracking
   const hideCoach = () => {
     console.log('GameCoach: Manual hide requested');
+    
+    // FIXED: Track that this message was manually closed
+    if (currentMessage && currentMessage.id) {
+      console.log(`🔒 GameCoach: Marking message "${currentMessage.id}" as manually closed`);
+      setManuallyClosedMessages(prev => new Set([...prev, currentMessage.id]));
+    }
+    
     setCoachVisible(false);
     debugInfoRef.current.visibilityState = false;
     clearAllTimers();
+  };
+
+  // 🛡️ ENHANCED: Add force cleanup function
+  const forceCleanup = () => {
+    console.log('🧹 GAMECOACH: Force cleanup called');
+    setCoachVisible(false);
+    setCurrentMessage(null);
+    setMessageQueue([]);
+    clearAllTimers();
+    isProcessingRef.current = false;
+  };
+
+  // FIXED: Add function to clear manual close tracking (for new zone visits)
+  const clearManualCloseTracking = () => {
+    console.log('🧹 GameCoach: Clearing manual close tracking for new zone visit');
+    setManuallyClosedMessages(new Set());
   };
 
   // Debug function to check coach state
@@ -149,6 +292,7 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
       ...debugInfoRef.current,
       currentVisibility: coachVisible,
       queueLength: messageQueue.length,
+      manuallyClosedCount: manuallyClosedMessages.size,
       activeTimers: {
         dismissTimer: dismissTimerRef.current !== null,
         safetyTimer: safetyTimerRef.current !== null
@@ -160,6 +304,8 @@ export const GameCoachProvider = ({ children, defaultConfig }) => {
     <GameCoachContext.Provider value={{ 
       showMessage, 
       hideCoach, 
+      forceCleanup,
+      clearManualCloseTracking, // ← FIXED: Add to context
       setCoachConfig,
       isVisible: coachVisible,
       debugCoach
@@ -184,26 +330,71 @@ export const useGameCoach = () => {
   return context;
 };
 
-// The actual coach component
 const GameCoach = ({ visible, message, config, onClose }) => {
-  // Don't render if coach is not visible or there's no message
-  if (!visible || !message) return null;
+  // 💖 Heart Particles Function
+  const createHeartParticles = () => {
+    const hearts = ['💖', '💝', '💕', '💗', '🌟'];
+    const container = document.querySelector('.coach-container');
+    if (!container) return;
 
-  return (
-    <div className={`game-coach ${config.position} ${visible ? 'visible' : ''}`}>
-      <div className={`coach-container ${message.animation}`}>
-        <div className="coach-character">
-          <img src={config.image} alt={config.name} />
+    for (let i = 0; i < 6; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+      heart.style.left = Math.random() * 100 + '%';
+      heart.style.animationDelay = (Math.random() * 2) + 's';
+      
+      container.appendChild(heart);
+      
+      setTimeout(() => {
+        if (heart.parentNode) heart.parentNode.removeChild(heart);
+      }, 3000);
+    }
+  };
+
+  useEffect(() => {
+  if (visible && message) {
+    // Add bounce directly to character element
+    setTimeout(() => {
+      const character = document.querySelector('.coach-character');
+      if (character) {
+        character.style.animation = 'gentleFloat 4s ease-in-out infinite, excitedBounce 0.6s ease-out';
+        
+        // Reset to normal animation after bounce
+        setTimeout(() => {
+          character.style.animation = 'gentleFloat 4s ease-in-out infinite';
+        }, 600);
+      }
+    }, 500);
+
+    // Show hearts for positive messages
+    if (message.text.includes('Amazing') || 
+        message.text.includes('Wonderful') || 
+        message.text.includes('Incredible')) {
+      setTimeout(() => createHeartParticles(), 800);
+    }
+  }
+}, [visible, message]);
+
+  if (!visible || !message) return null;
+return (
+  <div className={`game-coach ${config.position} ${visible ? 'visible' : ''}`}>
+    <div className={`coach-container ${message.animation}`}>
+      <div className="coach-character">
+        <img src={config.image} alt={config.name} />
+        {/* ✨ MOVE HEARTS HERE - inside character div */}
+        <div className="heart-particles"></div>
+      </div>
+      
+      <div className="coach-message">
+        <div className={`message-bubble ${message.messageType || 'welcome'}`}>
+          {message.text}
         </div>
-        <div className="coach-message">
-          <div className="message-bubble">
-            {message.text}
-          </div>
-          <button className="close-btn" onClick={onClose}>×</button>
-        </div>
+        <button className="close-btn" onClick={onClose}></button>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 // Pre-configured message sets
@@ -233,6 +424,13 @@ export const CoachMessages = {
     scene: "Amazing! You've completed this scene!",
     zone: "Incredible! You've mastered this entire zone!",
     game: "Congratulations! You've completed the entire game!"
+  },
+  
+  // 🎯 ZONE-SPECIFIC MESSAGES
+  ZONE_WELCOME: {
+    first_visit: (zoneName) => `Welcome to ${zoneName}! Your adventure begins here. Click on Scene 1 to start!`,
+    returning: (zoneName, completed, total) => `Welcome back to ${zoneName}! You've completed ${completed} of ${total} scenes. Keep going!`,
+    complete: (zoneName) => `Amazing! You've mastered all of ${zoneName}! You're ready for the next zone!`
   },
   
   // Added specific messages from your pond scene flow
@@ -270,124 +468,6 @@ export const ProgressCoach = ({ children, sceneId, sceneState }) => {
       isMountedRef.current = false;
     };
   }, [sceneId]);
-
-  // Welcome message - with extra reliability
-  /*useEffect(() => {
-    const showWelcomeMessage = () => {
-      if (!welcomeShownRef.current && !isVisible) {
-        welcomeShownRef.current = true;
-        
-        // Get welcome message for scene or use default
-        const welcomeMessage = CoachMessages.WELCOME[sceneId] || "Let's start this adventure!";
-        
-        console.log(`ProgressCoach: Showing welcome message for ${sceneId}: "${welcomeMessage}"`);
-        
-        showMessage(welcomeMessage, {
-          duration: 5000, // 5 seconds for welcome messages
-          priority: 5,
-          animation: 'bounceIn'
-        });
-        
-        if (isMountedRef.current) {
-          setShownMessages(prev => ({ ...prev, welcome: true }));
-        }
-      }
-    };
-    
-    // Small delay to ensure scene is fully loaded
-    const welcomeTimer = setTimeout(showWelcomeMessage, 500);
-    
-    return () => clearTimeout(welcomeTimer);
-  }, [sceneId, showMessage, isVisible]);*/
-
-  // Progress-based messages
-  /*useEffect(() => {
-    if (!sceneState?.progress) return;
-    
-    const progress = sceneState.progress?.percentage || 0;
-    
-    // Only show progress messages if coach is not currently visible
-    // And only if we haven't shown this progress message before
-    if (progress >= 25 && progress < 50 && !shownMessages.quarter && !isVisible) {
-      showMessage(CoachMessages.ENCOURAGEMENT[0], {
-        duration: 3000,
-        priority: 3
-      });
-      
-      if (isMountedRef.current) {
-        setShownMessages(prev => ({ ...prev, quarter: true }));
-      }
-    }
-    
-    if (progress >= 50 && progress < 75 && !shownMessages.half && !isVisible) {
-      showMessage(CoachMessages.ENCOURAGEMENT[1], {
-        duration: 3000,
-        priority: 3
-      });
-      
-      if (isMountedRef.current) {
-        setShownMessages(prev => ({ ...prev, half: true }));
-      }
-    }
-    
-    if (progress >= 75 && progress < 100 && !shownMessages.threeQuarter && !isVisible) {
-      showMessage(CoachMessages.HINTS.almostDone, {
-        duration: 3000,
-        priority: 3
-      });
-      
-      if (isMountedRef.current) {
-        setShownMessages(prev => ({ ...prev, threeQuarter: true }));
-      }
-    }
-    
-    if (progress === 100 && !shownMessages.complete) {
-      showMessage(CoachMessages.COMPLETION.scene, { 
-        duration: 5000,
-        priority: 10,
-        immediate: true  // Immediate display for completion
-      });
-      
-      if (isMountedRef.current) {
-        setShownMessages(prev => ({ ...prev, complete: true }));
-      }
-    }
-  }, [sceneState?.progress, shownMessages, showMessage, isVisible]);*/
-
-  // Idle timer with improved cleanup - 30 seconds as mentioned in your flow
-  /*useEffect(() => {
-  let idleTimer;
-  
-  const resetTimer = () => {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-      // Only show hint if user is actually stuck
-      if (
-        (sceneState.lotusStates && sceneState.lotusStates.some(state => state === 0)) || 
-        (sceneState.goldenLotusVisible && !sceneState.interactions?.['golden-lotus']) ||
-        (sceneState.elephantVisible && !sceneState.waterVisible)
-      ) {
-        showMessage(CoachMessages.HINTS.stuck);
-      }
-    }, 60000); // Increased from 30000 to 60000 (1 minute)
-  };
-    
-    // Add event listeners
-    window.addEventListener('click', resetTimer);
-    window.addEventListener('touchstart', resetTimer);
-    window.addEventListener('mousemove', resetTimer);
-    
-    // Start the timer
-    resetTimer();
-    
-    // Cleanup
-    return () => {
-      clearTimeout(idleTimer);
-      window.removeEventListener('click', resetTimer);
-      window.removeEventListener('touchstart', resetTimer);
-      window.removeEventListener('mousemove', resetTimer);
-    };
-  }, [showMessage, isVisible]);*/
 
   // Debug mechanism
   useEffect(() => {
@@ -436,6 +516,7 @@ export const TriggerCoach = ({ message, condition, once = true, options = {} }) 
       const messageOptions = { 
         duration: 3000,
         priority: 4,
+        source: 'scene', // Default to scene source
         ...options
       };
       

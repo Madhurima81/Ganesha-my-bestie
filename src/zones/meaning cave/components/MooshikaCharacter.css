@@ -1,0 +1,219 @@
+/* MooshikaCharacter.css - Mooshika character animations and styling */
+
+.mooshika-container {
+  position: relative;
+  pointer-events: none;
+}
+
+/* === CHARACTER STATES === */
+.mooshika-character {
+  position: relative;
+  /* border-radius: 50%; ← REMOVED */
+  transition: all 0.2s ease-out;
+}
+
+.mooshika-character.happy {
+  animation: happyBounce 1s ease-in-out infinite;
+}
+
+.mooshika-character.concerned {
+  animation: concernedWiggle 0.8s ease-in-out infinite;
+}
+
+.mooshika-character.tracing {
+  animation: tracingMove 0.5s ease-in-out infinite;
+}
+
+.mooshika-character.idle {
+  animation: idleBreathe 2s ease-in-out infinite;
+}
+
+/* === CHARACTER ANIMATIONS === */
+@keyframes happyBounce {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes concernedWiggle {
+  0%, 100% { 
+    transform: translate(-50%, -50%) rotate(-2deg);
+  }
+  50% { 
+    transform: translate(-50%, -50%) rotate(2deg);
+  }
+}
+
+@keyframes tracingMove {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+@keyframes idleBreathe {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+}
+
+/* === TRAIL EFFECTS === */
+.mooshika-trail {
+  border-radius: 50%;
+  pointer-events: none;
+  transition: opacity 0.3s ease-out;
+}
+
+.mooshika-trail.trail-good {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, rgba(255, 215, 0, 0.3) 70%, transparent 100%);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+.mooshika-trail.trail-offpath {
+  background: radial-gradient(circle, rgba(255, 165, 0, 0.6) 0%, rgba(255, 165, 0, 0.2) 70%, transparent 100%);
+  box-shadow: 0 0 6px rgba(255, 165, 0, 0.4);
+}
+
+/* === QUALITY INDICATORS === */
+.quality-sparkle {
+  position: absolute;
+  top: -15px;
+  right: -10px;
+  font-size: 16px;
+  animation: sparkleFloat 1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.quality-warning {
+  position: absolute;
+  top: -15px;
+  right: -10px;
+  font-size: 16px;
+  animation: warningPulse 0.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sparkleFloat {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateY(-5px) rotate(180deg);
+    opacity: 0.7;
+  }
+}
+
+@keyframes warningPulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* === SPEECH BUBBLES === */
+.mooshika-speech {
+  pointer-events: none;
+  z-index: 25;
+}
+
+.speech-bubble {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #8B4513;
+  border-radius: 15px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  white-space: nowrap;
+  animation: bubbleBounce 0.3s ease-out;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #8B4513;
+}
+
+.speech-bubble.good {
+  color: #2E8B57;
+  border-color: #2E8B57;
+}
+
+.speech-bubble.good::after {
+  border-top-color: #2E8B57;
+}
+
+.speech-bubble.offpath {
+  color: #FF8C00;
+  border-color: #FF8C00;
+}
+
+.speech-bubble.offpath::after {
+  border-top-color: #FF8C00;
+}
+
+@keyframes bubbleBounce {
+  0% { 
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+  .speech-bubble {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  
+  .quality-sparkle,
+  .quality-warning {
+    font-size: 14px;
+  }
+}
+
+/* === PERFORMANCE OPTIMIZATIONS === */
+.mooshika-character,
+.mooshika-trail,
+.quality-sparkle,
+.quality-warning {
+  will-change: transform, opacity;
+}
+
+/* Force hardware acceleration */
+.mooshika-character {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* === HOVER EFFECTS (for desktop) === */
+@media (hover: hover) {
+  .mooshika-character:hover {
+    transform: translate(-50%, -50%) scale(1.1) !important;
+    transition: transform 0.2s ease-out;
+  }
+}

@@ -1,0 +1,919 @@
+/* MusicalMountainScene.css - Musical Discovery, Rhythm & Assembly */
+
+/* Define CSS variables */
+:root {
+  /* Spacing variables */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  /* Font sizes */
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  
+  /* Musical Mountain theme colors */
+  --eyes-blue: #4a90e2;
+  --ears-orange: #ff8c00;
+  --tusk-gold: #DAA520;
+  --divine-gold: #ffd700;
+  --sacred-light: #fff8e1;
+  --musical-purple: #8e24aa;
+  --rhythm-green: #4caf50;
+  --assembly-amber: #ff8f00;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  
+  /* Transitions */
+  --transition-fast: 0.2s;
+  --transition-medium: 0.3s;
+  --transition-slow: 0.5s;
+}
+
+/* ================================
+   MAIN CONTAINER STYLES
+   ================================ */
+.symbol-mountain-scene-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: relative;
+}
+
+.mountain-background {
+  width: 100% !important;
+  height: 100vh !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* ================================
+   MAIN SYMBOL CONTAINERS
+   ================================ */
+
+/* 👁️ EYES SYMBOL - Musical Discovery */
+.eyes-symbol-container {
+  position: absolute;
+  top: 25%;
+  left: 20%;
+  width: 80px;
+  height: 60px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  transform-origin: center center;
+}
+
+.eyes-symbol-container:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 15px var(--eyes-blue));
+}
+
+.eyes-symbol-container.active {
+  animation: symbolPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px var(--eyes-blue));
+}
+
+.eyes-symbol-container.completed {
+  filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 25px var(--divine-gold));
+  animation: completedGlow 3s ease-in-out infinite;
+}
+
+/* 👂 EARS SYMBOL - Musical Rhythm */
+.ears-symbol-container {
+  position: absolute;
+  top: 35%;
+  right: 15%;
+  width: 100px;
+  height: 80px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  transform-origin: center center;
+}
+
+.ears-symbol-container:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 15px var(--ears-orange));
+}
+
+.ears-symbol-container.active {
+  animation: symbolPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px var(--ears-orange));
+}
+
+.ears-symbol-container.completed {
+  filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 25px var(--divine-gold));
+  animation: completedGlow 3s ease-in-out infinite;
+}
+
+.ears-symbol-container.materialized {
+  animation: symbolMaterialize 2s ease-out;
+}
+
+/* ================================
+   TELESCOPE STYLES
+   ================================ */
+.telescope-container {
+  filter: drop-shadow(0 0 15px #ffd700);
+  transition: all 0.3s ease;
+  cursor: grab;
+}
+
+.telescope-container:hover {
+  filter: drop-shadow(0 0 20px #ffd700) drop-shadow(0 0 35px rgba(255, 215, 0, 0.8));
+}
+
+.telescope-container.dragging {
+  filter: drop-shadow(0 0 30px #ffd700) 
+          drop-shadow(0 0 40px rgba(255, 215, 0, 0.8))
+          drop-shadow(0 0 50px rgba(255, 140, 0, 0.6))
+          brightness(1.2);
+  
+  animation: divineTelescopePulse 1s ease-in-out infinite;
+  cursor: grabbing;
+}
+
+.telescope-container img {
+  filter: none !important;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* ================================
+   MUSICAL INSTRUMENTS STYLES
+   ================================ */
+.discovered-instruments-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+}
+
+.discovered-instrument {
+  transition: all 0.5s ease;
+  transform-origin: center center;
+}
+
+.discovered-instrument.discovered {
+  animation: instrumentGlow 2s infinite;
+}
+
+.discovered-instrument.rhythm-available {
+  animation: rhythmPulse 1s ease-in-out infinite;
+  transform: translate(-50%, -50%) scale(1.2) !important;
+  border: 3px solid #ffd700;
+  border-radius: 50%;
+}
+
+.discovered-instrument.rhythm-available:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  filter: brightness(1.2) drop-shadow(0 0 15px #ffd700);
+}
+
+.discovered-instrument.rhythm-playing {
+  animation: instrumentPlay 0.8s ease;
+  transform: translate(-50%, -50%) scale(1.4) !important;
+  border: 4px solid #00ff00;
+  border-radius: 50%;
+  box-shadow: 0 0 30px #00ff00;
+}
+
+
+.play-sequence-btn:hover {
+  transform: translateX(-50%) translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(33,150,243,0.6) !important;
+}
+
+.play-sequence-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(50%);
+}
+
+/* ================================
+   MUSICAL NOTES STYLES
+   ================================ */
+.musical-notes-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+}
+
+.musical-note {
+  transition: all 0.5s ease;
+  user-select: none;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.musical-note.gray {
+  filter: grayscale(100%) brightness(0.6);
+}
+
+.musical-note.golden {
+  filter: brightness(1.5) drop-shadow(0 0 15px #ffd700);
+  animation: noteGolden 2s infinite;
+  cursor: grab;
+}
+
+.musical-note.used {
+  opacity: 0.3;
+  filter: grayscale(100%);
+  pointer-events: none;
+}
+
+.musical-note.current-note {
+  animation: notePulse 1s ease-in-out infinite;
+}
+
+/* ================================
+   RHYTHM GAME STYLES
+   ================================ */
+.rhythm-sequence-display {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 40;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+.rhythm-sequence-display > div:first-child {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.rhythm-sequence-display > div:last-child {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* ================================
+   ASSEMBLY GAME STYLES
+   ================================ */
+.ganesha-outline {
+  border: 3px dashed #ffd700;
+  border-radius: 10px;
+  transition: opacity 1s ease;
+  z-index: 10;
+}
+
+.ganesha-outline > div {
+  color: #ffd700;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tusk-outline {
+  border: 3px dashed #daa520;
+  border-radius: 5px;
+  transition: opacity 1s ease;
+  z-index: 15;
+}
+
+.tusk-outline > div {
+  color: #daa520;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.floating-tusk {
+  z-index: 35;
+  animation: floatToGanesha 3s ease-in-out forwards;
+}
+
+.complete-ganesha {
+  z-index: 40;
+  animation: ganeshaAssembled 2s ease-out;
+}
+
+/* ================================
+   COUNTER DISPLAYS
+   ================================ */
+.instruments-found-counter {
+  background: rgba(255, 215, 0, 0.9);
+  color: #333;
+  border-radius: 20px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 50;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+/* ================================
+   ANIMATIONS
+   ================================ */
+@keyframes symbolPulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes completedGlow {
+  0%, 100% { 
+    filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 25px var(--divine-gold));
+  }
+  50% { 
+    filter: brightness(1.4) saturate(1.5) drop-shadow(0 0 35px var(--divine-gold));
+  }
+}
+
+@keyframes symbolMaterialize {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.5) rotate(-180deg); 
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.2) rotate(-90deg); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) rotate(0deg); 
+  }
+}
+
+@keyframes divineTelescopePulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 30px #ffd700) 
+            drop-shadow(0 0 40px rgba(255, 215, 0, 0.8))
+            brightness(1.2);
+  }
+  50% { 
+    filter: drop-shadow(0 0 40px #ffd700) 
+            drop-shadow(0 0 50px rgba(255, 215, 0, 1))
+            drop-shadow(0 0 60px rgba(255, 140, 0, 0.8))
+            brightness(1.4);
+  }
+}
+
+@keyframes instrumentGlow {
+  0%, 100% { 
+    filter: brightness(1);
+  }
+  50% { 
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes rhythmPulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1.1);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.1);
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes instrumentPlay {
+  0% { 
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1.1);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.2);
+    filter: brightness(1.4);
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes noteGolden {
+  0%, 100% { 
+    filter: brightness(1.5) drop-shadow(0 0 15px #ffd700);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    filter: brightness(2) drop-shadow(0 0 25px #ffd700);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes notePulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@keyframes floatToGanesha {
+  0% { 
+    transform: translate(-50%, -50%); 
+  }
+  100% { 
+    transform: translate(-50%, -300%); 
+    opacity: 0;
+  }
+}
+
+@keyframes ganeshaAssembled {
+  0% { 
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% { 
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ================================
+   CONFETTI ANIMATION
+   ================================ */
+@keyframes confettiFall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+  }
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+@media (max-width: 768px) {
+  .eyes-symbol-container {
+    width: 60px;
+    height: 45px;
+    top: 20%;
+    left: 15%;
+  }
+  
+  .ears-symbol-container {
+    width: 75px;
+    height: 60px;
+    top: 30%;
+    right: 10%;
+  }
+  
+  .instruments-found-counter {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  
+  .musical-note {
+    font-size: 32px;
+  }
+  
+  .rhythm-sequence-display {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .eyes-symbol-container {
+    width: 50px;
+    height: 35px;
+  }
+  
+  .ears-symbol-container {
+    width: 60px;
+    height: 50px;
+  }
+  
+  .instruments-found-counter {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .musical-note {
+    font-size: 28px;
+  }
+  
+  .rhythm-sequence-display {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+  
+  .discovered-instrument {
+    max-width: 60px;
+    max-height: 60px;
+  }
+}
+
+/* ================================
+   PORTRAIT ORIENTATION
+   ================================ */
+@media (orientation: portrait) {
+  .eyes-symbol-container {
+    top: 15%;
+    left: 10%;
+  }
+  
+  .ears-symbol-container {
+    top: 25%;
+    right: 5%;
+  }
+  
+  .instruments-found-counter {
+    top: 50px;
+  }
+  
+  .rhythm-sequence-display {
+    top: 100px;
+  }
+}
+
+/* ================================
+   ACCESSIBILITY IMPROVEMENTS
+   ================================ */
+.eyes-symbol-container:focus,
+.ears-symbol-container:focus {
+  outline: 3px solid var(--divine-gold);
+  outline-offset: 2px;
+}
+
+.discovered-instrument.rhythm-available:focus {
+  outline: 2px solid var(--rhythm-green);
+  outline-offset: 2px;
+}
+
+/* ================================
+   HIGH CONTRAST MODE SUPPORT
+   ================================ */
+@media (prefers-contrast: high) {
+  .eyes-symbol-container,
+  .ears-symbol-container {
+    border: 2px solid currentColor;
+  }
+  
+  .instruments-found-counter,
+  .rhythm-sequence-display {
+    border: 2px solid #333;
+  }
+  
+  .ganesha-outline,
+  .tusk-outline {
+    border-width: 4px;
+  }
+}
+
+/* ================================
+   REDUCED MOTION SUPPORT
+   ================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .symbolPulse,
+  .completedGlow,
+  .divineTelescopePulse,
+  .instrumentGlow,
+  .rhythmPulse,
+  .noteGolden,
+  .notePulse {
+    animation: none;
+  }
+}
+
+/* ================================
+   ERROR BOUNDARY STYLES
+   ================================ */
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
+}
+
+.error-boundary h2 {
+  color: #dc3545;
+  margin-bottom: 20px;
+}
+
+.error-boundary details {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 600px;
+}
+
+.error-boundary button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.error-boundary button:hover {
+  background-color: #0056b3;
+}
+
+/* ================================
+   NEW CSS FOR RHYTHM GAME FEEDBACK
+   ================================ */
+
+/* ✅ CORRECT CLICK FEEDBACK */
+.discovered-instrument.correct-click {
+  animation: correctClick 0.3s ease !important;
+  filter: brightness(1.5) drop-shadow(0 0 15px #4caf50) !important;
+  transform: translate(-50%, -50%) scale(1.2) !important;
+}
+
+/* ❌ WRONG CLICK FEEDBACK */
+.discovered-instrument.wrong-click {
+  animation: wrongClick 0.5s ease !important;
+  filter: brightness(1.5) drop-shadow(0 0 15px #f44336) !important;
+}
+
+/* 🔄 RHYTHM PLAYING FEEDBACK - Enhanced */
+.discovered-instrument.rhythm-playing {
+  animation: instrumentPlay 0.6s ease !important;
+  filter: brightness(2) drop-shadow(0 0 30px #ffd700) !important;
+  transform: translate(-50%, -50%) scale(1.3) !important;
+}
+
+/* ================================
+   RHYTHM GAME ANIMATIONS
+   ================================ */
+
+/* ✅ Correct click animation */
+@keyframes correctClick {
+  0% { 
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1.2);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.3);
+    filter: brightness(1.8) drop-shadow(0 0 20px #4caf50);
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1.1);
+    filter: brightness(1.5) drop-shadow(0 0 15px #4caf50);
+  }
+}
+
+/* ❌ Wrong click animation (shake effect) */
+@keyframes wrongClick {
+  0%, 100% { 
+    transform: translate(-50%, -50%) translateX(0);
+    filter: brightness(1.2);
+  }
+  15% { 
+    transform: translate(-50%, -50%) translateX(-8px);
+    filter: brightness(1.5) drop-shadow(0 0 15px #f44336);
+  }
+  30% { 
+    transform: translate(-50%, -50%) translateX(8px);
+    filter: brightness(1.5) drop-shadow(0 0 15px #f44336);
+  }
+  45% { 
+    transform: translate(-50%, -50%) translateX(-5px);
+    filter: brightness(1.5) drop-shadow(0 0 15px #f44336);
+  }
+  60% { 
+    transform: translate(-50%, -50%) translateX(5px);
+    filter: brightness(1.5) drop-shadow(0 0 15px #f44336);
+  }
+  75% { 
+    transform: translate(-50%, -50%) translateX(-2px);
+    filter: brightness(1.3) drop-shadow(0 0 10px #f44336);
+  }
+  90% { 
+    transform: translate(-50%, -50%) translateX(2px);
+    filter: brightness(1.3) drop-shadow(0 0 10px #f44336);
+  }
+}
+
+/* 🎵 Enhanced instrument play animation */
+@keyframes instrumentPlay {
+  0% { 
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1.2);
+  }
+  25% { 
+    transform: translate(-50%, -50%) scale(1.1);
+    filter: brightness(1.6) drop-shadow(0 0 20px #ffd700);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.4);
+    filter: brightness(2.2) drop-shadow(0 0 35px #ffd700) drop-shadow(0 0 50px #ff8c00);
+  }
+  75% { 
+    transform: translate(-50%, -50%) scale(1.2);
+    filter: brightness(1.8) drop-shadow(0 0 25px #ffd700);
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1.2) drop-shadow(0 0 10px #ffd700);
+  }
+}
+
+/* ================================
+   RHYTHM SEQUENCE DISPLAY ENHANCEMENTS
+   ================================ */
+
+/* Enhanced rhythm display styling */
+.rhythm-sequence-display {
+  font-family: 'Comic Sans MS', cursive;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+/* Sequence item indicators */
+.rhythm-sequence-display .sequence-item {
+  transition: all 0.3s ease;
+}
+
+.rhythm-sequence-display .sequence-item.correct {
+  border-color: #4caf50;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.rhythm-sequence-display .sequence-item.wrong {
+  border-color: #f44336;
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+  animation: sequenceWrong 0.3s ease;
+}
+
+.rhythm-sequence-display .sequence-item.pending {
+  border-color: #333;
+  opacity: 0.6;
+}
+
+/* Sequence wrong animation */
+@keyframes sequenceWrong {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.9); }
+}
+
+/* ================================
+   PHASE-SPECIFIC STYLING
+   ================================ */
+
+/* Playing phase - pulse effect on display */
+.rhythm-sequence-display.phase-playing {
+  animation: displayPulse 2s ease-in-out infinite;
+}
+
+/* Input phase - ready glow */
+.rhythm-sequence-display.phase-inputting {
+  border-color: #4caf50;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+/* Wrong phase - error state */
+.rhythm-sequence-display.phase-wrong {
+  border-color: #f44336;
+  box-shadow: 0 0 20px rgba(244, 67, 54, 0.3);
+  animation: displayShake 0.5s ease;
+}
+
+/* Correct phase - success state */
+.rhythm-sequence-display.phase-correct {
+  border-color: #4caf50;
+  box-shadow: 0 0 25px rgba(76, 175, 80, 0.5);
+  animation: displaySuccess 0.8s ease;
+}
+
+/* ================================
+   PHASE ANIMATIONS
+   ================================ */
+
+@keyframes displayPulse {
+  0%, 100% { 
+    border-color: rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  50% { 
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+}
+
+@keyframes displayShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@keyframes displaySuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* ================================
+   INSTRUMENT AVAILABILITY STATES
+   ================================ */
+
+/* Not player turn - dimmed instruments */
+.discovered-instrument.rhythm-available:not(.player-turn) {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: grayscale(50%);
+}
+
+/* Player turn - enhanced availability */
+.discovered-instrument.rhythm-available.player-turn {
+  opacity: 1;
+  cursor: pointer;
+  filter: brightness(1.2) drop-shadow(0 0 10px #ffd700);
+}
+
+.discovered-instrument.rhythm-available.player-turn:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  filter: brightness(1.4) drop-shadow(0 0 15px #ffd700);
+}
+
+/* ================================
+   RESPONSIVE ENHANCEMENTS
+   ================================ */
+
+@media (max-width: 768px) {
+  .rhythm-sequence-display {
+    padding: 12px 20px;
+    top: 100px;
+  }
+  
+  .rhythm-sequence-display .sequence-item {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .discovered-instrument.correct-click,
+  .discovered-instrument.wrong-click,
+  .discovered-instrument.rhythm-playing {
+    animation-duration: 0.4s;
+  }
+}
+
+@media (max-width: 480px) {
+  .rhythm-sequence-display {
+    padding: 10px 15px;
+    top: 80px;
+    font-size: 14px;
+  }
+  
+  .rhythm-sequence-display .sequence-item {
+    width: 25px;
+    height: 25px;
+  }
+}
+/* ================================
+   Z-INDEX HIERARCHY
+   ================================ */
+.mountain-background { z-index: 1; }
+.discovered-instruments-container { z-index: 15; }
+.musical-notes-container { z-index: 20; }
+.telescope-container { z-index: 20; }
+.ganesha-outline { z-index: 10; }
+.tusk-outline { z-index: 15; }
+.floating-tusk { z-index: 35; }
+.complete-ganesha { z-index: 40; }
+.rhythm-sequence-display { z-index: 40; }
+.instruments-found-counter { z-index: 50; }
+.interactive-hint, .hint-bubble { z-index: 90; }
+.scene-navigation-bar { z-index: 100; }
+.popup-overlay, .celebration-overlay { z-index: 1000; }
+.game-overlay { z-index: 2000; }
