@@ -34,7 +34,7 @@ const SCENE_MAPPING = {
     'suryakoti-bank': () => import('./zones/shloka-river/scenes/Scene2/SuryakotiBank'),
     'nirvighnam-chant': () => import('./zones/shloka-river/scenes/Scene3/NirvighnamChant'),
     'sarvakaryeshu-chant': () => import('./zones/shloka-river/scenes/scene4/SarvakaryeshuChant'),
-    'shloka-river-finale': () => import('./zones/shloka-river/scenes/Scene5/ShlokaRiverFinale')
+    'shloka-river-finale': () => import('./zones/shloka-river/scenes/scene5/ShlokaRiverFinale')
   },
   'festival-square': {
     'game1': () => import('./zones/festival-square/Game1-piano/FestivalPianoGame.jsx'),
