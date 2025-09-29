@@ -63,18 +63,18 @@ import kuruBg from './assets/images/kuru-bg.png';
 
 
 // Nirvighnam game assets - Animals, Objects, Stones
-import frogNir from './assets/images/Nirvighnam/nir-frog.png';
-import snailVigh from './assets/images/Nirvighnam/nir-snail.png';
-import turtleNam from './assets/images/Nirvighnam/nir-turtle.png';
-import leafNir from './assets/images/Nirvighnam/nir-leaf.png';
-import drumVigh from './assets/images/Nirvighnam/nir-drum.png';
-import featherNam from './assets/images/Nirvighnam/nir-feather.png';
-import stone1Nir from './assets/images/Nirvighnam/stone1.png';
-import stone2Vigh from './assets/images/Nirvighnam/stone2.png';
-import stone3Nam from './assets/images/Nirvighnam/stone3.png';
-import stone1NirCol from './assets/images/Nirvighnam/stone1-col.png';
-import stone2VighCol from './assets/images/Nirvighnam/stone2-col.png';
-import stone3NamCol from './assets/images/Nirvighnam/stone3-col.png';
+import frogNir from './assets/images/nirvighnam/nir-frog.png';
+import snailVigh from './assets/images/nirvighnam/nir-snail.png';
+import turtleNam from './assets/images/nirvighnam/nir-turtle.png';
+import leafNir from './assets/images/nirvighnam/nir-leaf.png';
+import drumVigh from './assets/images/nirvighnam/nir-drum.png';
+import featherNam from './assets/images/nirvighnam/nir-feather.png';
+import stone1Nir from './assets/images/nirvighnam/stone1.png';
+import stone2Vigh from './assets/images/nirvighnam/stone2.png';
+import stone3Nam from './assets/images/nirvighnam/stone3.png';
+import stone1NirCol from './assets/images/nirvighnam/stone1-col.png';
+import stone2VighCol from './assets/images/nirvighnam/stone2-col.png';
+import stone3NamCol from './assets/images/nirvighnam/stone3-col.png';
 
 // Kurumedeva game assets - Animals, Items, Decorations
 import animal1Ku from './assets/images/Kurumedeva/animal1-ku.png';
@@ -101,8 +101,8 @@ import appKurumedeva from '../assets/images/apps/app-kurumedeva.png';
 import boyNamaste from '../assets/images/boy-namaste.png';
 
 // Rescue mission images
-import nirvighnamBefore from './assets/images/Nirvighnam/nirvighnam-before.png';
-import nirvighnamAfter from './assets/images/Nirvighnam/nirvighnam-after.png';
+import nirvighnamBefore from './assets/images/nirvighnam/nirvighnam-before.png';
+import nirvighnamAfter from './assets/images/nirvighnam/nirvighnam-after.png';
 import kurumedevaBefore from './assets/images/Kurumedeva/kurumedeva-before.png'; 
 import kurumedevaAfter from './assets/images/Kurumedeva/kurumedeva-after.png';
 
