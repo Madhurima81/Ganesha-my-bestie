@@ -44,8 +44,8 @@ export default defineConfig({
             './src/zones/shloka-river/scenes/Scene1/VakratundaGroveV2',
             './src/zones/shloka-river/scenes/Scene2/SuryakotiBank',
             './src/zones/shloka-river/scenes/Scene3/NirvighnamChant',
-            './src/zones/shloka-river/scenes/Scene4/SarvakaryeshuChant',
-            './src/zones/shloka-river/scenes/Scene5/ShlokaRiverFinale'
+            './src/zones/shloka-river/scenes/scene4/SarvakaryeshuChant',
+            './src/zones/shloka-river/scenes/scene5/ShlokaRiverFinale'
           ],
           
           'zone-festival-square': [
