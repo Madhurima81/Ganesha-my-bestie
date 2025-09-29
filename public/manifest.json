@@ -1,0 +1,103 @@
+{
+  "name": "Ganesha My Bestie - Sanskrit Learning Adventure",
+  "short_name": "Ganesha Adventure",
+  "description": "Interactive educational app for kids to learn Sanskrit through games, stories, and adventures with Lord Ganesha. Explore 7 magical zones!",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#FFF8E7",
+  "theme_color": "#FF6B35",
+  "categories": ["education", "kids", "games", "entertainment"],
+  "lang": "en-US",
+  
+  "icons": [
+    {
+      "src": "/icons/icon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  
+
+  
+  "shortcuts": [
+    {
+      "name": "Continue Journey",
+      "short_name": "Continue",
+      "description": "Resume your last adventure",
+      "url": "/?continue=true",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Map",
+      "short_name": "Map",
+      "description": "View all zones",
+      "url": "/?view=map",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  
+  "related_applications": [],
+  "prefer_related_applications": false,
+  
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

@@ -20,6 +20,10 @@ import Fireworks from '../../../../lib/components/feedback/Fireworks';
 import ProgressiveHintSystem from '../../../../lib/components/interactive/ProgressiveHintSystem';
 import SceneCompletionCelebration from '../../../../lib/components/celebration/SceneCompletionCelebration';
 
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+
 // Scene-specific components
 import SanskritSidebar from '../../../../lib/components/feedback/SanskritSidebar';
 import DoorComponent from '../../components/DoorComponent';
@@ -940,7 +944,12 @@ const SarvakaryeshuSarvadaContent = ({
 
   // Access GameCoach functionality
   const { showMessage, hideCoach, isVisible, clearManualCloseTracking } = useGameCoach();
-
+  const { resetScene } = useSceneReset(
+  sceneActions, 
+  'cave-of-secrets', 
+  'sarvakaryeshu-sarvada', 
+  getSceneResetConfig('sarvakaryeshu-sarvada')
+);
   // State management
   const [showSparkle, setShowSparkle] = useState(null);
   const [showSceneCompletion, setShowSceneCompletion] = useState(false);
@@ -1872,11 +1881,16 @@ onClick={() => {
             🎭 Game 2
           </button>
 
+                      <BackToMapButton onNavigate={onNavigate} hideCoach={hideCoach} clearManualCloseTracking={clearManualCloseTracking} />
+
+
 
             {/* ✅ FIRST: Door 1 Component */}
             {(sceneState.phase === SCENE_PHASES.DOOR1_ACTIVE || sceneState.phase === SCENE_PHASES.DOOR1_COMPLETE) && (
               <div className="door1-area" id="door1-area">
                 <DoorComponent
+                                  key={`door1-${sceneState.door1CurrentStep}-${sceneState.door1Completed}-${sceneState.phase}`}
+
                   syllables={['Sar', 'va', 'kar', 'ye', 'shu']}
                   completedWord="Sarvakaryeshu"
                   onDoorComplete={handleDoor1Complete}
@@ -2089,6 +2103,8 @@ onClick={() => {
             {(sceneState.phase === SCENE_PHASES.DOOR2_ACTIVE || sceneState.phase === SCENE_PHASES.DOOR2_COMPLETE) && (
               <div className="door2-area" id="door2-area">
                 <DoorComponent
+                                  key={`door2-${sceneState.door2CurrentStep}-${sceneState.door2Completed}-${sceneState.phase}`}
+
                   syllables={['Sar', 'va', 'da']}
                   completedWord="Sarvada"
                   onDoorComplete={handleDoor2Complete}
@@ -2471,9 +2487,52 @@ onClick={() => {
                 totalStars: 8
               }}
               onComplete={onComplete}
-              onReplay={() => window.location.reload()}
-              onContinue={() => onNavigate?.('scene-complete-continue')}
-            />
+        onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);
+  resetScene();}}
+        // ADD THIS TO SceneCompletionCelebration:
+onContinue={() => {
+  console.log('🔧 CONTINUE: Suryakoti scene to next scene');
+  
+  // 1. Clear GameCoach
+  if (clearManualCloseTracking) clearManualCloseTracking();
+  if (hideCoach) hideCoach();
+  
+  setTimeout(() => {
+    if (clearManualCloseTracking) clearManualCloseTracking();
+  }, 500);
+  
+  // 2. Save completion data - CHANT FORMAT
+  const profileId = localStorage.getItem('activeProfileId');
+  if (profileId) {
+    ProgressManager.updateSceneCompletion(profileId, 'cave-of-secrets', 'sarvakaryeshu-sarvada', {
+      completed: true,
+      stars: 8,
+      symbols: {},  // ← Cave scenes don't learn symbols
+      sanskritWords: { suryakoti: true, samaprabha: true },
+      learnedWords: sceneState.learnedWords || {},
+      chants: { suryakoti: true, samaprabha: true }
+    });
+    
+    GameStateManager.saveGameState('cave-of-secrets', 'sarvakaryeshu-sarvada', {
+      completed: true,
+      stars: 8,
+      sanskritWords: { suryakoti: true, samaprabha: true },
+      learnedWords: sceneState.learnedWords || {}
+    });
+    
+    console.log('✅ CONTINUE: sarvakaryeshu-sarvada completion data saved');
+  }
+
+  // 3. Set next scene for resume tracking
+  setTimeout(() => {
+    SimpleSceneManager.setCurrentScene('cave-of-secrets', 'nirvighnam-kurumedeva', false, false);
+    console.log('✅ CONTINUE: Next scene (nirvighnam-kurumedeva) set for resume tracking');
+    
+    onNavigate?.('scene-complete-continue');
+  }, 100);
+}}            />
 
             {/* Progressive Hints System */}
             <ProgressiveHintSystem
@@ -2502,12 +2561,18 @@ onClick={() => {
                 if (clearManualCloseTracking) clearManualCloseTracking();
                 setTimeout(() => onNavigate?.('home'), 100);
               }}
-              onProgress={() => setShowCulturalCelebration(true)}
-              onZonesClick={() => {
+      onProgress={() => {
+                const name = activeProfile?.name || 'little explorer';
+                console.log(`Great Sanskrit progress, ${name}!`);
+                if (hideCoach) hideCoach();
+                setShowCulturalCelebration(true);
+              }}
+                            onZonesClick={() => {
                 if (hideCoach) hideCoach();
                 if (clearManualCloseTracking) clearManualCloseTracking();
                 setTimeout(() => onNavigate?.('zones'), 100);
               }}
+                                                        onStartFresh={() => resetScene()}
               currentProgress={{
                 stars: sceneState.stars || 0,
                 completed: sceneState.completed ? 1 : 0,

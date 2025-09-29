@@ -17,7 +17,7 @@ const RotatingOrbsEffect = ({
   const [showFireworks, setShowFireworks] = useState(false);  // ← ADD FIREWORKS STATE
 
   // Sacred symbols for orbs
-  const SACRED_SYMBOLS = [
+  /*const SACRED_SYMBOLS = [
     { id: 'mooshika', image: symbolImages.mooshika, position: 0, blessing: 'Divine Vehicle' },
     { id: 'modak', image: symbolImages.modak, position: 45, blessing: 'Sweet Blessings' },
     { id: 'belly', image: symbolImages.belly, position: 90, blessing: 'Universe Within' },
@@ -26,7 +26,33 @@ const RotatingOrbsEffect = ({
     { id: 'eyes', image: symbolImages.eyes, position: 225, blessing: 'Divine Sight' },
     { id: 'ears', image: symbolImages.ears, position: 270, blessing: 'Sacred Listening' },
     { id: 'tusk', image: symbolImages.tusk, position: 315, blessing: 'Breaking Barriers' }
-  ];
+  ];*/
+
+  // Dynamic symbols based on what's passed
+const SACRED_SYMBOLS = Object.keys(symbolImages).map((key, index) => ({
+  id: key,
+  image: symbolImages[key],
+  position: index * 45, // 360/8 = 45 degrees apart
+  blessing: {
+    vakratunda: 'Obstacle Remover',
+    mahakaya: 'Great Strength', 
+    samaprabha: 'Equal Light',
+    suryakoti: 'Solar Power',
+    nirvighnam: 'Unobstructed',
+    kurumedeva: 'Divine Action',
+    sarvakaryeshu: 'All Tasks',
+    sarvada: 'Always',
+    // Mountain symbols (for backwards compatibility)
+    mooshika: 'Divine Vehicle',
+    modak: 'Sweet Blessings',
+    belly: 'Universe Within',
+    lotus: 'Pure Wisdom',
+    trunk: 'Obstacle Remover',
+    eyes: 'Divine Sight',
+    ears: 'Sacred Listening',
+    tusk: 'Breaking Barriers'
+  }[key] || 'Sacred Power'
+}));
 
   useEffect(() => {
     if (!show) {

@@ -14,27 +14,36 @@ import { GameCoachProvider } from './lib/components/coach/GameCoach';
 import ProgressManager from './lib/services/ProgressManager';
 import SimpleSceneManager from './lib/services/SimpleSceneManager';
 
-// 🎯 DYNAMIC SCENE MAPPING: Define available scenes
 const SCENE_MAPPING = {
   'symbol-mountain': {
-    
     'modak': () => import('./zones/symbol-mountain/scenes/modak/NewModakSceneV5'),
     'pond': () => import('./zones/symbol-mountain/scenes/pond/PondSceneSimplifiedV3'),
-'symbol': () => import('./zones/symbol-mountain/scenes/tusk/SymbolMountainSceneV3'),
-'final-scene': () => import('./zones/symbol-mountain/scenes/final scene/SacredAssemblySceneV8'),  },
- // ✅ ADD: Cave of Secrets scenes
+    'symbol': () => import('./zones/symbol-mountain/scenes/tusk/SymbolMountainSceneV3'),
+    'final-scene': () => import('./zones/symbol-mountain/scenes/final scene/SacredAssemblySceneV8'),
+  },
   'cave-of-secrets': {
     'vakratunda-mahakaya': () => import('./zones/meaning cave/scenes/VakratundaMahakaya/CaveSceneFixedV1'),
     'suryakoti-samaprabha': () => import('./zones/meaning cave/scenes/suryakoti-samaprabha/SuryakotiSceneV2'), 
-    'nirvighnam-kurumedeva': () => import('./zones/meaning cave/scenes/nirvighnam-kurumedeva/NirvighnamSceneV3')
-  }
-  //'cave-of-secrets': {
-    //'crystal-cave': () => import('./zones/cave-of-secrets/scenes/crystal-cave/CrystalScene'),
-    //'treasure-chamber': () => import('./zones/cave-of-secrets/scenes/treasure-chamber/TreasureScene')
-  }
-  // Add more zones as you create them
+    'nirvighnam-kurumedeva': () => import('./zones/meaning cave/scenes/nirvighnam-kurumedeva/NirvighnamSceneV3'),
+    'sarvakaryeshu-sarvada': () => import('./zones/meaning cave/scenes/sarvakaryeshu-sarvada/SarvakaryeshuSarvadaV5.jsx'),
 
+  },
+  // ✅ ADD: Shloka River scenes
+  'shloka-river': {
+    'vakratunda-grove': () => import('./zones/shloka-river/scenes/Scene1/VakratundaGroveV2'),
+    'suryakoti-bank': () => import('./zones/shloka-river/scenes/Scene2/SuryakotiBank'),
+    'nirvighnam-chant': () => import('./zones/shloka-river/scenes/Scene3/NirvighnamChant'),
+    'sarvakaryeshu-chant': () => import('./zones/shloka-river/scenes/Scene4/SarvakaryeshuChant'),
+    'shloka-river-finale': () => import('./zones/shloka-river/scenes/Scene5/ShlokaRiverFinale')
+  },
+  'festival-square': {
+    'game1': () => import('./zones/festival-square/Game1-piano/FestivalPianoGame.jsx'),
+    'game2': () => import('./zones/festival-square/Game2-Rangoli/FestivalRangoliGame.jsx'), 
+    'game3': () => import('./zones/festival-square/game3-cooking/ModakCookingGame.jsx'),
+    'game4': () => import('./zones/festival-square/Game4-mandapdecor/MandapDecorationGame.jsx')
+  }
 
+};
 
 
 const GameStateManagerClass = GameStateManager.constructor;
@@ -428,23 +437,26 @@ const handleSceneSelect = (sceneId, options = {}) => {
   }
 };
 
-// ✅ ADD: Helper function for scene progression
 const getNextScene = (zoneId, currentSceneId) => {
   const sceneProgression = {
     'symbol-mountain': ['modak', 'pond', 'symbol', 'final-scene'],
-     
-    // ✅ ADD: Cave of Secrets progression (Sanskrit mantra learning)
- // ✅ UPDATED: Cave of Secrets with ALL 5 scenes
     'cave-of-secrets': [
       'vakratunda-mahakaya', 
       'suryakoti-samaprabha', 
       'nirvighnam-kurumedeva',
-      'sarvakaryeshu-sarvada',    // ✅ Scene 4
-      'mantra-assembly'           // ✅ Scene 5 (final)
+      'sarvakaryeshu-sarvada',
+      'mantra-assembly'
     ],
-    // Add other zones as you create them
-    // 'cave-of-secrets': ['crystal-cave', 'treasure-chamber'],
-    // 'obstacle-forest': ['forest', 'logs', 'leaves', 'mud']
+    // ✅ ADD: Shloka River progression - Sanskrit chant learning journey
+    'shloka-river': [
+      'vakratunda-grove',      // Scene 1: Learn Vakratunda
+      'suryakoti-bank',        // Scene 2: Learn Suryakoti  
+      'nirvighnam-chant',      // Scene 3: Learn Nirvighnam
+      'sarvakaryeshu-chant',   // Scene 4: Learn Sarvakaryeshu
+      'shloka-river-finale'    // Scene 5: Complete chant assembly
+    ],
+      'festival-square': ['game1', 'game2', 'game3', 'game4']
+
   };
   
   const scenes = sceneProgression[zoneId];
@@ -567,6 +579,15 @@ case 'scene-complete-map':
   } else {
     setCurrentView('zone-welcome');
   }
+  break;
+
+  // In App.jsx, add this to your handleNavigate function:
+case 'direct-to-map':
+  console.log('🗺️ DIRECT MAP: Bypassing profile welcome, going straight to map');
+  SimpleSceneManager.clearCurrentScene();
+  setCurrentZone(null);
+  setCurrentScene(null);
+  setCurrentView('map');
   break;
       default:
         console.log('Unknown navigation:', destination);
@@ -750,7 +771,7 @@ const handleSceneComplete = (sceneId, result) => {
 
   // ✅ REPLACE the existing clearing logic:
 // ✅ UPDATED: Check if we should start fresh
-const profileId = localStorage.getItem('activeProfileId');
+/*const profileId = localStorage.getItem('activeProfileId');
 const tempKey = `temp_session_${profileId}_${currentZone}_${currentScene}`;
 const tempData = JSON.parse(localStorage.getItem(tempKey) || '{}');
 
@@ -764,6 +785,19 @@ if (tempData.completed && !tempData.showingCompletionScreen) {
 } else if (tempData.showingCompletionScreen) {
   console.log('🎬 APP: Scene showing completion screen - keeping state for resume');
   // Don't clear anything - let scene resume completion screen
+}*/
+
+// ✅ SIMPLE: Let scenes handle their own state - don't interfere
+const profileId = localStorage.getItem('activeProfileId');
+const tempKey = `temp_session_${profileId}_${currentZone}_${currentScene}`;
+const tempData = JSON.parse(localStorage.getItem(tempKey) || '{}');
+
+// Only clear if explicit play again flag is set
+if (tempData.playAgainRequested) {
+  console.log('🔄 APP: Play Again detected - clearing all scene storage');
+  localStorage.removeItem(tempKey);
+  const sceneStateKey = `${profileId}_${currentZone}_${currentScene}_state`;
+  localStorage.removeItem(sceneStateKey);
 }
 
         

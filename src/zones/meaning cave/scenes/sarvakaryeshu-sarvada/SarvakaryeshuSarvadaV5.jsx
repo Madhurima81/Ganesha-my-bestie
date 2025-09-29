@@ -27,6 +27,10 @@ import DraggableItem from '../../../../lib/components/interactive/DraggableItem'
 import DropZone from '../../../../lib/components/interactive/DropZone';
 import HelperSignatureAnimation from './HelperSignatureAnimation';
 
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+
 // Import assets
 import sceneBackground from './assets/images/scene-background.png';
 import doorImage from './assets/images/door-image.png';
@@ -154,6 +158,18 @@ import parkLeafyfriend from './assets/images/game 2/helpers/park_leafyfriend.png
 import parkCleaniebucket from './assets/images/game 2/helpers/park_cleaniebucket.png';
 import parkBloomyflower from './assets/images/game 2/helpers/park_bloomyflower.png';
 import parkSparklestar from './assets/images/game 2/helpers/park_sparklestar.png';
+
+import meaningJournal from '../../assets/images/meaning-journal.png';
+
+// All 8 app images
+import appVakratunda from '../../assets/images/apps/app-vakratunda.png';
+import appMahakaya from '../../assets/images/apps/app-mahakaya.png';
+import appSuryakoti from "../../assets/images/apps/app-suryakoti.png";
+import appSamaprabha from "../../assets/images/apps/app-samaprabha.png";
+import appNirvighnam from "../../assets/images/apps/app-nirvighnam.png";
+import appKurumedeva from "../../assets/images/apps/app-kurumedeva.png";
+import appSarvakaryeshu from "../../assets/images/apps/app-sarvakaryeshu.png";
+import appSarvada from "../../assets/images/apps/app-sarvada.png";
 
 // ✅ FIXED: Correct flow sequence
 const SCENE_PHASES = {
@@ -754,6 +770,13 @@ const SarvakaryeshuSarvadaContent = ({
 
   // Access GameCoach functionality
   const { showMessage, hideCoach, isVisible, clearManualCloseTracking } = useGameCoach();
+
+    const { resetScene } = useSceneReset(
+  sceneActions, 
+  'cave-of-secrets', 
+  'sarvakaryeshu-sarvada', 
+  getSceneResetConfig('sarvakaryeshu-sarvada')
+);
 
   // State management
   const [showSparkle, setShowSparkle] = useState(null);
@@ -2409,9 +2432,30 @@ const getCurrentHelperSymbols = () => {
               totalScenes={4}
               starsEarned={sceneState.progress?.starsEarned || 8}
               totalStars={8}
-              discoveredSymbols={['sarvakaryeshu', 'sarvada'].filter(word =>
-                sceneState.learnedWords?.[word]?.learned
-              )}
+ discoveredSymbols={['vakratunda', 'mahakaya', 'suryakoti', 'samaprabha', 'nirvighnam', 'kurumedeva', 'sarvakaryeshu', 'sarvada']}
+containerType="journal"
+containerImage={meaningJournal}
+meaningCards={{
+  vakratunda: { sanskrit: "वक्रतुण्ड", meaning: "Curved Trunk" },
+  mahakaya: { sanskrit: "महाकाय", meaning: "Great Body" },
+  suryakoti: { sanskrit: "सूर्यकोटि", meaning: "Million Suns" },
+  samaprabha: { sanskrit: "समप्रभ", meaning: "Equal Radiance" },
+  nirvighnam: { sanskrit: "निर्विघ्नम्", meaning: "Without Obstacles" },
+  kurumedeva: { sanskrit: "कुरुमे देव", meaning: "Please Bless" },
+  sarvakaryeshu: { sanskrit: "सर्वकार्येषु", meaning: "In All Tasks" },
+  sarvada: { sanskrit: "सर्वदा", meaning: "Always" }
+}}
+appImages={{
+  vakratunda: appVakratunda,
+  mahakaya: appMahakaya,
+  suryakoti: appSuryakoti,
+  samaprabha: appSamaprabha,
+  nirvighnam: appNirvighnam,
+  kurumedeva: appKurumedeva,
+  sarvakaryeshu: appSarvakaryeshu,
+  sarvada: appSarvada
+}}
+isFinalScene={true}  // Add this for Scene 4 only
               nextSceneName="Complete Cave Journey"
               sceneId="sarvakaryeshu-sarvada"
               completionData={{
@@ -2424,9 +2468,51 @@ const getCurrentHelperSymbols = () => {
                 totalStars: 8
               }}
               onComplete={onComplete}
-              onReplay={() => window.location.reload()}
-              onContinue={() => onNavigate?.('scene-complete-continue')}
-            />
+             onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);
+  resetScene();}}
+           onContinue={() => {
+  console.log('🔧 CONTINUE: Suryakoti scene to next scene');
+  
+  // 1. Clear GameCoach
+  if (clearManualCloseTracking) clearManualCloseTracking();
+  if (hideCoach) hideCoach();
+  
+  setTimeout(() => {
+    if (clearManualCloseTracking) clearManualCloseTracking();
+  }, 500);
+  
+  // 2. Save completion data - CHANT FORMAT
+  const profileId = localStorage.getItem('activeProfileId');
+  if (profileId) {
+    ProgressManager.updateSceneCompletion(profileId, 'cave-of-secrets', 'sarvakaryeshu-sarvada', {
+      completed: true,
+      stars: 8,
+      symbols: {},  // ← Cave scenes don't learn symbols
+      sanskritWords: { suryakoti: true, samaprabha: true },
+      learnedWords: sceneState.learnedWords || {},
+      chants: { suryakoti: true, samaprabha: true }
+    });
+    
+    GameStateManager.saveGameState('cave-of-secrets', 'sarvakaryeshu-sarvada', {
+      completed: true,
+      stars: 8,
+      sanskritWords: { suryakoti: true, samaprabha: true },
+      learnedWords: sceneState.learnedWords || {}
+    });
+    
+    console.log('✅ CONTINUE: sarvakaryeshu-sarvada completion data saved');
+  }
+
+  // 3. Set next scene for resume tracking
+  setTimeout(() => {
+    SimpleSceneManager.setCurrentScene('cave-of-secrets', 'nirvighnam-kurumedeva', false, false);
+    console.log('✅ CONTINUE: Next scene (nirvighnam-kurumedeva) set for resume tracking');
+    
+    onNavigate?.('scene-complete-continue');
+  }, 100);
+}}            />
 
             {/* Progressive Hints System */}
             <ProgressiveHintSystem
@@ -2604,6 +2690,9 @@ const getCurrentHelperSymbols = () => {
               🚪 Test Door 2
             </button>
 
+                                  <BackToMapButton onNavigate={onNavigate} hideCoach={hideCoach} clearManualCloseTracking={clearManualCloseTracking} />
+
+
             {/* Navigation */}
             <TocaBocaNav
               onHome={() => {
@@ -2617,6 +2706,7 @@ const getCurrentHelperSymbols = () => {
                 if (clearManualCloseTracking) clearManualCloseTracking();
                 setTimeout(() => onNavigate?.('zones'), 100);
               }}
+                                                                      onStartFresh={() => resetScene()}
               currentProgress={{
                 stars: sceneState.stars || 0,
                 completed: sceneState.completed ? 1 : 0,

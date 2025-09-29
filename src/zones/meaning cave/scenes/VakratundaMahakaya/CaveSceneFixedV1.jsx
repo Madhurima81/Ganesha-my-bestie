@@ -24,6 +24,11 @@ import SymbolSceneIntegration from '../../../../lib/components/animation/SymbolS
 import MagicalCardFlip from '../../../../lib/components/animation/MagicalCardFlip';
 import SceneCompletionCelebration from '../../../../lib/components/celebration/SceneCompletionCelebration';
 
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+
+
 // Cave-specific components
 import SanskritSidebar from '../../../../lib/components/feedback/SanskritSidebar';
 import doorImage from './assets/images/door-image.png';
@@ -40,6 +45,14 @@ import stoneHead from './assets/images/stone-head.png';
 import stoneTrunk from './assets/images/stone-trunk.png';
 import stoneBody from './assets/images/stone-body.png';
 import stoneLegs from './assets/images/stone-legs.png';
+
+// Journal container image
+import meaningJournal from '../../assets/images/meaning-journal.png';
+
+// All 8 app images
+import appVakratunda from '../../assets/images/apps/app-vakratunda.png';
+import appMahakaya from '../../assets/images/apps/app-mahakaya.png';
+
 
 const CAVE_PHASES = {
   // Part 1: Vakratunda Learning
@@ -233,6 +246,13 @@ const CaveSceneContent = ({
   // Access GameCoach functionality (PROVEN FROM POND)
   const { showMessage, hideCoach, isVisible, clearManualCloseTracking } = useGameCoach();
 
+  const { resetScene } = useSceneReset(
+  sceneActions, 
+  'cave-of-secrets', 
+  'vakratunda-mahakaya', 
+  getSceneResetConfig('vakratunda-mahakaya')
+);
+
   // State management (PROVEN FROM POND)
   const [showSparkle, setShowSparkle] = useState(null);
   const [currentSourceElement, setCurrentSourceElement] = useState(null);
@@ -243,6 +263,8 @@ const CaveSceneContent = ({
   const [showSceneCompletion, setShowSceneCompletion] = useState(false);
   const [showCulturalCelebration, setShowCulturalCelebration] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
+const [isManualReset, setIsManualReset] = useState(false);
+
 
   // Refs (PROVEN FROM POND)
   const timeoutsRef = useRef([]);
@@ -633,7 +655,12 @@ const getHintConfigs = () => [
 
 useEffect(() => {
   if (!isReload || !sceneState) return;
- 
+
+    // BLOCK reload logic during manual reset
+  if (isManualReset) {
+    console.log('🚫 RELOAD BLOCKED: Manual reset in progress');
+    return;
+  }
  
   console.log('🔄 CAVE RELOAD: Starting comprehensive reload sequence', {
     currentPopup: sceneState.currentPopup,
@@ -1605,7 +1632,7 @@ const showFinalCelebration = () => {
 )}
 
 
-{/* Start Growing Test Button */}
+{/* Start Growing Test Button 
 <div style={{
   position: 'fixed',
   top: '320px',
@@ -1654,7 +1681,7 @@ const showFinalCelebration = () => {
   <div>Phase: {sceneState.phase}</div>
 </div>
 
-{/* Clear Storage Button */}
+{/* Clear Storage Button 
 <button 
   className="clear-storage-button"
   onClick={clearLocalStorage}
@@ -1777,7 +1804,7 @@ const showFinalCelebration = () => {
   🎆 PERFECT TEST
 </div>
 
-            {/* Start Tracing Test Button */}
+            {/* Start Tracing Test Button 
 <div style={{
   position: 'fixed',
   top: '270px',
@@ -1805,7 +1832,7 @@ const showFinalCelebration = () => {
   🐘 START TRACE
 </div>
 
-{/* Door 1 Test Button */}
+{/* Door 1 Test Button 
 <div style={{
   position: 'fixed',
   top: '370px',
@@ -1865,7 +1892,7 @@ const showFinalCelebration = () => {
   <div>isVisible: {String(isVisible)}</div>
 </div>
 
-{/* Door 2 Test Button */}
+{/* Door 2 Test Button 
 <div style={{
   position: 'fixed',
   top: '420px',
@@ -1958,12 +1985,145 @@ const showFinalCelebration = () => {
                   />
                 )}
               </div>
-            )}
+            )}*/}
+
+            <BackToMapButton onNavigate={onNavigate} hideCoach={hideCoach} clearManualCloseTracking={clearManualCloseTracking} />
+
+{/* Working Start Fresh Button */}
+<div 
+  style={{
+    position: 'fixed',
+    top: '70px',
+    right: '20px',
+    zIndex: 10000,
+    background: 'linear-gradient(135deg, #2ECC71 0%, #27AE60 100%)',
+    color: 'white',
+    padding: '14px 18px',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    boxShadow: '0 6px 20px rgba(46,204,113,0.4)',
+    border: '3px solid white',
+    transition: 'all 0.3s ease',
+    userSelect: 'none',
+    textAlign: 'center',
+    minWidth: '140px'
+  }}
+  onClick={() => {
+    if (window.confirm('🔄 Start Fresh?\n\nReset this Cave scene to the very beginning?')) {
+      console.log('🔄 BLOCKING RELOAD and resetting...');
+      
+      // 1. BLOCK the reload logic first
+      setIsManualReset(true);
+      
+      // 2. Clear all UI
+      setShowMagicalCard(false);
+      setShowPopupBook(false);
+      setShowSceneCompletion(false);
+      setShowSparkle(null);
+      setCardContent({});
+      setPopupBookContent({});
+      
+      // 3. Clear GameCoach
+      if (hideCoach) hideCoach();
+      if (clearManualCloseTracking) clearManualCloseTracking();
+      
+      // 4. Clear storage to prevent restore
+      const profileId = localStorage.getItem('activeProfileId');
+      if (profileId) {
+        localStorage.removeItem(`temp_session_${profileId}_cave-of-secrets_vakratunda-mahakaya`);
+        localStorage.removeItem(`play_again_${profileId}_cave-of-secrets_vakratunda-mahakaya`);
+      }
+      
+      // 5. Apply reset after a small delay
+      setTimeout(() => {
+        sceneActions.updateState({
+          phase: CAVE_PHASES.DOOR1_ACTIVE,
+          currentFocus: 'door1',
+          
+          // Door states
+          door1State: 'waiting',
+          door1SyllablesPlaced: [],
+          door1Completed: false,
+          door1CurrentStep: 0,
+          door2State: 'waiting',
+          door2SyllablesPlaced: [],
+          door2Completed: false,
+          door2CurrentStep: 0,
+          
+          // Game states
+          tracingStarted: false,
+          tracingCompleted: false,
+          traceProgress: 0,
+          currentPathSegment: 0,
+          segmentsCompleted: [],
+          tracedPoints: [],
+          growingStarted: false,
+          growingCompleted: false,
+          stonesClicked: 0,
+          floatingStones: [
+            { id: 1, clicked: false, x: 20, y: 30 },
+            { id: 2, clicked: false, x: 70, y: 20 },
+            { id: 3, clicked: false, x: 30, y: 60 },
+            { id: 4, clicked: false, x: 80, y: 50 }
+          ],
+          
+          // Ganesha
+          ganeshaVisible: false,
+          ganeshaAnimation: 'breathing',
+          ganeshaSize: 0.8,
+          ganeshaGlow: 0.2,
+          
+          // Learning
+          learnedWords: {
+            vakratunda: { learned: false, scene: 1 },
+            mahakaya: { learned: false, scene: 1 }
+          },
+          
+          // UI states
+          currentPopup: null,
+          symbolDiscoveryState: null,
+          sidebarHighlightState: null,
+          showCurvedText: false,
+          showMightyText: false,
+          showingCompletionScreen: false,
+          
+          // GameCoach
+          gameCoachState: null,
+          welcomeShown: false,
+          vakratundaWisdomShown: false,
+          mahakayaWisdomShown: false,
+          readyForWisdom: false,
+          tracingIntroShown: false,
+          isReloadingGameCoach: false,
+          
+          // Progress
+          stars: 0,
+          completed: false,
+          progress: { percentage: 0, starsEarned: 0, completed: false }
+        });
+        
+        // 6. Unblock reload logic after reset is applied
+        setTimeout(() => {
+          setIsManualReset(false);
+          console.log('✅ Reset complete, reload logic unblocked');
+        }, 500);
+        
+      }, 100);
+    }
+  }}
+  title="Reset to Door 1"
+>
+  🔄 START<br/>FRESH
+</div>
+
 
             {/* Door 1 Component */}
 {(sceneState.phase === CAVE_PHASES.DOOR1_ACTIVE || sceneState.phase === CAVE_PHASES.DOOR1_COMPLETE) && (
   <div className="door1-area" id="door1-area">
-    <DoorComponent
+    <DoorComponent 
+    key={`door1-${sceneState.door1CurrentStep}-${sceneState.door1Completed}`} // ← ADD THIS
       syllables={['Va', 'kra', 'tun', 'da']}
       completedWord="Vakratunda"
       onDoorComplete={handleDoor1Complete}
@@ -2015,6 +2175,7 @@ const showFinalCelebration = () => {
 {(sceneState.phase === CAVE_PHASES.DOOR2_ACTIVE || sceneState.phase === CAVE_PHASES.DOOR2_COMPLETE) && (
   <div className="door2-area" id="door2-area">
     <DoorComponent
+      key={`door2-${sceneState.door2CurrentStep}-${sceneState.door2Completed}`} // ← ADD THIS
       syllables={['Ma', 'ha', 'ka', 'ya']}
       completedWord="Mahakaya"
       onDoorComplete={handleDoor2Complete}
@@ -2303,13 +2464,17 @@ const showFinalCelebration = () => {
               totalScenes={4}
               starsEarned={sceneState.progress?.starsEarned || 8}
               totalStars={8}
-              discoveredSymbols={['vakratunda', 'mahakaya'].filter(word =>
-                sceneState.learnedWords?.[word]?.learned
-              )}
-              symbolImages={{
-                vakratunda: vakratundaCard,
-                mahakaya: mahakayaCard
-              }}
+    discoveredSymbols={['vakratunda', 'mahakaya']}
+containerType="journal"
+containerImage={meaningJournal}
+meaningCards={{
+  vakratunda: { sanskrit: "वक्रतुण्ड", meaning: "Curved Trunk" },
+  mahakaya: { sanskrit: "महाकाय", meaning: "Great Body" }
+}}
+appImages={{
+  vakratunda: appVakratunda,
+  mahakaya: appMahakaya
+}}
               nextSceneName="Million Suns Chamber"
               sceneId="vakratunda-mahakaya"
               completionData={{
@@ -2324,24 +2489,10 @@ const showFinalCelebration = () => {
               onComplete={onComplete}
 
           // ADD THIS TO SceneCompletionCelebration:
-onReplay={() => {
-  console.log('🔄 Vakratunda Scene: Play Again requested');
-  
-  const profileId = localStorage.getItem('activeProfileId');
-  if (profileId) {
-    // Clear ALL storage
-    localStorage.removeItem(`temp_session_${profileId}_cave-of-secrets_vakratunda-mahakaya`);
-    localStorage.removeItem(`replay_session_${profileId}_cave-of-secrets_vakratunda-mahakaya`);
-    localStorage.removeItem(`play_again_${profileId}_cave-of-secrets_vakratunda-mahakaya`);
-    
-    SimpleSceneManager.setCurrentScene('cave-of-secrets', 'vakratunda-mahakaya', false, false);
-    console.log('🗑️ Vakratunda scene storage cleared');
-  }
-  
-  // Force clean reload
-  setTimeout(() => {
-    window.location.reload();
-  }, 100);
+        onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);
+  resetScene();
 }}
         
 // ADD THIS TO SceneCompletionCelebration:
@@ -2429,6 +2580,8 @@ onContinue={() => {
                 if (clearManualCloseTracking) clearManualCloseTracking();
                 setTimeout(() => onNavigate?.('zones'), 100);
               }}
+                            onStartFresh={() => resetScene()}
+
               currentProgress={{
                 stars: sceneState.stars || 0,
                 completed: sceneState.completed ? 1 : 0,

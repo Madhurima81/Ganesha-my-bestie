@@ -1,4 +1,4 @@
-/* SceneCompletionCelebration.css - Updated for Final Scene */
+/* SceneCompletionCelebration.css - Updated with Journal Support */
 
 /* Sparkle Effects */
 .sparkle-effects {
@@ -38,7 +38,7 @@
   }
 }
 
-/* BRING BACK: Card sparkles but positioned to not block symbols */
+/* Card sparkles */
 .card-sparkles {
   position: absolute;
   top: 0;
@@ -46,14 +46,14 @@
   right: 0;
   bottom: 0;
   pointer-events: none;
-  z-index: 0;  /* Behind symbols */
+  z-index: 0;
 }
 
 .card-sparkle {
   position: absolute;
-  font-size: 18px;  /* Bigger sparkles */
+  font-size: 18px;
   color: #FFD700;
-  animation: cardSparkleShine 4s ease-in-out infinite;  /* Continuous */
+  animation: cardSparkleShine 4s ease-in-out infinite;
   filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
 }
 
@@ -68,35 +68,7 @@
   }
 }
 
-/* ADD: Floating sparkles around the card */
-.floating-sparkle {
-  position: absolute;
-  animation: sparkleFloat 6s linear infinite;  /* Continuous floating */
-  pointer-events: none;
-  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
-  font-size: 20px;  /* Bigger floating sparkles */
-  color: #FFD700;
-}
-
-@keyframes sparkleFloat {
-  0% {
-    transform: translateY(50px) rotate(0deg) scale(0.3);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-    transform: translateY(0px) rotate(36deg) scale(1);
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(-50px) rotate(324deg) scale(1);
-  }
-  100% {
-    transform: translateY(-70px) rotate(360deg) scale(0.3);
-    opacity: 0;
-  }
-}
-
+/* Celebration backdrop */
 .celebration-backdrop {
   position: absolute;
   top: 0;
@@ -126,7 +98,7 @@
   visibility: visible;
 }
 
-/* Backpack container */
+/* BACKPACK CONTAINER STYLES */
 .backpack-container {
   position: absolute;
   left: 60px;
@@ -163,7 +135,7 @@
   width: 32px;
   height: 32px;
   animation: symbolPop 0.6s ease-out both;
-  z-index: 10;  /* Ensure symbols appear above everything */
+  z-index: 10;
 }
 
 .symbol-img {
@@ -180,7 +152,158 @@
   filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
 }
 
-/* Trekker Ganesha container */
+/* SMARTWATCH CONTAINER STYLES */
+.smartwatch-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.smartwatch-screen {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  z-index: 2;
+}
+
+.smartwatch-apps-overlay {
+  position: absolute;
+  top: 60px;
+  left: 80px;
+  width: 160px;
+  height: 160px;
+  display: grid;
+  grid-Template-Columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  align-items: center;
+  justify-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.smartwatch-app {
+  width: 36px;
+  height: 36px;
+  animation: symbolPop 0.6s ease-out both;
+}
+
+.app-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+}
+
+.app-emoji {
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+}
+
+/* JOURNAL CONTAINER STYLES */
+.journal-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.journal-base {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 360px;
+  height: 280px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.journal-pages-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.journal-page {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.journal-page.left-page {
+  top: 40px;
+  left: 30px;
+  width: 140px;
+  height: 180px;
+}
+
+.journal-page.right-page {
+  top: 40px;
+  right: 30px;
+  width: 140px;
+  height: 180px;
+}
+
+.meaning-card:nth-child(1) { top: 10px; }
+.meaning-card:nth-child(2) { top: 65px; }
+.meaning-card:nth-child(3) { top: 120px; }
+.meaning-card:nth-child(4) { top: 175px; }
+
+.meaning-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 4px 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  animation: meaningCardAppear 0.8s ease-out both;
+}
+
+.meaning-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.meaning-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meaning-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.meaning-text {
+  flex: 1;
+  min-width: 0; /* Allows text to shrink */
+}
+
+.sanskrit-text {
+  font-size: 12px !important; /* Increase from 10px */
+  font-weight: bold;
+  color: #8B4513;
+  margin-bottom: 2px;
+}
+
+.english-meaning {
+  font-size: 10px !important; /* Increase from 8px */
+  color: #2E7D32; /* Darker green for better contrast */
+  font-weight: 500;
+}
+
+/* GANESHA AND SPEECH BUBBLE */
 .trekker-container {
   position: absolute;
   right: 120px;
@@ -235,15 +358,17 @@
   font-family: 'Georgia', serif;
   font-size: 16px;
   font-weight: 600;
-  color: white;
+  color: white !important;
   margin-bottom: 5px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .bubble-text {
   font-family: 'Georgia', serif;
   font-size: 13px;
-  color: white;
+  color: white !important;
   line-height: 1.3;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .speech-bubble.stage-actions-ready {
@@ -259,36 +384,35 @@
   }
 }
 
-/* UPDATED: Action buttons - Wider like image 2 */
+/* ACTION BUTTONS */
 .action-buttons {
   position: absolute;
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 12px;  /* Reduced gap for better fit */
+  gap: 12px;
   animation: buttonsSlideUp 0.8s ease-out;
-  width: 85%;  /* Wider container */
+  width: 85%;
   justify-content: center;
 }
 
 .action-btn {
-  padding: 18px 20px;  /* Taller, wider padding like image 2 */
+  padding: 18px 20px;
   border: none;
-  border-radius: 18px;  /* More rounded like image 2 */
+  border-radius: 18px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Georgia', serif;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  min-width: 130px;  /* Much wider minimum width */
-  flex: 1;  /* Equal width distribution */
-  max-width: 180px;  /* Reasonable max width */
-  border: 2px solid transparent;  /* For hover borders */
+  min-width: 130px;
+  flex: 1;
+  max-width: 180px;
+  border: 2px solid transparent;
 }
 
-/* NEW: Final Scene Button Colors (like image 2) */
 .explore-btn {
-  background: linear-gradient(135deg, #4CAF50, #45a049);  /* Green for explore zones */
+  background: linear-gradient(135deg, #4CAF50, #45a049);
   color: white;
   border-color: #388e3c;
 }
@@ -300,19 +424,19 @@
 }
 
 .replay-btn {
-  background: linear-gradient(135deg, #FFD700, #FFC107);  /* NEW: Golden yellow */
-  color: #8B4513;  /* Brown text for better contrast */
+  background: linear-gradient(135deg, #FFD700, #FFC107);
+  color: #8B4513;
   border-color: #FFC107;
 }
 
 .replay-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);  /* Golden glow */
-  background: linear-gradient(135deg, #FFC107, #FF8F00);  /* Darker golden hover */
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+  background: linear-gradient(135deg, #FFC107, #FF8F00);
 }
 
 .home-btn {
-  background: linear-gradient(135deg, #2196F3, #1976d2);  /* Blue for home */
+  background: linear-gradient(135deg, #2196F3, #1976d2);
   color: white;
   border-color: #1565c0;
 }
@@ -323,7 +447,6 @@
   background: linear-gradient(135deg, #1976d2, #1565c0);
 }
 
-/* Remove old button styles for regular scenes */
 .continue-btn {
   background: linear-gradient(135deg, #20B2AA, #008B8B);
   color: white;
@@ -349,7 +472,7 @@
 }
 
 .btn-title {
-  font-size: 15px;  /* Larger text for wider buttons */
+  font-size: 15px;
   font-weight: 700;
   margin-bottom: 3px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -361,7 +484,7 @@
   font-weight: 500;
 }
 
-/* Animations */
+/* ANIMATIONS */
 @keyframes symbolPop {
   0% {
     opacity: 0;
@@ -373,6 +496,20 @@
   100% {
     opacity: 1;
     transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes meaningCardAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  60% {
+    transform: scale(1.05) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
@@ -414,7 +551,7 @@
   }
 }
 
-/* Mobile Responsive */
+/* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
   .celebration-card {
     width: 95%;
@@ -422,25 +559,55 @@
     padding: 20px;
   }
 
-  .backpack-container {
-    left: 20px;
-    top: 20px;
-    width: 120px;
-    height: 140px;
+  .container-holder.journal {
+    width: 280px !important;
+    height: 220px !important;
+    left: 10px !important;
   }
 
-  .backpack-image {
-    width: 100px;
-    height: 130px;
+  .journal-base {
+    width: 280px;
+    height: 220px;
   }
 
-  .backpack-symbol {
-    width: 20px;
-    height: 20px;
+.journal-page.left-page,
+.journal-page.right-page {
+  top: 35px !important; /* Move up slightly */
+  width: 150px !important; /* Wider pages */
+  height: 200px !important; /* Taller pages */
+}
+
+.journal-page.left-page {
+  left: 20px !important;
+}
+
+.journal-page.right-page {
+  right: 20px !important;
+}
+
+.meaning-card {
+  height: 45px !important; /* Increase from 35px */
+  padding: 6px 8px !important; /* More padding */
+  margin-bottom: 8px; /* Add spacing between cards */
+}
+
+.meaning-content {
+  gap: 10px !important; /* More space between icon and text */
+}
+
+.meaning-icon {
+  width: 28px !important; /* Increase from 20px */
+  height: 28px !important;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+  .sanskrit-text {
+    font-size: 8px;
   }
 
-  .symbol-emoji {
-    font-size: 20px;
+  .english-meaning {
+    font-size: 7px;
   }
 
   .trekker-container {
@@ -457,6 +624,7 @@
 
   .speech-bubble {
     padding: 12px 15px;
+    width: 180px;
   }
 
   .bubble-title {

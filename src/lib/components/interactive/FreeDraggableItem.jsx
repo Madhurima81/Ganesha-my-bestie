@@ -1,174 +1,231 @@
-// lib/components/interactive/FreeDraggableItem.jsx
-// 🎯 Reusable component for free dragging (no snap-back, no drop zones required)
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-import React, { useState, useRef } from 'react';
-
-const FreeDraggableItem = ({ 
+const FreeDraggableItem = ({
   id,
-  position = { top: '50%', left: '50%' }, // Current position
-  onPositionChange, // Callback when position changes
-  onDragStart, // Optional: Called when drag starts
-  onDragEnd, // Optional: Called when drag ends
-  disabled = false,
   children,
-  className = "",
+  position = { top: '0%', left: '0%' },
+  bounds,
+  dragDelay = 0,
+  onPositionChange,
+  onDragStart,
+  onDragEnd,
   style = {},
-  bounds = { top: 0, left: 0, right: 95, bottom: 95 }, // Percentage bounds
-  dragDelay = 0 // Optional delay before drag starts (useful for distinguishing from clicks)
+  className = '',
+  disabled = false,
+  ...props
 }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const dragTimeoutRef = useRef(null);
+  const [currentPosition, setCurrentPosition] = useState(position);
+  const [dragStarted, setDragStarted] = useState(false);
   
-  // 🔧 MOUSE DRAG HANDLER
-  const handleMouseDown = (e) => {
+  const elementRef = useRef(null);
+  const dragDataRef = useRef({
+    startX: 0,
+    startY: 0,
+    startLeft: 0,
+    startTop: 0,
+    offsetX: 0,
+    offsetY: 0,
+    dragTimer: null,
+    hasMoved: false
+  });
+
+  // Convert percentage to pixels for calculations
+  const percentToPixels = useCallback((percent, dimension) => {
+    if (!elementRef.current || !elementRef.current.parentElement) return 0;
+    const parentSize = dimension === 'width' 
+      ? elementRef.current.parentElement.offsetWidth
+      : elementRef.current.parentElement.offsetHeight;
+    return (parseFloat(percent) / 100) * parentSize;
+  }, []);
+
+  // Convert pixels to percentage
+  const pixelsToPercent = useCallback((pixels, dimension) => {
+    if (!elementRef.current || !elementRef.current.parentElement) return 0;
+    const parentSize = dimension === 'width' 
+      ? elementRef.current.parentElement.offsetWidth
+      : elementRef.current.parentElement.offsetHeight;
+    return (pixels / parentSize) * 100;
+  }, []);
+
+  // Update position when prop changes
+  useEffect(() => {
+    setCurrentPosition(position);
+  }, [position]);
+
+  // FIXED: Handle drag start with proper event handling
+  const handleDragStart = useCallback((clientX, clientY, event) => {
     if (disabled) return;
+
+    // Only prevent default for non-passive events
+    if (event && event.cancelable) {
+      event.preventDefault();
+    }
+
+    const rect = elementRef.current.getBoundingClientRect();
+    const parentRect = elementRef.current.parentElement.getBoundingClientRect();
     
-    console.log(`🎮 Mouse drag started for: ${id}`);
-    
-    // Optional drag delay (useful for click vs drag distinction)
+    dragDataRef.current = {
+      startX: clientX,
+      startY: clientY,
+      startLeft: percentToPixels(currentPosition.left, 'width'),
+      startTop: percentToPixels(currentPosition.top, 'height'),
+      offsetX: clientX - rect.left,
+      offsetY: clientY - rect.top,
+      dragTimer: null,
+      hasMoved: false
+    };
+
     if (dragDelay > 0) {
-      dragTimeoutRef.current = setTimeout(() => {
-        startDrag(e.clientX, e.clientY, 'mouse');
-      }, dragDelay);
-      
-      // Cancel delay if mouse moves quickly
-      const handleEarlyMove = () => {
-        if (dragTimeoutRef.current) {
-          clearTimeout(dragTimeoutRef.current);
-          startDrag(e.clientX, e.clientY, 'mouse');
+      dragDataRef.current.dragTimer = setTimeout(() => {
+        if (!dragDataRef.current.hasMoved) {
+          setIsDragging(true);
+          setDragStarted(true);
+          onDragStart?.();
         }
-      };
-      
-      document.addEventListener('mousemove', handleEarlyMove, { once: true });
-    } else {
-      startDrag(e.clientX, e.clientY, 'mouse');
-    }
-    
-    e.preventDefault();
-  };
-  
-  // 🔧 TOUCH DRAG HANDLER
-  const handleTouchStart = (e) => {
-    if (disabled) return;
-    
-    console.log(`📱 Touch drag started for: ${id}`);
-    
-    const touch = e.touches[0];
-    
-    if (dragDelay > 0) {
-      dragTimeoutRef.current = setTimeout(() => {
-        startDrag(touch.clientX, touch.clientY, 'touch');
       }, dragDelay);
     } else {
-      startDrag(touch.clientX, touch.clientY, 'touch');
+      setIsDragging(true);
+      setDragStarted(true);
+      onDragStart?.();
     }
-    
-    e.preventDefault();
-  };
-  
-  // 🔧 START DRAG LOGIC
-  const startDrag = (startX, startY, inputType) => {
-    setIsDragging(true);
-    
-    // Call external drag start handler
-    if (onDragStart) {
-      onDragStart(id);
+  }, [disabled, currentPosition, dragDelay, onDragStart, percentToPixels]);
+
+  // FIXED: Handle drag move with proper event handling
+  const handleDragMove = useCallback((clientX, clientY, event) => {
+    if (!isDragging && !dragDataRef.current.dragTimer) return;
+
+    // Only prevent default for non-passive events
+    if (event && event.cancelable) {
+      event.preventDefault();
     }
+
+    const deltaX = clientX - dragDataRef.current.startX;
+    const deltaY = clientY - dragDataRef.current.startY;
     
-    const startPos = position;
-    
-    const handleMove = (moveEvent) => {
-      let currentX, currentY;
-      
-      if (inputType === 'touch') {
-        const touch = moveEvent.touches[0];
-        currentX = touch.clientX;
-        currentY = touch.clientY;
-      } else {
-        currentX = moveEvent.clientX;
-        currentY = moveEvent.clientY;
+    // Check if we've moved enough to start dragging
+    if (!dragDataRef.current.hasMoved && (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3)) {
+      dragDataRef.current.hasMoved = true;
+    }
+
+    if (isDragging || dragStarted) {
+      let newLeft = dragDataRef.current.startLeft + deltaX;
+      let newTop = dragDataRef.current.startTop + deltaY;
+
+      // Apply bounds if specified
+      if (bounds && elementRef.current.parentElement) {
+        const parentWidth = elementRef.current.parentElement.offsetWidth;
+        const parentHeight = elementRef.current.parentElement.offsetHeight;
+        const elementWidth = elementRef.current.offsetWidth;
+        const elementHeight = elementRef.current.offsetHeight;
+
+        const minLeft = percentToPixels(bounds.left || 0, 'width');
+        const maxLeft = percentToPixels(bounds.right || 100, 'width') - elementWidth;
+        const minTop = percentToPixels(bounds.top || 0, 'height');
+        const maxTop = percentToPixels(bounds.bottom || 100, 'height') - elementHeight;
+
+        newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
+        newTop = Math.max(minTop, Math.min(maxTop, newTop));
       }
-      
-      // Calculate movement delta
-      const deltaX = currentX - startX;
-      const deltaY = currentY - startY;
-      
-      // Convert pixel movement to percentage
-      const newLeft = parseFloat(startPos.left) + (deltaX / window.innerWidth) * 100;
-      const newTop = parseFloat(startPos.top) + (deltaY / window.innerHeight) * 100;
-      
-      // Apply bounds
-      const boundedLeft = Math.max(bounds.left, Math.min(bounds.right, newLeft));
-      const boundedTop = Math.max(bounds.top, Math.min(bounds.bottom, newTop));
-      
+
       const newPosition = {
-        top: `${boundedTop}%`,
-        left: `${boundedLeft}%`
+        left: `${pixelsToPercent(newLeft, 'width')}%`,
+        top: `${pixelsToPercent(newTop, 'height')}%`
       };
-      
-      // Update position
-      if (onPositionChange) {
-        onPositionChange(newPosition);
-      }
-    };
-    
-    const handleEnd = () => {
-      console.log(`🎯 Drag ended for: ${id}`);
-      setIsDragging(false);
-      
-      // Call external drag end handler
-      if (onDragEnd) {
-        onDragEnd(id);
-      }
-      
-      // Cleanup event listeners
-      if (inputType === 'touch') {
-        document.removeEventListener('touchmove', handleMove);
-        document.removeEventListener('touchend', handleEnd);
-      } else {
-        document.removeEventListener('mousemove', handleMove);
-        document.removeEventListener('mouseup', handleEnd);
-      }
-    };
-    
-    // Add event listeners
-    if (inputType === 'touch') {
-      document.addEventListener('touchmove', handleMove, { passive: false });
-      document.addEventListener('touchend', handleEnd);
-    } else {
-      document.addEventListener('mousemove', handleMove);
-      document.addEventListener('mouseup', handleEnd);
+
+      setCurrentPosition(newPosition);
+      onPositionChange?.(newPosition);
     }
-  };
-  
-  // 🎨 DRAG STYLES
-  const dragStyles = isDragging ? {
-    transform: 'scale(1.05)',
-    filter: 'brightness(1.1) drop-shadow(0 5px 15px rgba(0,0,0,0.3))',
-    zIndex: 9999,
-    transition: 'none'
-  } : {
-    transition: 'all 0.2s ease'
-  };
-  
+  }, [isDragging, dragStarted, bounds, onPositionChange, percentToPixels, pixelsToPercent]);
+
+  // Handle drag end
+  const handleDragEnd = useCallback((event) => {
+    // Only prevent default for non-passive events
+    if (event && event.cancelable) {
+      event.preventDefault();
+    }
+
+    if (dragDataRef.current.dragTimer) {
+      clearTimeout(dragDataRef.current.dragTimer);
+      dragDataRef.current.dragTimer = null;
+    }
+
+    if (isDragging || dragStarted) {
+      setIsDragging(false);
+      setDragStarted(false);
+      onDragEnd?.();
+    }
+
+    dragDataRef.current.hasMoved = false;
+  }, [isDragging, dragStarted, onDragEnd]);
+
+  // FIXED: Mouse event handlers
+  const handleMouseDown = useCallback((event) => {
+    handleDragStart(event.clientX, event.clientY, event);
+  }, [handleDragStart]);
+
+  const handleMouseMove = useCallback((event) => {
+    handleDragMove(event.clientX, event.clientY, event);
+  }, [handleDragMove]);
+
+  const handleMouseUp = useCallback((event) => {
+    handleDragEnd(event);
+  }, [handleDragEnd]);
+
+  // FIXED: Touch event handlers with proper passive handling
+  const handleTouchStart = useCallback((event) => {
+    // Don't prevent default - let it be passive
+    const touch = event.touches[0];
+    handleDragStart(touch.clientX, touch.clientY);
+  }, [handleDragStart]);
+
+  const handleTouchMove = useCallback((event) => {
+    // Don't prevent default - let it be passive
+    const touch = event.touches[0];
+    handleDragMove(touch.clientX, touch.clientY);
+  }, [handleDragMove]);
+
+  const handleTouchEnd = useCallback((event) => {
+    // Don't prevent default - let it be passive
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  // FIXED: Event listeners with proper passive options
+  useEffect(() => {
+    if (isDragging || dragDataRef.current.dragTimer) {
+      // Mouse events
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      // Touch events - explicitly set as non-passive only when needed
+      document.addEventListener('touchmove', handleTouchMove, { passive: true });
+      document.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
+
   return (
     <div
-      className={`free-draggable-item ${className} ${isDragging ? 'dragging' : ''}`}
+      ref={elementRef}
+      className={`draggable-item ${className} ${isDragging ? 'dragging' : ''}`}
       style={{
         position: 'absolute',
-        top: position.top,
-        left: position.left,
+        left: currentPosition.left,
+        top: currentPosition.top,
         cursor: disabled ? 'default' : (isDragging ? 'grabbing' : 'grab'),
         userSelect: 'none',
-        WebkitUserSelect: 'none',
-        MozUserSelect: 'none',
-        touchAction: 'none',
+        touchAction: 'none', // This prevents browser default touch behaviors
         ...style,
-        ...dragStyles
       }}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
-      data-free-draggable={id}
+      {...props}
     >
       {children}
     </div>

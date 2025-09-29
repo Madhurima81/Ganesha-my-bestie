@@ -1,0 +1,385 @@
+.benefits-wheel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  h2 {
+    color: #ff6b00;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .wheel-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 30px 0;
+  }
+  
+  .wheel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #f5f0ff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+    overflow: hidden;
+  }
+  
+  .wheel.spinning {
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  }
+  
+  .wheel-segment {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    left: 50%;
+    top: 50%;
+    transform-origin: 0 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .segment-even {
+    background-color: #FFD700; /* Gold */
+  }
+  
+  .segment-odd {
+    background-color: #FF6347; /* Tomato */
+  }
+  
+  .segment-content {
+    transform: skewY(15deg) rotate(45deg);
+    width: 100%;
+    text-align: center;
+    padding-top: 60px;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+  }
+  
+  .wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+  }
+  
+  .ganesha-icon {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+  
+  .wheel-pointer {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 30px solid #333;
+    z-index: 10;
+  }
+  
+  .spin-button {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: #ff6b00;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .spin-button:hover {
+    background-color: #e05a00;
+    transform: translateX(-50%) scale(1.05);
+  }
+  
+  .spin-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .benefit-display {
+    margin-top: 80px;
+    width: 100%;
+    min-height: 200px;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .instruction-text {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  .benefit-animation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .benefit-animation-container h3 {
+    color: #ff6b00;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .benefit-animation-container p {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .benefit-animation {
+    width: 200px;
+    height: 150px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Concentration Animation - Focusing light */
+  .concentration-animation {
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(173,216,230,1) 100%);
+  }
+  
+  .concentration-animation::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 0 20px 20px rgba(255,255,255,0.8);
+    animation: focus 3s infinite alternate;
+  }
+  
+  @keyframes focus {
+    0% {
+      box-shadow: 0 0 5px 5px rgba(255,255,255,0.5);
+    }
+    100% {
+      box-shadow: 0 0 30px 30px rgba(255,255,255,0.9);
+    }
+  }
+  
+  /* Wisdom Animation - Growing brain */
+  .wisdom-animation {
+    background-color: #f0d6ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .wisdom-animation::before {
+    content: '🧠';
+    font-size: 30px;
+    animation: growBrain 2s infinite alternate;
+  }
+  
+  @keyframes growBrain {
+    0% {
+      font-size: 30px;
+      opacity: 0.7;
+    }
+    100% {
+      font-size: 70px;
+      opacity: 1;
+    }
+  }
+  
+  /* Positivity Animation - Sunshine rays */
+  .positivity-animation {
+    background-color: #fffacd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .positivity-animation::before {
+    content: '☀️';
+    font-size: 50px;
+    animation: pulseSun 1.5s infinite alternate;
+  }
+  
+  @keyframes pulseSun {
+    0% {
+      transform: scale(1);
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    100% {
+      transform: scale(1.3);
+      text-shadow: 0 0 20px rgba(255, 215, 0, 1);
+    }
+  }
+  
+  /* Courage Animation - Growing muscles */
+  .courage-animation {
+    background-color: #ffcccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .courage-animation::before {
+    content: '💪';
+    font-size: 40px;
+    animation: flexMuscle 1s infinite alternate;
+  }
+  
+  @keyframes flexMuscle {
+    0% {
+      transform: rotate(-20deg) scale(1);
+    }
+    50% {
+      transform: rotate(0deg) scale(1.2);
+    }
+    100% {
+      transform: rotate(20deg) scale(1.4);
+    }
+  }
+  
+  /* Happiness Animation - Flying hearts */
+  .happiness-animation {
+    background-color: #ffd6e7;
+    overflow: hidden;
+  }
+  
+  .happiness-animation::before {
+    content: '😊';
+    font-size: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 1s infinite alternate;
+  }
+  
+  .happiness-animation::after {
+    content: '❤️';
+    font-size: 20px;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    animation: floatHeart 3s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.3);
+    }
+  }
+  
+  @keyframes floatHeart {
+    0% {
+      top: 100%;
+      left: 20%;
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      top: 0%;
+      left: 50%;
+      opacity: 0;
+    }
+  }
+  
+  /* Creativity Animation - Colorful waves */
+  .creativity-animation {
+    background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #a1c4fd);
+    background-size: 400% 400%;
+    animation: gradient 5s ease infinite;
+  }
+  
+  .creativity-animation::before {
+    content: '🎨';
+    font-size: 40px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  @keyframes float {
+    0% {
+      transform: translate(-50%, -60%);
+    }
+    50% {
+      transform: translate(-50%, -40%);
+    }
+    100% {
+      transform: translate(-50%, -60%);
+    }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 480px) {
+    .wheel-container {
+      width: 250px;
+      height: 250px;
+    }
+    
+    .segment-content {
+      padding-top: 50px;
+      font-size: 0.9rem;
+    }
+    
+    .benefit-animation {
+      width: 160px;
+      height: 120px;
+    }
+  }

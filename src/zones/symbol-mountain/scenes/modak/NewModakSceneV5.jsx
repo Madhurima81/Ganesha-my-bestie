@@ -31,6 +31,11 @@ import MagicalCardFlip from '../../../../lib/components/animation/MagicalCardFli
 import SymbolSidebar from '../../shared/components/SymbolSidebar';
 import SceneCompletionCelebration from '../../../../lib/components/celebration/SceneCompletionCelebration';
 
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
+
+
 // Images - 🎯 UPDATED for ModakScene
 import forestBackground from './assets/images/forest-background.png';
 
@@ -260,6 +265,14 @@ console.log('🎭 MODAK GAMECOACH HOOK CHECK:', {
   timestamp: Date.now()
 });
 
+  const { resetScene } = useSceneReset(
+  sceneActions, 
+  'cave-of-secrets', 
+  'suryakoti-samaprabha', 
+  getSceneResetConfig('suryakoti-samaprabha')
+);
+
+
   const [showSparkle, setShowSparkle] = useState(null);
   const [currentSourceElement, setCurrentSourceElement] = useState(null);
   const [showPopupBook, setShowPopupBook] = useState(false);
@@ -287,6 +300,8 @@ const [mooshikaSpeechMessage, setMooshikaSpeechMessage] = useState('');
   // 🐭 ADD THESE TWO LINES HERE:
 const [mooshikaPosition, setMooshikaPosition] = useState({ top: '45%', left: '25%' });
 const [mooshikaDragging, setMooshikaDragging] = useState(false);
+
+
 
 // Add this function inside your scene component (around line 200-300)
 const resetSceneForNewPlaythrough = () => {
@@ -2207,6 +2222,9 @@ className={`mooshika-container ${getMooshikaAnimationClass()}`}    style={{
 )}
 
             {/* 🧪 COMPLETION TEST BUTTON */}
+
+            <BackToMapButton onNavigate={onNavigate} hideCoach={hideCoach} clearManualCloseTracking={clearManualCloseTracking} />
+
 <div style={{
   position: 'fixed',
   top:' 170px',
@@ -2521,7 +2539,9 @@ onZonesClick={() => {
     if (hideCoach) hideCoach();
     if (clearManualCloseTracking) clearManualCloseTracking();
     setTimeout(() => onNavigate?.('zones'), 100);
-  }}            currentProgress={{
+  }}       
+    onStartFresh={() => resetScene()}  // ← ADD THIS LINE
+     currentProgress={{
               stars: sceneState.celebrationStars || 0,
               completed: sceneState.phase === PHASES.COMPLETE ? 1 : 0,
               total: 1
@@ -2579,102 +2599,96 @@ onZonesClick={() => {
 
 )}
 
-          <SceneCompletionCelebration
-  show={showSceneCompletion}
-  sceneName="Garden Adventure"
-  sceneNumber={1}
-  totalScenes={4}
-  starsEarned={8}
-  totalStars={8}
-  discoveredSymbols={['mooshika', 'modak', 'belly']}
-  symbolImages={{
-  mooshika: symbolMooshikaColored,
-  modak: symbolModakColored,
-  belly: symbolBellyColored
-}}
-  nextSceneName="Temple Discovery"
-  sceneId="modak"                    // ← ADD THIS LINE
-  completionData={{                  // ← ADD THIS BLOCK
-    stars: 8,
-    symbols: { mooshika: true, modak: true, belly: true },
-    completed: true,
-    totalStars: 8
-  }}
-
-    onComplete={onComplete}  // ← ADD THIS LINE
-
-onReplay={() => {
-  console.log('🔧 NUCLEAR OPTION: Bulletproof Play Again');
-  
-  const profileId = localStorage.getItem('activeProfileId');
-  if (profileId) {
-    // Clear ALL storage
-    localStorage.removeItem(`temp_session_${profileId}_symbol-mountain_modak`);
-    localStorage.removeItem(`replay_session_${profileId}_symbol-mountain_modak`);
-    localStorage.removeItem(`play_again_${profileId}_symbol-mountain_modak`);
-    
-    SimpleSceneManager.setCurrentScene('symbol-mountain', 'modak', false, false);
-    console.log('🗑️ NUCLEAR: All storage cleared');
-  }
-  
-  // Force clean reload
-  console.log('🔄 NUCLEAR: Forcing reload in 100ms');
-  setTimeout(() => {
-    window.location.reload();
-  }, 100);
-}}
-
-onContinue={() => {
-  console.log('🔧 CONTINUE: Going to next scene + preserving resume');
-  
-  // 1. ✅ ENHANCED: More aggressive GameCoach clearing (same as Play Again)
-  if (clearManualCloseTracking) {
-    clearManualCloseTracking();
-    console.log('✅ CONTINUE: GameCoach manual tracking cleared');
-  }
-  if (hideCoach) {
-    hideCoach();
-    console.log('✅ CONTINUE: GameCoach hidden');
-  }
-  
-  // ✅ NEW: Enhanced GameCoach timeout for Continue too
-  setTimeout(() => {
-    console.log('🎭 CONTINUE: Forcing GameCoach fresh start for next scene');
-    if (clearManualCloseTracking) {
-      clearManualCloseTracking();
-      console.log('🎭 CONTINUE: GameCoach cleared again after delay');
-    }
-  }, 500);
-  
-  // 2. Save completion data
-  const profileId = localStorage.getItem('activeProfileId');
-  if (profileId) {
-    ProgressManager.updateSceneCompletion(profileId, 'symbol-mountain', 'modak', {
-      completed: true,
+      {/* Scene Completion - FIXED: Single state control */}
+{showSceneCompletion && (
+  <SceneCompletionCelebration
+    show={true}  // Always true when rendered
+    sceneName="Garden Adventure"
+    sceneNumber={1}
+    totalScenes={4}
+    starsEarned={8}
+    totalStars={8}
+    discoveredSymbols={['mooshika', 'modak', 'belly'].filter(symbol =>
+      sceneState.discoveredSymbols?.[symbol]
+    )}
+    symbolImages={{
+      mooshika: symbolMooshikaColored,
+      modak: symbolModakColored,
+      belly: symbolBellyColored
+    }}
+    nextSceneName="Pond Discovery"
+    sceneId="modak"
+    completionData={{
       stars: 8,
-      symbols: { mooshika: true, modak: true, belly: true }
-    });
-    
-    GameStateManager.saveGameState('symbol-mountain', 'modak', {
+      symbols: { mooshika: true, modak: true, belly: true },
       completed: true,
-      stars: 8,
-      symbols: { mooshika: true, modak: true, belly: true }
-    });
-    
-    console.log('✅ CONTINUE: Completion data saved');
-  }
+      totalStars: 8
+    }}
+    onComplete={onComplete}
 
-  // 3. ✅ CRITICAL: Set NEXT scene for resume tracking
-  setTimeout(() => {
-    SimpleSceneManager.setCurrentScene('symbol-mountain', 'pond', false, false);
-    console.log('✅ CONTINUE: Next scene (pond) set for resume tracking');
-    
-    // Navigate to next scene
-    onNavigate?.('scene-complete-continue');
-  }, 100);
+   onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);  // Hide completion screen
+  resetScene();  // Use the hook instead of all that complex logic
 }}
 
-/>
+    onContinue={() => {
+      console.log('🔧 GARDEN ADVENTURE CONTINUE: Going to next scene + preserving resume');
+      
+      // 1. Enhanced GameCoach clearing
+      if (clearManualCloseTracking) {
+        clearManualCloseTracking();
+        console.log('✅ GARDEN ADVENTURE CONTINUE: GameCoach manual tracking cleared');
+      }
+      if (hideCoach) {
+        hideCoach();
+        console.log('✅ GARDEN ADVENTURE CONTINUE: GameCoach hidden');
+      }
+      
+      // Enhanced GameCoach timeout
+      setTimeout(() => {
+        console.log('🎭 GARDEN ADVENTURE CONTINUE: Forcing GameCoach fresh start for next scene');
+        if (clearManualCloseTracking) {
+          clearManualCloseTracking();
+          console.log('🎭 GARDEN ADVENTURE CONTINUE: GameCoach cleared again after delay');
+        }
+      }, 500);
+      
+      // 2. Save completion data
+      const profileId = localStorage.getItem('activeProfileId');
+      if (profileId) {
+        try {
+          ProgressManager.updateSceneCompletion(profileId, 'symbol-mountain', 'modak', {
+            completed: true,
+            stars: 8,
+            symbols: { mooshika: true, modak: true, belly: true }
+          });
+          
+          GameStateManager.saveGameState('symbol-mountain', 'modak', {
+            completed: true,
+            stars: 8,
+            symbols: { mooshika: true, modak: true, belly: true },
+            unlocked: true,
+            timestamp: Date.now()
+          });
+          
+          console.log('✅ GARDEN ADVENTURE CONTINUE: Completion data saved');
+        } catch (error) {
+          console.error('❌ GARDEN ADVENTURE CONTINUE SAVE ERROR:', error);
+          console.log('🔄 GARDEN ADVENTURE CONTINUE: Navigation continues despite save error');
+        }
+      }
+
+      // 3. Set NEXT scene for resume tracking
+      setTimeout(() => {
+        SimpleSceneManager.setCurrentScene('symbol-mountain', 'pond', false, false);
+        console.log('✅ GARDEN ADVENTURE CONTINUE: Next scene (pond) set for resume tracking');
+        
+        onNavigate?.('scene-complete-continue');
+      }, 100);
+    }}
+  />
+)}
 
         </div>       
       </MessageManager>

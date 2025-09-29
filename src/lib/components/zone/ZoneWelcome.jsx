@@ -18,7 +18,7 @@ const ZONE_CONTENT_TYPES = {
   'symbol-mountain': ['symbols'],
   'shloka-river': ['chants'],
   'story-treehouse': ['stories'], 
-  'festival-square': ['symbols', 'stories', 'chants'],
+  'festival-square': [], // ✅ CHANGE: Empty array since it's pure fun games
   'about-me-hut': ['stories'],
   'cave-of-secrets': ['chants'],
   'obstacle-forest': ['symbols']

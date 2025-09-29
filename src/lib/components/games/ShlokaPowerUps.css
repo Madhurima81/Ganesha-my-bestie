@@ -1,0 +1,372 @@
+.shloka-power-ups-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f0ff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    color: #ff6b00;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 2rem;
+  }
+  
+  .intro-text {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  /* Scenario Selection Styles */
+  .scenario-selector {
+    margin-bottom: 20px;
+  }
+  
+  .scenario-selector h3 {
+    text-align: center;
+    color: #8e44ad;
+    margin-bottom: 15px;
+  }
+  
+  .scenario-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .scenario-button {
+    background-color: #e8e8e8;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .scenario-button:hover {
+    background-color: #d0d0d0;
+  }
+  
+  .scenario-button.active {
+    background-color: #8e44ad;
+    color: white;
+  }
+  
+  /* Scenario Display Styles */
+  .scenario-display {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .scenario-display h3 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+  }
+  
+  .scenario-description {
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+  }
+  
+  .scenario-visual {
+    position: relative;
+    min-height: 300px;
+    margin-bottom: 20px;
+  }
+  
+  /* Character States */
+  .character-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: opacity 0.5s;
+  }
+  
+  .character-state.hidden {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  
+  .character-state.visible {
+    opacity: 1;
+  }
+  
+  .character-image {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .placeholder-image {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #ddd;
+  }
+  
+  .emotion-emoji {
+    font-size: 5rem;
+  }
+  
+  .character-thoughts {
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 15px;
+    max-width: 80%;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  
+  .character-thoughts:after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 10px 10px;
+    border-style: solid;
+    border-color: transparent transparent #f0f0f0;
+  }
+  
+  .character-thoughts p {
+    margin: 0;
+    text-align: center;
+    color: #333;
+    font-size: 1.1rem;
+  }
+  
+  .character-thoughts.success {
+    background-color: #e6f7e8;
+  }
+  
+  .character-thoughts.success:after {
+    border-color: transparent transparent #e6f7e8;
+  }
+  
+  /* Shloka Animation */
+  .shloka-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    z-index: 10;
+  }
+  
+  .shloka-animation.visible {
+    opacity: 1;
+  }
+  
+  .shloka-text {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(142, 68, 173, 0.5);
+    animation: pulse 2s infinite alternate;
+    z-index: 2;
+  }
+  
+  .shloka-text p {
+    margin: 10px 0;
+    text-align: center;
+    color: #8e44ad;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .glowing-energy {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(142, 68, 173, 0.8) 0%, rgba(142, 68, 173, 0) 70%);
+    border-radius: 50%;
+    animation: expand 2s infinite alternate;
+    z-index: 1;
+  }
+  
+  @keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+  }
+  
+  @keyframes expand {
+    from { transform: scale(0.8); opacity: 0.5; }
+    to { transform: scale(1.2); opacity: 0.2; }
+  }
+  
+  /* Power-Up Badge */
+  .power-up-badge {
+    background-color: #ff6b00;
+    color: white;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 10px;
+    transform: rotate(-5deg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    animation: bounce 1s infinite alternate;
+  }
+  
+  @keyframes bounce {
+    from { transform: rotate(-5deg) translateY(0); }
+    to { transform: rotate(-5deg) translateY(-10px); }
+  }
+  
+  /* Activation Button */
+  .activate-shloka-button {
+    display: block;
+    margin: 0 auto;
+    background-color: #ff6b00;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .activate-shloka-button:hover {
+    background-color: #e05a00;
+    transform: scale(1.05);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Success Message */
+  .power-up-message {
+    background-color: #fff3e0;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    margin-top: 20px;
+    animation: fadeIn 0.5s;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .power-up-message h3 {
+    color: #ff6b00;
+    margin-bottom: 10px;
+  }
+  
+  .power-up-message p {
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  /* Shloka Info Section */
+  .shloka-info {
+    background-color: #e8f4f8;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .shloka-info h3 {
+    color: #2980b9;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  .shloka-info p {
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.5;
+  }
+  
+  .shloka-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .benefit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100px;
+  }
+  
+  .benefit-icon {
+    font-size: 2rem;
+    margin-bottom: 5px;
+  }
+  
+  .benefit-text {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #444;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 600px) {
+    .scenario-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .scenario-button {
+      width: 90%;
+    }
+    
+    .scenario-visual {
+      min-height: 350px;
+    }
+    
+    .character-image {
+      width: 150px;
+      height: 150px;
+    }
+    
+    .emotion-emoji {
+      font-size: 4rem;
+    }
+    
+    .character-thoughts {
+      max-width: 90%;
+    }
+    
+    .shloka-benefits {
+      gap: 10px;
+    }
+    
+    .benefit {
+      width: 80px;
+    }
+  }

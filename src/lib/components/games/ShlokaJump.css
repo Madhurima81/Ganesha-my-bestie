@@ -1,0 +1,380 @@
+.shloka-jump-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f0ff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    color: #ff6b00;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+  }
+  
+  /* Introduction Screen Styles */
+  .shloka-jump-intro {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .intro-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .intro-content p {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  .intro-ganesha {
+    font-size: 4rem;
+    margin: 20px 0;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  .start-game-btn {
+    background-color: #ff6b00;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+  }
+  
+  .start-game-btn:hover {
+    background-color: #e05a00;
+    transform: scale(1.05);
+  }
+  
+  /* Game Screen Styles */
+  .shloka-jump-game {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .game-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .level-info {
+    color: #27ae60;
+  }
+  
+  .score-info {
+    color: #e74c3c;
+  }
+  
+  .game-path {
+    position: relative;
+    height: 150px;
+    background-color: #e6e6e6;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  
+  .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 10px;
+    background-color: #3498db;
+    transition: width 0.5s ease;
+  }
+  
+  .ganesha-character {
+    position: absolute;
+    bottom: 20px;
+    font-size: 3rem;
+    transition: left 0.5s ease;
+    z-index: 2;
+  }
+  
+  .ganesha-character.jump {
+    animation: jump 1s;
+  }
+  
+  @keyframes jump {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-80px); }
+    100% { transform: translateY(0); }
+  }
+  
+  .obstacle {
+    position: absolute;
+    bottom: 20px;
+    font-size: 2.5rem;
+    transition: left 0.5s ease;
+  }
+  
+  .shloka-display {
+    margin: 20px 0;
+  }
+  
+  .current-word-status {
+    background-color: #ffeecc;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 1.1rem;
+  }
+  
+  .correct-option {
+    border: 2px solid #27ae60 !important;
+  }
+  
+  .word-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .word-option {
+    background-color: white;
+    border: 2px solid #8e44ad;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+    margin: 5px;
+  }
+  
+  .word-option:hover {
+    background-color: #8e44ad;
+    color: white;
+    transform: scale(1.05);
+  }
+  
+  .word-option:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .shloka-progress {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .shloka-words {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .shloka-word {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    background-color: #f0f0f0;
+    color: #777;
+  }
+  
+  .shloka-word.completed {
+    background-color: #27ae60;
+    color: white;
+  }
+  
+  .shloka-word.current {
+    background-color: #e74c3c;
+    color: white;
+    animation: pulse 1s infinite alternate;
+  }
+  
+  @keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+  }
+  
+  .reset-game-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 20px;
+  }
+  
+  .reset-game-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  .shake {
+    animation: shake 0.5s;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  
+  /* Completion Screen Styles */
+  .shloka-jump-completion {
+    text-align: center;
+    padding: 20px;
+    animation: fadeIn 1s;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .completion-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .winning-ganesha {
+    font-size: 4rem;
+    margin: 20px 0;
+    animation: celebrate 2s infinite alternate;
+  }
+  
+  @keyframes celebrate {
+    0% { transform: scale(1) rotate(-5deg); }
+    50% { transform: scale(1.1) rotate(0deg); }
+    100% { transform: scale(1) rotate(5deg); }
+  }
+  
+  .completion-message {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 15px 0;
+  }
+  
+  .completion-score {
+    font-size: 1.2rem;
+    color: #e74c3c;
+    margin-bottom: 20px;
+  }
+  
+  .completion-lesson {
+    background-color: #fff3e0;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+  }
+  
+  .completion-lesson h3 {
+    color: #ff6b00;
+    margin-bottom: 10px;
+  }
+  
+  .completion-lesson p {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .full-shloka {
+    margin: 25px 0;
+    padding: 15px;
+    background-color: #f0e6ff;
+    border-radius: 10px;
+  }
+  
+  .full-shloka h3 {
+    color: #8e44ad;
+    margin-bottom: 10px;
+  }
+  
+  .full-shloka p {
+    font-style: italic;
+    color: #6c3483;
+    line-height: 1.6;
+  }
+  
+  .shloka-meaning {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+    margin: 15px 0;
+  }
+  
+  .play-again-btn {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+  }
+  
+  .play-again-btn:hover {
+    background-color: #219653;
+    transform: scale(1.05);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 600px) {
+    .game-path {
+      height: 120px;
+    }
+    
+    .ganesha-character {
+      font-size: 2.5rem;
+    }
+    
+    .obstacle {
+      font-size: 2rem;
+    }
+    
+    .word-options {
+      gap: 8px;
+    }
+    
+    .word-option {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+    }
+    
+    .shloka-word {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+    }
+    
+    .winning-ganesha {
+      font-size: 3rem;
+    }
+  }

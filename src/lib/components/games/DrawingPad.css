@@ -1,0 +1,298 @@
+.drawing-pad-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .drawing-tools {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .color-palette {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+  }
+  
+  .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .color-option.selected {
+    border: 3px solid #FF9800;
+    transform: scale(1.2);
+  }
+  
+  .brush-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .brush-controls label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #5D1049;
+  }
+  
+  .brush-controls input[type="range"] {
+    width: 80%;
+    max-width: 300px;
+    height: 10px;
+    background: linear-gradient(to right, #FF9800, #F57C00);
+    border-radius: 5px;
+    outline: none;
+  }
+  
+  .brush-controls input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #5D1049;
+    cursor: pointer;
+  }
+  
+  .brush-controls input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #5D1049;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .drawing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .drawing-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  
+  .drawing-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .drawing-btn:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  .drawing-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .drawing-btn.clear {
+    background-color: #FF5252;
+    color: white;
+  }
+  
+  .drawing-btn.undo, .drawing-btn.redo {
+    background-color: #90CAF9;
+    color: #333;
+  }
+  
+  .drawing-btn.save {
+    background-color: #66BB6A;
+    color: white;
+  }
+  
+  .drawing-btn.template {
+    background-color: #FFCA28;
+    color: #333;
+  }
+  
+  .canvas-container {
+    position: relative;
+    margin: 10px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  canvas {
+    border: 3px solid #5D1049;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: white;
+    touch-action: none; /* Prevents scrolling on touch devices */
+    max-width: 100%;
+  }
+  
+  .drawing-instructions {
+    margin-top: 15px;
+    text-align: center;
+    color: #5D1049;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  /* Templates overlay */
+  .templates-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .templates-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .templates-container h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #5D1049;
+  }
+  
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .template-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 2px solid #FF9800;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .template-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .template-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .close-templates-btn {
+    display: block;
+    margin: 0 auto;
+    padding: 8px 20px;
+    background-color: #FF5252;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  
+  .close-templates-btn:hover {
+    background-color: #D32F2F;
+    transform: translateY(-2px);
+  }
+  
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .drawing-pad-container {
+      padding: 15px;
+    }
+    
+    .drawing-tools {
+      margin-bottom: 10px;
+    }
+    
+    .color-palette {
+      gap: 5px;
+    }
+    
+    .color-option {
+      width: 25px;
+      height: 25px;
+    }
+    
+    .drawing-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+    
+    .templates-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .drawing-pad-container {
+      padding: 10px;
+    }
+    
+    .color-option {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .drawing-actions {
+      gap: 5px;
+    }
+    
+    .drawing-btn {
+      padding: 5px 10px;
+      font-size: 0.75rem;
+    }
+    
+    .templates-container {
+      width: 95%;
+      padding: 15px;
+    }
+  }

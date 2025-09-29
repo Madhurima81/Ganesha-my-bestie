@@ -9,6 +9,7 @@ const TocaBocaNav = ({
   isAudioOn,
   onAudioToggle,
   onZonesClick,
+    onStartFresh, // ← ADD THIS NEW PROP
   currentProgress = { stars: 0, completed: 0, total: 4 }
 }) => {
   const [showLeftMenu, setShowLeftMenu] = useState(false);
@@ -231,6 +232,19 @@ const TocaBocaNav = ({
             <span className="menu-icon">❓</span>
             <span className="menu-label">Help</span>
           </button>
+
+          {/* ✨ ADD THIS NEW START FRESH BUTTON */}
+<button 
+  className="menu-button restart-button"
+  onClick={() => handleMenuAction(() => {
+    if (window.confirm('Start this scene fresh? You will lose current progress in this scene only.')) {
+      onStartFresh();
+    }
+  })}
+>
+  <span className="menu-icon">🔄</span>
+  <span className="menu-label">Start Fresh</span>
+</button>
           
           <div className="menu-divider" />
           

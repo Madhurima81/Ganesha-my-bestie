@@ -24,6 +24,12 @@ class ProgressManager {
       totalScenes: 5,
       order: 2
     },
+      'shloka-river': {
+    name: 'Shloka River',
+    scenes: ['vakratunda-grove', 'suryakoti-bank', 'nirvighnam-chant', 'sarvakaryeshu-chant', 'shloka-river-finale'],
+    totalScenes: 5,
+    order: 3
+  },
     'obstacle-forest': {
       name: 'Obstacle Forest', 
       scenes: ['forest', 'logs', 'leaves', 'mud'],
@@ -48,24 +54,43 @@ class ProgressManager {
       totalScenes: 3,
       order: 6
     },
-    'festival-square': {
-      name: 'Festival Square',
-      scenes: ['open-ground', 'mandap', 'ganesha'],
-      totalScenes: 3,
-      order: 7
-    }
+   'festival-square': {
+  name: 'Festival Square',
+  scenes: ['game1', 'game2', 'game3', 'game4'], // ✅ CHANGE: Match App.jsx
+  totalScenes: 4,
+  order: 7
+}
   };
 
-  // 🎯 SCENE METADATA - Names and max stars per scene
-  static SCENE_METADATA = {
-    'modak': { name: 'Modak Forest Adventure', maxStars: 8, order: 1 },
-    'pond': { name: 'Sacred Pond Discovery', maxStars: 5, order: 2 },
-    'symbol': { name: 'Ancient Temple Mystery', maxStars: 6, order: 3 },
-    'final-scene': { name: 'Magical Garden Quest', maxStars: 7, order: 4 },
-    'crystal-cave': { name: 'Crystal Cave Exploration', maxStars: 5, order: 1 },
-    'treasure-chamber': { name: 'Treasure Chamber Adventure', maxStars: 6, order: 2 }
-    // Add more scene metadata as needed
-  };
+static SCENE_METADATA = {
+  'modak': { name: 'Modak Forest Adventure', maxStars: 8, order: 1 },
+  'pond': { name: 'Sacred Pond Discovery', maxStars: 5, order: 2 },
+  'symbol': { name: 'Ancient Temple Mystery', maxStars: 6, order: 3 },
+  'final-scene': { name: 'Magical Garden Quest', maxStars: 7, order: 4 },
+  
+  // ✅ ADD: Cave of Secrets scenes (MISSING!)
+  'vakratunda-mahakaya': { name: 'Vakratunda Mahakaya', maxStars: 8, order: 1 },
+  'suryakoti-samaprabha': { name: 'Surya Koti Samaprabha', maxStars: 8, order: 2 },
+  'nirvighnam-kurumedeva': { name: 'Nirvighnam Kurume Deva', maxStars: 8, order: 3 },
+  'sarvakaryeshu-sarvada': { name: 'Sarvakaryeshu Sarvada', maxStars: 8, order: 4 },
+  'mantra-assembly': { name: 'Sacred Mantra Assembly', maxStars: 8, order: 5 },
+  
+  'crystal-cave': { name: 'Crystal Cave Exploration', maxStars: 5, order: 1 },
+  'treasure-chamber': { name: 'Treasure Chamber Adventure', maxStars: 6, order: 2 },
+  
+  // Shloka River scenes (already present)
+  'vakratunda-grove': { name: 'Vakratunda Grove', maxStars: 5, order: 1 },
+  'suryakoti-bank': { name: 'Suryakoti Bank', maxStars: 5, order: 2 },
+  'nirvighnam-chant': { name: 'Nirvighnam Chant', maxStars: 5, order: 3 },
+  'sarvakaryeshu-chant': { name: 'Sarvakaryeshu Chant', maxStars: 5, order: 4 },
+  'shloka-river-finale': { name: 'Shloka River Finale', maxStars: 6, order: 5 },
+  
+  // Festival Square scenes  
+  'game1': { name: 'Festival Piano', maxStars: 6, order: 1 },
+  'game2': { name: 'Rangoli Art Booth', maxStars: 6, order: 2 },
+  'game3': { name: 'Modak Cooking', maxStars: 6, order: 3 },
+  'game4': { name: 'Mandap Decoration', maxStars: 6, order: 4 }
+};
 
   // 📊 GET ZONE PROGRESS - Primary function for Zone Welcome screens
   static calculateZoneProgress(profileId, zoneId) {
@@ -254,12 +279,15 @@ class ProgressManager {
         stars: completionData.stars || 0,
         symbols: completionData.symbols || {},
 
-
   // ✅ ADD THESE LINES - Save chant data for all zones
   chants: completionData.chants || {},           // Generic chants
   mantras: completionData.mantras || {},         // Symbol Mountain mantras
   sanskritWords: completionData.sanskritWords || {}, // Cave Sanskrit words
   learnedChants: completionData.learnedChants || {}, // Alternative format
+
+    // ✅ ADD THESE MISSING LINES - Shloka River specific data
+  syllables: completionData.syllables || {},     // 🎯 MISSING - Shloka River syllables
+  words: completionData.words || {},             // 🎯 MISSING - Shloka River words
 
         completedAt: timestamp,
         lastPlayed: timestamp
@@ -344,6 +372,10 @@ profileProgress.zones[zoneId].scenes[sceneId] = {
   mantras: completionData.mantras || {},
   sanskritWords: completionData.sanskritWords || {},
   learnedChants: completionData.learnedChants || {},
+
+    // ✅ ADD THESE MISSING LINES - Shloka River specific data
+  syllables: completionData.syllables || {},     // 🎯 MISSING - Shloka River syllables
+  words: completionData.words || {},             // 🎯 MISSING - Shloka River words
   
   completedAt: Date.now(),
   lastPlayed: Date.now(),

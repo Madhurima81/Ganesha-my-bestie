@@ -14,65 +14,65 @@ const SceneCompletionCelebration = ({
   nextSceneName = "Temple Discovery",
   onContinue,
   onReplay,
-  onExploreZones,        // ← NEW: For final scene
-  onViewProgress,        // ← NEW: For final scene
-  onHome,                // ← NEW: For final scene
+  onExploreZones,
+  onViewProgress,
+  onHome,
   sceneId = 'pond',
   completionData = null,
   onComplete = null,
   childName = "little explorer",
-  isFinalScene = false   // ← NEW: Different buttons for final scene
+  isFinalScene = false,
+  
+  // Container type props
+  containerType = "backpack",        // "backpack", "smartwatch", or "journal"
+  containerImage = null,             // Base container image
+  containerScreenImage = null,       // Screen overlay (smartwatch only)
+  appImages = {},                    // App icon mappings (smartwatch)
+  meaningCards = {},                 // Meaning card data (journal)
+  zoneId = 'symbol-mountain'
 }) => {
   const [stage, setStage] = useState('hidden');
-  const [symbolsInBackpack, setSymbolsInBackpack] = useState([]);
+  const [symbolsInContainer, setSymbolsInContainer] = useState([]);
   
   const { clearManualCloseTracking } = useGameCoach();
 
-  useEffect(() => {
-    if (!show) {
-      setStage('hidden');
-      setSymbolsInBackpack([]);
-      return;
-    }
+useEffect(() => {
+  if (!show) {
+    // IMMEDIATE: Hide without delay or animation
+    setStage('hidden');
+    setSymbolsInContainer([]);
+    return;
+  }
 
-    // Show immediately when scene tells us to
-    setStage('celebrating');
-    
-    // Remove duplicates from discoveredSymbols first
-    const uniqueSymbols = [...new Set(discoveredSymbols)];
-    
-    // Symbols appear in backpack one by one
-    setTimeout(() => {
-      uniqueSymbols.forEach((symbol, index) => {
-        setTimeout(() => {
-          setSymbolsInBackpack(prev => {
-            // Prevent duplicates in state too
-            if (prev.includes(symbol)) return prev;
-            return [...prev, symbol];
-          });
-        }, index * 500);
-      });
-    }, 500);
+  // Only animate in if we're actually showing
+  setStage('celebrating');
+  const uniqueSymbols = [...new Set(discoveredSymbols)];
+  
+  setTimeout(() => {
+    uniqueSymbols.forEach((symbol, index) => {
+      setTimeout(() => {
+        setSymbolsInContainer(prev => {
+          if (prev.includes(symbol)) return prev;
+          return [...prev, symbol];
+        });
+      }, index * 500);
+    });
+  }, 500);
 
-    // Show action buttons after symbols
-    setTimeout(() => {
-      setStage('actions-ready');
-    }, 500 + (uniqueSymbols.length * 500) + 2500);
+  setTimeout(() => {
+    setStage('actions-ready');
+  }, 500 + (uniqueSymbols.length * 500) + 2500);
 
-  }, [show, discoveredSymbols]);
+}, [show, discoveredSymbols]);
 
-  // Generic action handler with GameCoach cleanup
+  // Action handlers
   const handleAction = (actionCallback, skipComplete = false) => {
-    console.log('🔧 ACTION: Scene-level handling + GameCoach cleanup');
-    
     if (clearManualCloseTracking) {
       clearManualCloseTracking();
-      console.log('✅ GameCoach state cleared');
     }
     
     setStage('exiting');
     setTimeout(() => {
-      // Save completion data if needed
       if (!skipComplete && onComplete && completionData) {
         onComplete(sceneId, completionData);
       }
@@ -80,40 +80,54 @@ const SceneCompletionCelebration = ({
     }, 400);
   };
 
-  // Regular scene handlers
-  const handleContinue = () => {
-    handleAction(() => onContinue?.());
+  const handleContinue = () => handleAction(() => onContinue?.());
+
+const handleReplay = () => {
+  console.log('🔄 COMPLETION: Immediate hide + callback');
+  
+  if (clearManualCloseTracking) {
+    clearManualCloseTracking();
+  }
+  
+  // IMMEDIATE: Force hide the component
+  setStage('hidden');
+  
+  // IMMEDIATE: Execute callback (no delay)
+  onReplay?.();
+  
+  // FAIL-SAFE: Force hide again after a tick
+  setTimeout(() => {
+    setStage('hidden');
+  }, 10);
+};
+
+  const handleBackToMap = () => handleAction(() => console.log('Navigate to zone map'));
+  const handleExploreZones = () => handleAction(() => onExploreZones?.());
+  const handleViewProgress = () => handleAction(() => onViewProgress?.());
+  const handleHome = () => handleAction(() => onHome?.());
+
+  // Helper functions
+  const getAppGridPosition = (index) => {
+    if (index < 3) return { gridColumn: index + 1, gridRow: 1 };
+    if (index < 5) return { gridColumn: (index - 3) + 2, gridRow: 2 };
+    return { gridColumn: (index - 5) + 1, gridRow: 3 };
   };
 
-  const handleReplay = () => {
-    handleAction(() => onReplay?.(), true); // Skip complete for replay
-  };
-
-  const handleBackToMap = () => {
-    handleAction(() => console.log('Navigate to zone map'));
-  };
-
-  // Final scene handlers
-  const handleExploreZones = () => {
-    handleAction(() => onExploreZones?.());
-  };
-
-  const handleViewProgress = () => {
-    handleAction(() => onViewProgress?.());
-  };
-
-  const handleHome = () => {
-    handleAction(() => onHome?.());
+  const getJournalPosition = (index) => {
+    const isLeftPage = index % 2 === 0;
+    const rowOnPage = Math.floor(index / 2);
+    return {
+      page: isLeftPage ? 'left' : 'right',
+      row: rowOnPage + 1
+    };
   };
 
   if (stage === 'hidden') return null;
 
   return (
     <>
-      {/* Light overlay to dim scene slightly */}
       <div className={`celebration-backdrop stage-${stage}`} />
       
-      {/* Sparkle effects */}
       <div className="sparkle-effects">
         {Array.from({length: 15}).map((_, i) => (
           <div 
@@ -131,10 +145,8 @@ const SceneCompletionCelebration = ({
         ))}
       </div>
       
-      {/* Main celebration card */}
       <div className={`celebration-card stage-${stage}`}>
         
-        {/* Background sparkles inside card */}
         <div className="card-sparkles">
           {Array.from({length: 12}).map((_, i) => (
             <div 
@@ -151,74 +163,293 @@ const SceneCompletionCelebration = ({
           ))}
         </div>
         
-        {/* Backpack on left */}
+        {/* Container - Backpack, Smartwatch, or Journal */}
         <div 
-          className="backpack-container"
+          className={`container-holder ${containerType}`}
           style={{
-            width: '280px',
-            height: '260px',
+            width: containerType === 'smartwatch' ? '320px' : containerType === 'journal' ? '360px' : '280px',
+            height: containerType === 'smartwatch' ? '300px' : containerType === 'journal' ? '280px' : '260px',
             position: 'absolute',
-            left: '10px',
-            top: '10px'
+            left: containerType === 'smartwatch' ? '40px' : containerType === 'journal' ? '20px' : '10px',
+            top: containerType === 'smartwatch' ? '5px' : containerType === 'journal' ? '10px' : '10px'
           }}
         >
-          <div className="backpack">
-            <img src="/images/symbol-backpack.png" alt="Adventure Backpack" className="backpack-image"
-             style={{
-                width: '280px',
-                height: '260px',
-                objectFit: 'contain',
-                margin: '0 auto',
-                display: 'block'
-              }} />
-            <div 
-              className="backpack-symbols-overlay"
-              style={{
-                position: 'absolute',
-                top: '90px',
-                left: '50px', 
-                right: '50px',
-                bottom: '60px',
-                pointerEvents: 'none',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gridTemplateRows: 'repeat(3, 1fr)', 
-                gap: '8px',
-                alignItems: 'center',
-                justifyItems: 'center'
-              }}
-            >
-              {/* Symbols inside backpack */}
-              {symbolsInBackpack.map((symbol, index) => (
-                <div 
-                  key={`backpack-${symbol}-${index}`}
-                  className="backpack-symbol"
+          {containerType === 'backpack' && (
+            <div className="backpack">
+              <img 
+                src="/images/symbol-backpack.png" 
+                alt="Adventure Backpack" 
+                className="backpack-image"
+                style={{
+                  width: '280px',
+                  height: '260px',
+                  objectFit: 'contain',
+                  margin: '0 auto',
+                  display: 'block'
+                }} 
+              />
+              <div 
+                className="backpack-symbols-overlay"
+                style={{
+                  position: 'absolute',
+                  top: '90px',
+                  left: '50px', 
+                  right: '50px',
+                  bottom: '60px',
+                  pointerEvents: 'none',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gridTemplateRows: 'repeat(3, 1fr)', 
+                  gap: '8px',
+                  alignItems: 'center',
+                  justifyItems: 'center'
+                }}
+              >
+                {symbolsInContainer.map((symbol, index) => (
+                  <div 
+                    key={`backpack-${symbol}-${index}`}
+                    className="backpack-symbol"
+                    style={{
+                      left: `${15 + (index % 3) * 20}%`,
+                      top: `${15 + Math.floor(index / 3) * 30}%`,
+                      animationDelay: `${index * 0.2}s`
+                    }}
+                  >
+                    {symbolImages[symbol] ? 
+                      <img src={symbolImages[symbol]} alt={symbol} className="symbol-img" /> :
+                      <span className="symbol-emoji">{
+                        {lotus: '🪷', trunk: '🐘', golden: '⭐', om: '🕉️', temple: '🛕', garden: '🌺', water: '💧', mooshika: '🐭', modak: '🍯', belly: '🌌', eyes: '👁️', ear: '👂', tusk: '🦷'}[symbol] || '✨'
+                      }</span>
+                    }
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {containerType === 'smartwatch' && (
+            <div className="smartwatch-container">
+              {containerScreenImage && (
+                <img 
+                  src={containerScreenImage} 
+                  alt="Smartwatch Screen" 
+                  className="smartwatch-screen"
                   style={{
-                    left: `${15 + (index % 3) * 20}%`,
-                    top: `${15 + Math.floor(index / 3) * 30}%`,
-                    animationDelay: `${index * 0.2}s`
+                    width: '200px',
+                    height: '200px',
+                    objectFit: 'contain',
+                    position: 'absolute',
+                    top: '40px',
+                    left: '60px',
+                    zIndex: 2
+                  }} 
+                />
+              )}
+              
+              <div 
+                className="smartwatch-apps-overlay"
+                style={{
+                  position: 'absolute',
+                  top: '60px',
+                  left: '80px',
+                  width: '160px',
+                  height: '160px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gridTemplateRows: 'repeat(3, 1fr)',
+                  gap: '6px',
+                  alignItems: 'center',
+                  justifyItems: 'center',
+                  zIndex: 10,
+                  pointerEvents: 'none'
+                }}
+              >
+                {symbolsInContainer.map((symbol, index) => {
+                  const gridPosition = getAppGridPosition(index);
+                  return (
+                    <div 
+                      key={`smartwatch-${symbol}-${index}`}
+                      className="smartwatch-app"
+                      style={{
+                        gridColumn: gridPosition.gridColumn,
+                        gridRow: gridPosition.gridRow,
+                        width: '36px',
+                        height: '36px',
+                        animation: 'symbolPop 0.6s ease-out both',
+                        animationDelay: `${index * 0.2}s`
+                      }}
+                    >
+                      {appImages[symbol] ? 
+                        <img 
+                          src={appImages[symbol]} 
+                          alt={symbol} 
+                          className="app-icon" 
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain',
+                            borderRadius: '8px',
+                            filter: 'drop-shadow(0 0 8px rgba(255,215,0,0.6))'
+                          }}
+                        /> :
+                        <span className="app-emoji" style={{ 
+                          fontSize: '28px',
+                          filter: 'drop-shadow(0 0 8px rgba(255,215,0,0.6))'
+                        }}>
+                          📱
+                        </span>
+                      }
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {containerType === 'journal' && (
+            <div className="journal-container">
+              <img 
+                src={containerImage || "/images/meaning-journal.png"} 
+                alt="Sacred Knowledge Journal" 
+                className="journal-base"
+                style={{
+                  width: '360px',
+                  height: '280px',
+                  objectFit: 'contain',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1
+                }} 
+              />
+              
+              <div className="journal-pages-overlay">
+                {/* Left Page */}
+                <div 
+                  className="journal-page left-page"
+                  style={{
+                    position: 'absolute',
+                    top: '40px',
+                    left: '30px',
+                    width: '140px',
+                    height: '180px',
+                    zIndex: 10
                   }}
                 >
-                  {symbolImages[symbol] ? 
-                    <img src={symbolImages[symbol]} alt={symbol} className="symbol-img" /> :
-                    <span className="symbol-emoji">{
-                      {lotus: '🪷', trunk: '🐘', golden: '⭐', om: '🕉️', temple: '🛕', garden: '🌺', water: '💧', mooshika: '🐭', modak: '🍯', belly: '🌌', eyes: '👁️', ear: '👂', tusk: '🦷'}[symbol] || '✨'
-                    }</span>
-                  }
+                  {symbolsInContainer.filter((_, index) => index % 2 === 0).map((symbol, index) => {
+                    const actualIndex = index * 2;
+                    const card = meaningCards[symbol];
+                    return (
+                      <div 
+                        key={`journal-left-${symbol}`}
+                        className="meaning-card"
+                        style={{
+                          position: 'absolute',
+                          top: `${index * 40}px`,
+                          left: '10px',
+                          width: '120px',
+                          height: '35px',
+                          animation: 'meaningCardAppear 0.8s ease-out both',
+                          animationDelay: `${actualIndex * 0.3}s`
+                        }}
+                      >
+                        <div className="meaning-content">
+                          {appImages[symbol] && (
+                            <img 
+                              src={appImages[symbol]}
+                              alt={symbol}
+                              className="meaning-icon"
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                objectFit: 'contain',
+                                float: 'left',
+                                marginRight: '8px'
+                              }}
+                            />
+                          )}
+                          <div className="meaning-text">
+                            <div className="sanskrit-text" style={{ fontSize: '10px', fontWeight: 'bold' }}>
+                              {card?.sanskrit || symbol}
+                            </div>
+                            <div className="english-meaning" style={{ fontSize: '8px', color: '#666' }}>
+                              {card?.meaning || symbol}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
+
+                {/* Right Page */}
+                <div 
+                  className="journal-page right-page"
+                  style={{
+                    position: 'absolute',
+                    top: '40px',
+                    right: '30px',
+                    width: '140px',
+                    height: '180px',
+                    zIndex: 10
+                  }}
+                >
+                  {symbolsInContainer.filter((_, index) => index % 2 === 1).map((symbol, index) => {
+                    const actualIndex = (index * 2) + 1;
+                    const card = meaningCards[symbol];
+                    return (
+                      <div 
+                        key={`journal-right-${symbol}`}
+                        className="meaning-card"
+                        style={{
+                          position: 'absolute',
+                          top: `${index * 40}px`,
+                          left: '10px',
+                          width: '120px',
+                          height: '35px',
+                          animation: 'meaningCardAppear 0.8s ease-out both',
+                          animationDelay: `${actualIndex * 0.3}s`
+                        }}
+                      >
+                        <div className="meaning-content">
+                          {appImages[symbol] && (
+                            <img 
+                              src={appImages[symbol]}
+                              alt={symbol}
+                              className="meaning-icon"
+                              style={{
+                                width: '30px',
+                                height: '30px',
+                                objectFit: 'contain',
+                                float: 'left',
+                                marginRight: '8px'
+                              }}
+                            />
+                          )}
+                          <div className="meaning-text">
+                            <div className="sanskrit-text" style={{ fontSize: '10px', fontWeight: 'bold' }}>
+                              {card?.sanskrit || symbol}
+                            </div>
+                            <div className="english-meaning" style={{ fontSize: '8px', color: '#666' }}>
+                              {card?.meaning || symbol}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Trekker Ganesha on right */}
+        {/* Trekker Ganesha */}
         <div className="trekker-container">
-          {/* Trekker Ganesha character */}
           <div className="trekker-ganesha">
             <img src="/images/ganesha-character.png" alt="Trekker Ganesha" />
           </div>
           
-          {/* Speech bubble - Different text for final scene */}
           <div 
             className={`speech-bubble ${stage === 'actions-ready' ? 'stage-actions-ready' : ''}`}
             style={{
@@ -241,7 +472,9 @@ const SceneCompletionCelebration = ({
               {stage === 'actions-ready' && (
                 <>
                   <div className="bubble-title">
-                    {isFinalScene ? 'Zone mastered!' : 'Sacred symbols collected!'}
+                    {isFinalScene ? 'Zone mastered!' : 
+                     containerType === 'smartwatch' ? 'Sacred apps collected!' : 
+                     containerType === 'journal' ? 'Sacred meanings learned!' : 'Sacred symbols collected!'}
                   </div>
                   <div className="bubble-text">
                     {isFinalScene ? 
@@ -255,10 +488,9 @@ const SceneCompletionCelebration = ({
           </div>
         </div>
 
-        {/* Action buttons - Different for final scene */}
+        {/* Action buttons */}
         <div className="action-buttons">
           {!isFinalScene ? (
-            // Regular scene buttons
             <>
               <button className="action-btn continue-btn" onClick={handleContinue}>
                 <div className="btn-text">
@@ -282,7 +514,6 @@ const SceneCompletionCelebration = ({
               </button>
             </>
           ) : (
-            // Final scene buttons
             <>
               <button className="action-btn explore-btn" onClick={handleExploreZones}>
                 <div className="btn-text">
@@ -298,15 +529,6 @@ const SceneCompletionCelebration = ({
                 </div>
               </button>
               
-             {/* 
-<button className="action-btn progress-btn" onClick={handleViewProgress}>
-  <div className="btn-text">
-    <div className="btn-title">📊 My Progress</div>
-    <div className="btn-subtitle">View achievements</div>
-  </div>
-</button>
-*/}
-
               <button className="action-btn home-btn" onClick={handleHome}>
                 <div className="btn-text">
                   <div className="btn-title">🏠 Home</div>

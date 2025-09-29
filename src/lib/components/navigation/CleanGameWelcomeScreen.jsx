@@ -73,6 +73,21 @@ const tempCave3Key = `temp_session_${profileId}_cave-of-secrets_nirvighnam-kurum
 const tempCave4Key = `temp_session_${profileId}_cave-of-secrets_sarvakaryeshu-sarvada`;     // ✅ Scene 4
 const tempCave5Key = `temp_session_${profileId}_cave-of-secrets_mantra-assembly`;    
 
+// Zone 3: Shloka River - ALL 5 scenes
+const tempShloka1Key = `temp_session_${profileId}_shloka-river_vakratunda-grove`;
+const tempShloka2Key = `temp_session_${profileId}_shloka-river_suryakoti-bank`;
+const tempShloka3Key = `temp_session_${profileId}_shloka-river_nirvighnam-chant`;
+const tempShloka4Key = `temp_session_${profileId}_shloka-river_sarvakaryeshu-chant`;
+const tempShloka5Key = `temp_session_${profileId}_shloka-river_shloka-river-finale`;
+
+// Add after the existing Shloka River keys (around line 60):
+
+// Zone 4: Festival Square - ALL 4 games
+const tempFestival1Key = `temp_session_${profileId}_festival-square_game1`;
+const tempFestival2Key = `temp_session_${profileId}_festival-square_game2`;
+const tempFestival3Key = `temp_session_${profileId}_festival-square_game3`;
+const tempFestival4Key = `temp_session_${profileId}_festival-square_game4`;
+
 if (localStorage.getItem(tempModakKey) || 
     localStorage.getItem(tempPondKey) || 
     localStorage.getItem(tempSymbolKey) || 
@@ -80,8 +95,17 @@ if (localStorage.getItem(tempModakKey) ||
     localStorage.getItem(tempCave1Key) ||
     localStorage.getItem(tempCave2Key) ||
     localStorage.getItem(tempCave3Key) ||
-    localStorage.getItem(tempCave4Key) ||     // ✅ Scene 4 detection
-    localStorage.getItem(tempCave5Key)) {     // ✅ Scene 5 detection
+    localStorage.getItem(tempCave4Key) ||
+    localStorage.getItem(tempCave5Key) ||
+    localStorage.getItem(tempShloka1Key) ||
+    localStorage.getItem(tempShloka2Key) ||
+    localStorage.getItem(tempShloka3Key) ||
+    localStorage.getItem(tempShloka4Key) ||
+    localStorage.getItem(tempShloka5Key) ||    // ✅ Scene 5 detection
+      localStorage.getItem(tempFestival1Key) ||
+    localStorage.getItem(tempFestival2Key) ||
+    localStorage.getItem(tempFestival3Key) ||
+    localStorage.getItem(tempFestival4Key)) {
   
   console.log('✅ TEMP SESSION FOUND - setting hasProgress = TRUE');
   setHasProgress(true);
@@ -93,21 +117,34 @@ if (localStorage.getItem(tempModakKey) ||
     
     Object.keys(localStorage).forEach(key => {
   // ✅ COMPREHENSIVE DETECTION INCLUDING CAVE'S 5 SCENES
-  if ((key.includes('sceneState') || 
-       // Zone detection
-       key.includes('symbol-mountain') || 
-       key.includes('cave-of-secrets') ||
-       // Symbol Mountain scenes
-       key.includes('modak') ||
-       key.includes('pond') ||
-       key.includes('symbol') ||
-       key.includes('final-scene') ||
-       // Cave of Secrets - ALL 5 scenes
-       key.includes('vakratunda-mahakaya') ||
-       key.includes('suryakoti-samaprabha') ||
-       key.includes('nirvighnam-kurumedeva') ||
-       key.includes('sarvakaryeshu-sarvada') ||    // ✅ Scene 4
-       key.includes('mantra-assembly') ||          // ✅ Scene 5
+if ((key.includes('sceneState') || 
+     // Zone detection
+     key.includes('symbol-mountain') || 
+     key.includes('cave-of-secrets') ||
+     key.includes('shloka-river') ||
+     // Symbol Mountain scenes
+     key.includes('modak') ||
+     key.includes('pond') ||
+     key.includes('symbol') ||
+     key.includes('final-scene') ||
+     // Cave of Secrets - ALL 5 scenes
+     key.includes('vakratunda-mahakaya') ||
+     key.includes('suryakoti-samaprabha') ||
+     key.includes('nirvighnam-kurumedeva') ||
+     key.includes('sarvakaryeshu-sarvada') ||
+     key.includes('mantra-assembly') ||
+     // Shloka River - ALL 5 scenes
+     key.includes('vakratunda-grove') ||
+     key.includes('suryakoti-bank') ||
+     key.includes('nirvighnam-chant') ||
+     key.includes('sarvakaryeshu-chant') ||
+     key.includes('shloka-river-finale') ||       // ✅ Scene 5
+        key.includes('festival-square') ||  // ✅ ADD THIS LINE
+     // Scene detection - add festival games
+     key.includes('game1') ||            // ✅ ADD THESE
+     key.includes('game2') ||            // ✅ ADD THESE  
+     key.includes('game3') ||            // ✅ ADD THESE
+     key.includes('game4') ||            // ✅ ADD THESE
        // Temp session detection
        key.startsWith(`temp_session_${profileId}`) ||
        // Progress key detection
@@ -345,17 +382,42 @@ const tempFinalKey = `temp_session_${activeProfileId}_symbol-mountain_final-scen
   const tempCave2Key = `temp_session_${activeProfileId}_cave-of-secrets_suryakoti-samaprabha`;
   const tempCave3Key = `temp_session_${activeProfileId}_cave-of-secrets_nirvighnam-kurumedeva`;
   const tempCave4Key = `temp_session_${activeProfileId}_cave-of-secrets_sarvakaryeshu-sarvada`;     // ✅ Scene 4
-  const tempCave5Key = `temp_session_${activeProfileId}_cave-of-secrets_mantra-assembly`;          // ✅ Scene 5
-  
-  if (localStorage.getItem(tempModakKey) || 
-      localStorage.getItem(tempPondKey) || 
-      localStorage.getItem(tempSymbolKey) || 
-      localStorage.getItem(tempFinalKey) ||
-      localStorage.getItem(tempCave1Key) ||
-      localStorage.getItem(tempCave2Key) ||
-      localStorage.getItem(tempCave3Key) ||
-      localStorage.getItem(tempCave4Key) ||     // ✅ Scene 4 detection
-      localStorage.getItem(tempCave5Key)) {     // ✅ Scene 5 detection
+  const tempCave5Key = `temp_session_${activeProfileId}_cave-of-secrets_mantra-assembly`;    
+        // ✅ Scene 5
+
+        // Zone 3: Shloka River - ALL 5 scenes
+  const tempShloka1Key = `temp_session_${activeProfileId}_shloka-river_vakratunda-grove`;
+  const tempShloka2Key = `temp_session_${activeProfileId}_shloka-river_suryakoti-bank`;
+  const tempShloka3Key = `temp_session_${activeProfileId}_shloka-river_nirvighnam-chant`;
+  const tempShloka4Key = `temp_session_${activeProfileId}_shloka-river_sarvakaryeshu-chant`;
+  const tempShloka5Key = `temp_session_${activeProfileId}_shloka-river_shloka-river-finale`;
+
+  // Add after the existing Shloka River keys (around line 60):
+
+  // Zone 4: Festival Square - ALL 4 games
+    const tempFestival1Key = `temp_session_${activeProfileId}_festival-square_game1`; // ✅ Use activeProfileId
+    const tempFestival2Key = `temp_session_${activeProfileId}_festival-square_game2`; // ✅ Use activeProfileId
+    const tempFestival3Key = `temp_session_${activeProfileId}_festival-square_game3`; // ✅ Use activeProfileId
+    const tempFestival4Key = `temp_session_${activeProfileId}_festival-square_game4`; // ✅ Use activeProfileId
+    
+if (localStorage.getItem(tempModakKey) || 
+    localStorage.getItem(tempPondKey) || 
+    localStorage.getItem(tempSymbolKey) || 
+    localStorage.getItem(tempFinalKey) ||
+    localStorage.getItem(tempCave1Key) ||
+    localStorage.getItem(tempCave2Key) ||
+    localStorage.getItem(tempCave3Key) ||
+    localStorage.getItem(tempCave4Key) ||
+    localStorage.getItem(tempCave5Key) ||
+    localStorage.getItem(tempShloka1Key) ||
+    localStorage.getItem(tempShloka2Key) ||
+    localStorage.getItem(tempShloka3Key) ||
+    localStorage.getItem(tempShloka4Key) ||
+    localStorage.getItem(tempShloka5Key) ||// ✅ Scene 5 detection
+      localStorage.getItem(tempFestival1Key) ||
+    localStorage.getItem(tempFestival2Key) ||
+    localStorage.getItem(tempFestival3Key) ||
+    localStorage.getItem(tempFestival4Key)) {
     
     console.log('🎯 FIRST TIME CHECK: Found temp session - this is NOT first time');
     return false; // Has progress = NOT first time

@@ -1,0 +1,894 @@
+/* Rangoli Art Booth - CSS Styles with 3D Color Pot Effects */
+
+/* Main Container */
+.rangoli-art-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #FF69B4, #9370DB, #4ECDC4);
+  overflow: hidden;
+  font-family: 'Comic Sans MS', cursive;
+  user-select: none;
+}
+
+/* Background */
+.art-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('./assets/images/art-studio-bg.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* Ganesha Character */
+.ganesha-character {
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  width: 120px;
+  height: 150px;
+  z-index: 100;
+}
+
+.ganesha-image {
+  width: 100%;
+  height: 80%;
+  background: linear-gradient(145deg, #FFD700, #FFA500);
+  border-radius: 50% 50% 40% 40%;
+  position: relative;
+  animation: gentle-bounce 3s ease-in-out infinite;
+}
+
+/* Simple Ganesha representation with CSS */
+.ganesha-image::before {
+  content: '🎨';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  animation: brush-wave 2s ease-in-out infinite;
+}
+
+.ganesha-speech-bubble {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background: white;
+  padding: 12px;
+  border-radius: 15px;
+  border: 3px solid #FF69B4;
+  max-width: 200px;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: bubble-appear 0.5s ease-out;
+  z-index: 101;
+}
+
+.ganesha-speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  border: 10px solid transparent;
+  border-top-color: white;
+}
+
+/* Pattern Selection Area */
+.pattern-selection {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 30px;
+  z-index: 60;
+}
+
+.pattern-option {
+  width: 120px;
+  height: 120px;
+  border-radius: 15px;
+  cursor: pointer;
+  border: 4px solid #8B4513;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.pattern-option:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  border-color: #FF69B4;
+}
+
+.pattern-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+}
+
+.pattern-lotus { background: linear-gradient(45deg, #FF69B4, #FFB6C1); }
+.pattern-peacock { background: linear-gradient(45deg, #4169E1, #87CEEB); }
+.pattern-festival { background: linear-gradient(45deg, #FFD700, #FFA500); }
+
+/* Art Canvas Area */
+.art-canvas {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 400px;
+  z-index: 50;
+}
+
+.rangoli-pattern {
+  width: 100%;
+  height: 100%;
+  border: 4px solid #8B4513;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #F5F5DC, #FFFACD);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.fillable-section {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  fill: none;
+  stroke: #8B4513;
+  stroke-width: 3;
+}
+
+.fillable-section:hover {
+  stroke: #FF69B4;
+  stroke-width: 5;
+  filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.6));
+}
+
+.fillable-section.filled {
+  stroke: rgba(139, 69, 19, 0.3);
+  stroke-width: 2;
+}
+
+.fillable-section.preview {
+  opacity: 0.7;
+  filter: brightness(1.3);
+}
+
+/* Color Pots - Enhanced 3D Effect */
+.color-pots-container {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 60;
+}
+
+.color-pot {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  
+  /* 3D Effect - Multiple Shadows */
+  box-shadow: 
+    0 8px 16px rgba(0,0,0,0.3),           /* Main shadow */
+    0 4px 8px rgba(0,0,0,0.2),            /* Mid shadow */
+    inset 0 2px 0 rgba(255,255,255,0.3),  /* Top highlight */
+    inset 0 -2px 0 rgba(0,0,0,0.2);       /* Bottom shadow */
+  
+  /* Border for definition */
+  border: 3px solid rgba(0,0,0,0.2);
+}
+
+.color-pot:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 
+    0 12px 20px rgba(0,0,0,0.4),
+    0 6px 12px rgba(0,0,0,0.3),
+    inset 0 2px 0 rgba(255,255,255,0.4),
+    inset 0 -2px 0 rgba(0,0,0,0.3),
+    0 0 15px currentColor;
+}
+
+.color-pot.selected {
+  transform: translateY(-2px) scale(1.15);
+  box-shadow: 
+    0 10px 25px rgba(0,0,0,0.5),
+    0 5px 15px rgba(0,0,0,0.4),
+    inset 0 3px 0 rgba(255,255,255,0.5),
+    inset 0 -3px 0 rgba(0,0,0,0.4),
+    0 0 20px currentColor;
+  border-color: white;
+}
+
+.color-pot.discovered {
+  animation: pot-sparkle 2s ease-in-out infinite;
+}
+
+/* Individual Color Pot Colors with 3D Gradients */
+.pot-red {
+  background: linear-gradient(145deg, #DC143C, #B22222);
+  color: #DC143C;
+}
+
+.pot-yellow {
+  background: linear-gradient(145deg, #FFD700, #DAA520);
+  color: #FFD700;
+}
+
+.pot-orange {
+  background: linear-gradient(145deg, #FF8C00, #FF7F00);
+  color: #FF8C00;
+}
+
+.pot-green {
+  background: linear-gradient(145deg, #32CD32, #228B22);
+  color: #32CD32;
+}
+
+.pot-blue {
+  background: linear-gradient(145deg, #4169E1, #0000CD);
+  color: #4169E1;
+}
+
+.pot-purple {
+  background: linear-gradient(145deg, #9370DB, #8A2BE2);
+  color: #9370DB;
+}
+
+/* Magic Brush */
+.magic-brush {
+  position: absolute;
+  bottom: 25%;
+  right: 15%;
+  width: 80px;
+  height: 200px;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+.magic-brush.active {
+  opacity: 1;
+  transform: rotate(-15deg);
+  animation: brush-float 2s ease-in-out infinite;
+}
+
+.brush-handle {
+  width: 20px;
+  height: 120px;
+  background: linear-gradient(145deg, #8B4513, #A0522D);
+  border-radius: 10px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.brush-ferrule {
+  width: 30px;
+  height: 25px;
+  background: linear-gradient(145deg, #C0C0C0, #A9A9A9);
+  border-radius: 15px;
+  margin: 0 auto;
+}
+
+.brush-bristles {
+  width: 25px;
+  height: 55px;
+  background: linear-gradient(145deg, #DDA0DD, #DA70D6);
+  border-radius: 0 0 12px 12px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.brush-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Color Preview on Brush */
+.color-preview {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 15px currentColor;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.color-preview.active {
+  opacity: 1;
+  animation: color-pulse 1.5s ease-in-out infinite;
+}
+
+/* Sparkle Effects */
+.section-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 80;
+}
+
+.sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #FFD700;
+  border-radius: 50%;
+  animation: sparkle-float 1.8s ease-out forwards;
+  box-shadow: 0 0 6px #FFD700;
+}
+
+/* I'm Done Creating Button */
+.done-creating-button {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #FF69B4, #FF1493);
+  color: white;
+  padding: 15px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 15px rgba(255, 20, 147, 0.4);
+  border: 3px solid white;
+  z-index: 100;
+  animation: button-glow 2s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.done-creating-button:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+}
+
+.done-creating-button:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* Art Badge Icon */
+.art-badge-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(145deg, #FFD700, #FFA500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin-bottom: 10px;
+  animation: badge-pulse 2s ease-in-out infinite;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+}
+
+.art-badge-icon::before {
+  content: '🎨';
+}
+
+/* Progress Counter */
+.progress-counter {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 15px;
+  display: flex;
+  gap: 15px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 100;
+}
+
+.progress-counter > div {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Gentle Celebration Effects */
+.gentle-celebration-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* Scene Completion Modal */
+.scene-completion-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: modal-fade-in 0.5s ease-out;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #FF69B4, #9370DB);
+  padding: 40px;
+  border-radius: 25px;
+  text-align: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  max-width: 500px;
+  margin: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  border: 4px solid white;
+}
+
+.modal-content h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  color: white;
+}
+
+.completion-stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 25px 0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 15px;
+  border-radius: 15px;
+  min-width: 80px;
+  color: white;
+}
+
+.stat-icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 1;
+  color: white;
+  font-weight: bold;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.modal-button {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+  border: 2px solid white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  color: white;
+  min-width: 120px;
+}
+
+.modal-button.play-again {
+  background: linear-gradient(135deg, #9370DB, #8A2BE2);
+}
+
+.modal-button.continue {
+  background: linear-gradient(135deg, #32CD32, #228B22);
+}
+
+.modal-button.zone-map {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.modal-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+
+.modal-button:active {
+  transform: scale(0.95);
+}
+
+/* Completion Badge */
+.completion-badge {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 500;
+  animation: badge-appear 1s ease-out;
+}
+
+.badge-content {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  border: 3px solid white;
+}
+
+.badge-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.badge-stars {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.star {
+  font-size: 20px;
+  animation: star-twinkle 1s ease-in-out infinite alternate;
+}
+
+/* Celebration Effects */
+.celebration-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 300;
+}
+
+.celebration-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, 
+    rgba(255, 105, 180, 0.1),
+    rgba(147, 112, 219, 0.1),
+    rgba(255, 215, 0, 0.1));
+  animation: celebration-pulse 2s ease-in-out infinite;
+}
+
+.celebration-confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confetti-fall 3s linear infinite;
+}
+
+/* Animations */
+@keyframes gentle-bounce {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-8px); 
+  }
+}
+
+@keyframes brush-wave {
+  0%, 100% { 
+    transform: translate(-50%, -50%) rotate(-5deg); 
+  }
+  50% { 
+    transform: translate(-50%, -50%) rotate(5deg); 
+  }
+}
+
+@keyframes bubble-appear {
+  0% { 
+    opacity: 0; 
+    transform: translateY(10px) scale(0.8); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes pot-sparkle {
+  0%, 100% { 
+    box-shadow: 
+      0 8px 16px rgba(0,0,0,0.3),
+      0 4px 8px rgba(0,0,0,0.2),
+      inset 0 2px 0 rgba(255,255,255,0.3),
+      inset 0 -2px 0 rgba(0,0,0,0.2);
+  }
+  50% { 
+    box-shadow: 
+      0 10px 20px rgba(0,0,0,0.4),
+      0 6px 12px rgba(0,0,0,0.3),
+      inset 0 3px 0 rgba(255,255,255,0.4),
+      inset 0 -3px 0 rgba(0,0,0,0.3),
+      0 0 15px currentColor;
+  }
+}
+
+@keyframes brush-float {
+  0%, 100% { 
+    transform: rotate(-15deg) translateY(0); 
+  }
+  50% { 
+    transform: rotate(-15deg) translateY(-10px); 
+  }
+}
+
+@keyframes color-pulse {
+  0%, 100% { 
+    transform: translateX(-50%) scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: translateX(-50%) scale(1.2); 
+    opacity: 0.8; 
+  }
+}
+
+@keyframes sparkle-float {
+  0% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1) rotate(0deg); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-80px) scale(0.3) rotate(360deg); 
+  }
+}
+
+@keyframes button-glow {
+  0%, 100% { 
+    box-shadow: 0 6px 15px rgba(255, 20, 147, 0.4); 
+  }
+  50% { 
+    box-shadow: 0 8px 25px rgba(255, 20, 147, 0.7); 
+  }
+}
+
+@keyframes badge-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    filter: brightness(1); 
+  }
+  50% { 
+    transform: scale(1.1); 
+    filter: brightness(1.2); 
+  }
+}
+
+@keyframes badge-appear {
+  0% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.5); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+}
+
+@keyframes modal-fade-in {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.8); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes star-twinkle {
+  0% { 
+    transform: scale(1); 
+    filter: brightness(1); 
+  }
+  100% { 
+    transform: scale(1.2); 
+    filter: brightness(1.3); 
+  }
+}
+
+@keyframes celebration-pulse {
+  0%, 100% { 
+    opacity: 0.1; 
+  }
+  50% { 
+    opacity: 0.3; 
+  }
+}
+
+@keyframes confetti-fall {
+  0% { 
+    transform: translateY(-100vh) rotate(0deg); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateY(100vh) rotate(720deg); 
+    opacity: 0; 
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .rangoli-art-container {
+    font-size: 14px;
+  }
+  
+  .art-canvas {
+    width: 320px;
+    height: 320px;
+    top: 35%;
+  }
+  
+  .color-pot {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .pattern-option {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .pattern-preview {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .ganesha-character {
+    width: 80px;
+    height: 100px;
+    top: 5%;
+    right: 5%;
+  }
+  
+  .ganesha-speech-bubble {
+    max-width: 150px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .magic-brush {
+    width: 60px;
+    height: 150px;
+    right: 10%;
+    bottom: 30%;
+  }
+  
+  .progress-counter {
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+    padding: 10px;
+  }
+  
+  .done-creating-button {
+    font-size: 16px;
+    padding: 12px 25px;
+  }
+  
+  .color-pots-container {
+    gap: 15px;
+    bottom: 12%;
+  }
+}
+
+@media (max-width: 480px) {
+  .art-canvas {
+    width: 280px;
+    height: 280px;
+  }
+  
+  .color-pot {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .pattern-option {
+    width: 75px;
+    height: 75px;
+  }
+  
+  .pattern-preview {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .color-pots-container {
+    gap: 10px;
+  }
+  
+  .pattern-selection {
+    gap: 20px;
+  }
+  
+  .done-creating-button {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}
+
+/* Focus Styles for Accessibility */
+.color-pot:focus,
+.pattern-option:focus {
+  outline: 3px solid #FFD700;
+  outline-offset: 2px;
+}
+
+.fillable-section:focus {
+  stroke: #FFD700;
+  stroke-width: 6;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .color-pot {
+    border-width: 4px;
+    border-color: #000;
+  }
+  
+  .fillable-section {
+    stroke-width: 4px;
+  }
+}

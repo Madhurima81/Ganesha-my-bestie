@@ -162,46 +162,57 @@ export const ZONE_CONFIGS = {
     ]
   },
 
-  'shloka-river': {
-    id: 'shloka-river',
-    name: 'Shloka River',
-    icon: '☁️',
-    background: '/images/shloka-river.png',
-    description: 'Learn sacred chants by the flowing waters.',
-    unlocked: false,
-    totalStars: 18,
-    requiredStars: 60,
-    sequence: 7,
-    scenes: [
-      {
-        id: 'river-bank',
-        name: 'River Bank',
-        emoji: '🏞️',
-        description: 'Start your journey at the peaceful river bank',
-        unlocked: false,
-        order: 1,
-        position: { top: 45, left: 20 }
-      },
-      {
-        id: 'floating-boat',
-        name: 'Floating Boat',
-        emoji: '🛶',
-        description: 'Sail across the sacred waters',
-        unlocked: false,
-        order: 2,
-        position: { top: 35, left: 55 }
-      },
-      {
-        id: 'lotus-temple',
-        name: 'Lotus Temple',
-        emoji: '🏛️',
-        description: 'Reach the temple in the middle of the river',
-        unlocked: false,
-        order: 3,
-        position: { top: 60, left: 75 }
-      }
-    ]
-  },
+  // Add this to your ZoneConfig.js
+'shloka-river': {
+  id: 'shloka-river',
+  name: 'Shloka River',
+  icon: '🌊',
+  emoji: '🌊', 
+  background: 'images/shloka-river-bg.png', // Your background image
+  description: 'Learn sacred Sanskrit shlokas by the flowing river of wisdom',
+  theme: 'water-wisdom',
+  difficulty: 'intermediate',
+  learningFocus: 'Sanskrit shloka recitation',
+  
+  // ✅ Your 5 scenes in order
+  scenes: [
+    {
+      id: 'vakratunda-grove',
+      name: 'Vakratunda Grove',
+      emoji: '🌳',
+      order: 1,
+      description: 'Learn the opening verse in the sacred grove'
+    },
+    {
+      id: 'suryakoti-bank', 
+      name: 'Suryakoti Bank',
+      emoji: '☀️',
+      order: 2,
+      description: 'Discover the radiance verse by the river bank'
+    },
+    {
+      id: 'nirvighnam-chant',
+      name: 'Nirvighnam Chant', 
+      emoji: '🎵',
+      order: 3,
+      description: 'Master the obstacle-removing chant'
+    },
+    {
+      id: 'sarvakaryeshu-chant',
+      name: 'Sarvakaryeshu Chant',
+      emoji: '🕉️', 
+      order: 4,
+      description: 'Learn the all-accomplishing verse'
+    },
+    {
+      id: 'shloka-river-finale',
+      name: 'Shloka River Finale',
+      emoji: '🎊',
+      order: 5, 
+      description: 'Complete the full shloka by the sacred waters'
+    }
+  ]
+},
 
   'about-me-hut': {
     id: 'about-me-hut',
@@ -285,55 +296,56 @@ export const ZONE_CONFIGS = {
     ]
   },
 
-  'festival-square': {
-    id: 'festival-square',
-    name: 'Festival Square',
-    icon: '❄️',
-    background: '/images/festival-square.png',
-    description: 'Celebrate with music, dance, and joy!',
-    unlocked: false,
-    totalStars: 24,
-    requiredStars: 40,
-    sequence: 6,
-    scenes: [
-      {
-        id: 'decoration-corner',
-        name: 'Decoration Corner',
-        emoji: '🎨',
-        description: 'Create beautiful decorations for the festival',
-        unlocked: false,
-        order: 1,
-        position: { top: 35, left: 25 }
-      },
-      {
-        id: 'music-pavilion',
-        name: 'Music Pavilion',
-        emoji: '🎵',
-        description: 'Play instruments and create music',
-        unlocked: false,
-        order: 2,
-        position: { top: 50, left: 60 }
-      },
-      {
-        id: 'dance-floor',
-        name: 'Dance Floor',
-        emoji: '💃',
-        description: 'Dance and celebrate with everyone',
-        unlocked: false,
-        order: 3,
-        position: { top: 70, left: 40 }
-      },
-      {
-        id: 'ganesha-shrine',
-        name: 'Ganesha Shrine',
-        emoji: '🕉️',
-        description: 'Pay respects at the beautiful shrine',
-        unlocked: false,
-        order: 4,
-        position: { top: 25, left: 55 }
-      }
-    ]
-  }
+ 'festival-square': {
+  id: 'festival-square',
+  name: 'Festival Square',
+  icon: '🎉',
+  background: '/images/festivalsquare-bg.png',
+  description: 'Celebrate with music, art, cooking, and decoration games!',
+  unlocked: true,
+  totalStars: 24, // 4 games × 6 stars each
+  requiredStars: 40,
+  sequence: 6,
+  scenes: [
+    {
+      id: 'game1', // ✅ Match App.jsx scene IDs
+      name: 'Festival Piano',
+      emoji: '🎹',
+      description: 'Play beautiful melodies on the festival piano',
+      unlocked: true, // ✅ All games unlocked from start
+      order: 1,
+      position: { top: 35, left: 25 }
+    },
+    {
+      id: 'game2', // ✅ Match App.jsx scene IDs  
+      name: 'Rangoli Art Booth',
+      emoji: '🎨',
+      description: 'Create colorful rangoli patterns',
+      unlocked: true, // ✅ All games unlocked from start
+      order: 2,
+      position: { top: 50, left: 60 }
+    },
+    {
+      id: 'game3', // ✅ Match App.jsx scene IDs
+      name: 'Modak Cooking',
+      emoji: '🍯',
+      description: 'Cook delicious modaks for the festival',
+      unlocked: true, // ✅ All games unlocked from start
+      order: 3,
+      position: { top: 70, left: 40 }
+    },
+    {
+      id: 'game4', // ✅ Match App.jsx scene IDs
+      name: 'Mandap Decoration',
+      emoji: '🏛️',
+      description: 'Decorate the beautiful festival mandap',
+      unlocked: true, // ✅ All games unlocked from start
+      order: 4,
+      position: { top: 25, left: 55 }
+    }
+  ]
+}
+  
 };
 
 // Helper functions for zone management

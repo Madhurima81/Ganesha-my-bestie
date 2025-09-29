@@ -1,0 +1,195 @@
+.ganesha-coloring-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  padding: 1rem;
+  background-color: #f8f4f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ganesha-coloring-activity h2 {
+  color: #FF6347;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.instructions {
+  color: #555;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 1rem;
+  max-width: 300px;
+}
+
+.color-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.color-button.selected {
+  transform: scale(1.2);
+  border-color: #333;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.svg-container {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ganesha-svg {
+  width: 100%;
+  height: auto;
+}
+
+.info-hotspot {
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.info-hotspot:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.info-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.info-content {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 320px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.info-content h3 {
+  color: #FF6347;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.info-content p {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.info-content button {
+  background-color: #FF6347;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.info-content button:hover {
+  background-color: #E74C3C;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.reset-button, .save-button {
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.reset-button {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.reset-button:hover {
+  background-color: #f5c6cb;
+  transform: scale(1.05);
+}
+
+.save-button {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.save-button:hover {
+  background-color: #c3e6cb;
+  transform: scale(1.05);
+}
+
+@media (min-width: 768px) {
+  .ganesha-coloring-activity {
+    padding: 2rem;
+  }
+
+  .ganesha-coloring-activity h2 {
+    font-size: 2rem;
+  }
+
+  .instructions {
+    font-size: 1rem;
+    max-width: 500px;
+  }
+
+  .color-palette {
+    max-width: 400px;
+  }
+
+  .color-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .svg-container {
+    max-width: 500px;
+    padding: 1.5rem;
+  }
+
+  .action-buttons {
+    margin-top: 2rem;
+  }
+
+  .reset-button, .save-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+}

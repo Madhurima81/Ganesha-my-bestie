@@ -1,0 +1,800 @@
+/* Festival Rangoli Game Styles */
+
+.festival-rangoli-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Comic Sans MS', 'Trebuchet MS', cursive;
+}
+
+/* Background */
+.rangoli-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    #8B5CF6 0%,     /* Purple */
+    #EC4899 25%,    /* Pink */
+    #F59E0B 50%,    /* Orange */
+    #EF4444 75%,    /* Red */
+    #8B5CF6 100%    /* Purple */
+  );
+  animation: gentle-bg-shift 8s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+@keyframes gentle-bg-shift {
+  0% { transform: scale(1) rotate(0deg); }
+  100% { transform: scale(1.05) rotate(1deg); }
+}
+
+/* Ganesha Character */
+.ganesha-character {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.ganesha-image {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #FF8C00, #DC143C);
+  border-radius: 50%;
+  border: 4px solid #FFD700;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ganesha-image::before {
+  content: '🐘';
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.ganesha-image:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+.ganesha-speech-bubble {
+  position: absolute;
+  top: 100px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px 20px;
+  border-radius: 15px;
+  border: 3px solid #FFD700;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-width: 320px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #7C3AED;
+  animation: bubble-appear 0.5s ease-out;
+  z-index: 1001;
+}
+
+.ganesha-speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 30px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #FFD700;
+}
+
+@keyframes bubble-appear {
+  from { opacity: 0; transform: translateY(-10px) scale(0.8); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Pattern Selection Phase */
+.pattern-selection-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.phase-title {
+  font-size: 48px;
+  font-weight: 900;
+  color: white;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.patterns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.pattern-card {
+  background: linear-gradient(135deg, #FFFBEB, #FED7AA);
+  border: 4px solid #FB923C;
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.pattern-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.pattern-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: #7C3AED;
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.3);
+}
+
+.pattern-card:hover::before {
+  left: 100%;
+}
+
+.pattern-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.3));
+}
+
+.pattern-name {
+  font-size: 32px;
+  font-weight: 800;
+  color: #7C3AED;
+  margin-bottom: 15px;
+}
+
+.pattern-description {
+  font-size: 18px;
+  color: #7C3AED;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.pattern-meaning {
+  font-size: 14px;
+  color: #A855F7;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Art Creation Phase */
+.art-creation-phase {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  height: 100vh;
+  padding: 20px;
+}
+
+/* Color Palette */
+.color-palette {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 3px solid #FFD700;
+}
+
+.palette-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #7C3AED;
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.palette-title::before {
+  content: '🌈 ';
+}
+
+.palette-title::after {
+  content: ' 🌈';
+}
+
+.colors-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.color-pot {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.color-pot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  background: var(--color);
+  border-radius: 50%;
+  border: 4px solid #D1D5DB;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.color-pot.selected::before {
+  border-color: #7C3AED;
+  border-width: 6px;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.color-pot:hover::before {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.color-symbol {
+  position: relative;
+  z-index: 2;
+  font-size: 20px;
+  top: 22px;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
+  pointer-events: none;
+}
+
+.color-name {
+  margin-top: 75px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #7C3AED;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.selected-color-info {
+  background: #F3E8FF;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  border: 2px solid #A855F7;
+}
+
+.selected-color-display {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid #7C3AED;
+  margin: 0 auto 12px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.selected-color-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #7C3AED;
+}
+
+/* Rangoli Canvas */
+.rangoli-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.canvas-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  border: 4px solid #FFD700;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SVG Styles */
+.rangoli-svg {
+  max-width: 100%;
+  max-height: 500px;
+  width: auto;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.fillable-section {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  stroke-width: 3px;
+}
+
+.fillable-section:hover {
+  stroke: #FFD700 !important;
+  stroke-width: 5px !important;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+}
+
+/* Sparkle Effects */
+.sparkle-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #FFD700;
+  border-radius: 50%;
+  animation: sparkle-animation 1s ease-out;
+  left: var(--random-x, 50%);
+  top: var(--random-y, 50%);
+  transform: translate(-50%, -50%);
+}
+
+.sparkle:nth-child(odd) {
+  background: #FF69B4;
+}
+
+.sparkle:nth-child(3n) {
+  background: #00CED1;
+}
+
+@keyframes sparkle-animation {
+  0% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.5); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0) translateY(-20px); 
+  }
+}
+
+/* Progress Tracker */
+.progress-tracker {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border: 3px solid #FFD700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #7C3AED;
+}
+
+.progress-stars {
+  display: flex;
+  gap: 8px;
+}
+
+.star {
+  width: 16px;
+  height: 16px;
+  background: #E5E7EB;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.star.filled {
+  background: #FFD700;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  transform: scale(1.1);
+}
+
+/* Done Button */
+.done-button {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+  padding: 15px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.4);
+  transition: all 0.3s ease;
+  z-index: 100;
+  border: 3px solid #FFD700;
+}
+
+.done-button:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.6);
+}
+
+.done-button::before {
+  content: '🎵 ';
+  font-size: 20px;
+}
+
+/* Modals */
+.color-education-modal,
+.diya-ceremony-modal,
+.completion-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(5px);
+}
+
+/* Color Education Modal */
+.education-content {
+  background: linear-gradient(135deg, #FFFBEB, #FED7AA);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 400px;
+  text-align: center;
+  border: 4px solid #FFD700;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modal-appear 0.5s ease-out;
+}
+
+.education-color {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid #7C3AED;
+  margin: 0 auto 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.education-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #7C3AED;
+  margin-bottom: 15px;
+}
+
+.education-meaning,
+.education-tradition {
+  font-size: 16px;
+  color: #7C3AED;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+/* Diya Ceremony Modal */
+.ceremony-content {
+  background: linear-gradient(135deg, #FFFBEB, #FED7AA);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 400px;
+  text-align: center;
+  border: 4px solid #FFD700;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modal-appear 0.5s ease-out;
+}
+
+.ceremony-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #7C3AED;
+  margin-bottom: 30px;
+}
+
+.ceremony-title::before {
+  content: '🪔 ';
+}
+
+.ceremony-title::after {
+  content: ' 🪔';
+}
+
+.diya-container {
+  margin: 30px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.diya-container:hover {
+  transform: scale(1.1);
+}
+
+.diya-flame {
+  font-size: 80px;
+  filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.3));
+  animation: diya-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes diya-glow {
+  from { transform: scale(1); filter: drop-shadow(4px 4px 8px rgba(255, 140, 0, 0.8)); }
+  to { transform: scale(1.05); filter: drop-shadow(6px 6px 12px rgba(255, 69, 0, 1)); }
+}
+
+.ceremony-instruction {
+  font-size: 18px;
+  color: #7C3AED;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Completion Modal */
+.completion-content {
+  background: linear-gradient(135deg, #FFFBEB, #FED7AA);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 500px;
+  text-align: center;
+  border: 4px solid #FFD700;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modal-appear 0.5s ease-out;
+}
+
+.completion-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #7C3AED;
+  margin-bottom: 20px;
+}
+
+.achievement-badge {
+  font-size: 80px;
+  margin: 20px 0;
+  animation: badge-celebrate 2s ease-in-out infinite alternate;
+}
+
+@keyframes badge-celebrate {
+  from { transform: scale(1) rotate(0deg); }
+  to { transform: scale(1.1) rotate(5deg); }
+}
+
+.completion-details {
+  margin: 30px 0;
+}
+
+.completion-pattern {
+  font-size: 24px;
+  font-weight: 800;
+  color: #7C3AED;
+  margin-bottom: 15px;
+}
+
+.completion-stars {
+  font-size: 28px;
+  margin: 15px 0;
+}
+
+.completion-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #7C3AED;
+}
+
+.completion-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.completion-button {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.completion-button.replay {
+  background: linear-gradient(135deg, #7C3AED, #A855F7);
+  color: white;
+}
+
+.completion-button.continue {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+}
+
+.completion-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.completion-button.replay::before {
+  content: '🎨 ';
+}
+
+.completion-button.continue::before {
+  content: '🎪 ';
+}
+
+/* Modal Animation */
+@keyframes modal-appear {
+  from { 
+    opacity: 0; 
+    transform: scale(0.8) translateY(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .art-creation-phase {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .color-palette {
+    margin-bottom: 20px;
+  }
+
+  .colors-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+
+  .color-pot::before {
+    width: 48px;
+    height: 48px;
+  }
+
+  .color-symbol {
+    font-size: 16px;
+    top: 16px;
+  }
+
+  .color-name {
+    margin-top: 55px;
+    font-size: 10px;
+  }
+
+  .phase-title {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+
+  .patterns-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .pattern-card {
+    padding: 30px 20px;
+  }
+
+  .pattern-icon {
+    font-size: 60px;
+  }
+
+  .pattern-name {
+    font-size: 24px;
+  }
+
+  .ganesha-character {
+    top: 10px;
+    left: 10px;
+  }
+
+  .ganesha-image {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
+  .ganesha-speech-bubble {
+    top: 80px;
+    max-width: 250px;
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .done-button {
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .festival-rangoli-container {
+    padding: 10px;
+  }
+
+  .art-creation-phase {
+    padding: 10px;
+    gap: 15px;
+  }
+
+  .education-content,
+  .ceremony-content,
+  .completion-content {
+    margin: 20px;
+    padding: 30px 20px;
+  }
+
+  .rangoli-svg {
+    max-height: 300px;
+  }
+}
+
+/* High DPI and Retina Display Support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .fillable-section {
+    stroke-width: 2px;
+  }
+  
+  .fillable-section:hover {
+    stroke-width: 4px !important;
+  }
+}

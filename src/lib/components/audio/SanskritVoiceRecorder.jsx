@@ -88,10 +88,16 @@ const SanskritVoiceRecorder = ({
   
   // Helper function to get syllables for a word
   const getSyllablesForWord = (word) => {
-    const syllableMap = {
-      'vakratunda': ['va', 'kra', 'tun', 'da'],
-      'mahakaya': ['ma', 'ha', 'ka', 'ya'],
-    };
+   const syllableMap = {
+        'vakratunda':    ['va', 'kra', 'tun', 'da'],
+        'mahakaya':      ['ma', 'ha', 'ka', 'ya'],
+        'suryakoti':     ['sur', 'ya', 'ko', 'ti'],
+        'samaprabha':    ['sa', 'ma', 'pra', 'bha'],
+        'nirvighnam':    ['nir', 'vigh', 'nam'],
+        'kurumedeva':    ['ku', 'ru', 'me', 'de', 'va'],
+        'sarvakaryeshu': ['sar', 'va', 'kar', 'ye', 'shu'],
+        'sarvada':       ['sar', 'va', 'da']
+      };
     return syllableMap[word.toLowerCase()] || [word];
   };
   
@@ -406,7 +412,7 @@ const SanskritVoiceRecorder = ({
               {getSyllablesForWord(word).map((syllable, index) => (
                 <button
                   key={index}
-                  onClick={() => playAudio(`/audio/syllables/${syllable}.mp3`)}
+                  onClick={() => playAudio(`/audio/syllables/${word.toLowerCase()}-${syllable}.mp3`)}
                   style={{
                     background: currentTheme.secondary,
                     color: 'white',

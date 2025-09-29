@@ -31,6 +31,20 @@ import DoorComponent from '../../components/DoorComponent';
 import DraggableItem from '../../../../lib/components/interactive/DraggableItem';
 import DropZone from '../../../../lib/components/interactive/DropZone';
 
+import meaningJournal from '../../assets/images/meaning-journal.png';
+
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+
+// All 8 app images
+import appVakratunda from '../../assets/images/apps/app-vakratunda.png';
+import appMahakaya from '../../assets/images/apps/app-mahakaya.png';
+import appSuryakoti from "../../assets/images/apps/app-suryakoti.png";
+import appSamaprabha from "../../assets/images/apps/app-samaprabha.png";
+import appNirvighnam from "../../assets/images/apps/app-nirvighnam.png";
+import appKurumedeva from "../../assets/images/apps/app-kurumedeva.png";
+
 // NEW: Canvas-based fog erasing component
 const FogErasingCanvas = ({ emotionId, fogImage, rockImage, onComplete, isActive }) => {
   const canvasRef = useRef(null);
@@ -540,6 +554,13 @@ const NirvighnamSceneContent = ({
   // Access GameCoach functionality (PROVEN FROM SURYAKOTI)
   const { showMessage, hideCoach, isVisible, clearManualCloseTracking } = useGameCoach();
 
+    const { resetScene } = useSceneReset(
+    sceneActions, 
+    'cave-of-secrets', 
+    'nirvighnam-kurumedeva', 
+    getSceneResetConfig('nirvighnam-kurumedeva')
+  );
+  
   // State management (PROVEN FROM SURYAKOTI)
   const [showSparkle, setShowSparkle] = useState(null);
   const [currentSourceElement, setCurrentSourceElement] = useState(null);
@@ -1688,10 +1709,14 @@ const startKurumedevaLearning = () => {
 
 </div>
 
+            <BackToMapButton onNavigate={onNavigate} hideCoach={hideCoach} clearManualCloseTracking={clearManualCloseTracking} />
+
+
             {/* Door 1 Component */}
             {(sceneState.phase === CAVE_PHASES.DOOR1_ACTIVE || sceneState.phase === CAVE_PHASES.DOOR1_COMPLETE) && (
               <div className="door1-area" id="door1-area">
                 <DoorComponent
+                                  key={`door1-${sceneState.door1CurrentStep}-${sceneState.door1Completed}-${sceneState.phase}`}
                   syllables={['Nir', 'vigh', 'nam']}
                   completedWord="Nirvighnam"
                   onDoorComplete={handleDoor1Complete}
@@ -1847,6 +1872,7 @@ const startKurumedevaLearning = () => {
             {(sceneState.phase === CAVE_PHASES.DOOR2_ACTIVE || sceneState.phase === CAVE_PHASES.DOOR2_COMPLETE) && (
               <div className="door2-area" id="door2-area">
                 <DoorComponent
+                                  key={`door2-${sceneState.door2CurrentStep}-${sceneState.door2Completed}-${sceneState.phase}`}
                   syllables={['Ku', 'ru', 'me', 'de', 'va']}
                   completedWord="Kurume Deva"
                   onDoorComplete={handleDoor2Complete}
@@ -2413,13 +2439,25 @@ filter: 'brightness(1.1)'        }}
               totalScenes={4}
               starsEarned={sceneState.progress?.starsEarned || 8}
               totalStars={8}
-              discoveredSymbols={['nirvighnam', 'kurumedeva'].filter(word =>
-                sceneState.learnedWords?.[word]?.learned
-              )}
-              symbolImages={{
-                nirvighnam: nirvighnamCard,
-                kurumedeva: kurumedevaCard
-              }}
+          discoveredSymbols={['vakratunda', 'mahakaya', 'suryakoti', 'samaprabha', 'nirvighnam', 'kurumedeva']}
+containerType="journal"
+containerImage={meaningJournal}
+meaningCards={{
+  vakratunda: { sanskrit: "वक्रतुण्ड", meaning: "Curved Trunk" },
+  mahakaya: { sanskrit: "महाकाय", meaning: "Great Body" },
+  suryakoti: { sanskrit: "सूर्यकोटि", meaning: "Million Suns" },
+  samaprabha: { sanskrit: "समप्रभ", meaning: "Equal Radiance" },
+  nirvighnam: { sanskrit: "निर्विघ्नम्", meaning: "Without Obstacles" },
+  kurumedeva: { sanskrit: "कुरुमे देव", meaning: "Please Bless" }
+}}
+appImages={{
+  vakratunda: appVakratunda,
+  mahakaya: appMahakaya,
+  suryakoti: appSuryakoti,
+  samaprabha: appSamaprabha,
+  nirvighnam: appNirvighnam,
+  kurumedeva: appKurumedeva
+}}
               nextSceneName="Divine Tasks Chamber"
               sceneId="nirvighnam-kurumedeva"
               completionData={{
@@ -2434,24 +2472,10 @@ filter: 'brightness(1.1)'        }}
               onComplete={onComplete}
 
        // ADD THIS TO SceneCompletionCelebration:
-onReplay={() => {
-  console.log('🔄 Nirvighnam Scene: Play Again requested');
-  
-  const profileId = localStorage.getItem('activeProfileId');
-  if (profileId) {
-    // Clear ALL storage
-    localStorage.removeItem(`temp_session_${profileId}_cave-of-secrets_nirvighnam-kurumedeva`);
-    localStorage.removeItem(`replay_session_${profileId}_cave-of-secrets_nirvighnam-kurumedeva`);
-    localStorage.removeItem(`play_again_${profileId}_cave-of-secrets_nirvighnam-kurumedeva`);
-    
-    SimpleSceneManager.setCurrentScene('cave-of-secrets', 'nirvighnam-kurumedeva', false, false);
-    console.log('🗑️ Nirvighnam scene storage cleared');
-  }
-  
-  // Force clean reload
-  setTimeout(() => {
-    window.location.reload();
-  }, 100);
+        onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);
+  resetScene();
 }}
 
              // ADD THIS TO SceneCompletionCelebration:
@@ -2539,6 +2563,7 @@ onContinue={() => {
                 if (clearManualCloseTracking) clearManualCloseTracking();
                 setTimeout(() => onNavigate?.('zones'), 100);
               }}
+              onStartFresh={() => resetScene()}
               currentProgress={{
                 stars: sceneState.stars || 0,
                 completed: sceneState.completed ? 1 : 0,

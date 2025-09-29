@@ -16,6 +16,10 @@ import SimpleSceneManager from '../../../../lib/services/SimpleSceneManager';
 import CulturalCelebrationModal from '../../../../lib/components/progress/CulturalCelebrationModal';
 import CulturalProgressExtractor from '../../../../lib/services/CulturalProgressExtractor';
 
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
+
 // Import game components
 import EyesTelescopeGame from './EyesTelescopeGame';
 import EarsRhythmGame from './EarsRhythmGame';
@@ -326,6 +330,9 @@ const SymbolMountainSceneContent = ({
   // ✅ NEW: Tusk assembly animation states
   const [tuskGlowing, setTuskGlowing] = useState(false);
   const [assemblyMessage, setAssemblyMessage] = useState('');
+
+  const { resetScene } = useSceneReset(sceneActions, 'symbol-mountain', 'symbol', getSceneResetConfig('symbol'));
+
 
   // Refs
   const timeoutsRef = useRef([]);
@@ -2520,6 +2527,8 @@ const handleEyesGameComplete = () => {
               if (clearManualCloseTracking) clearManualCloseTracking();
               setTimeout(() => onNavigate?.('zones'), 100);
             }}            
+                 onStartFresh={() => resetScene()}  // ← ADD THIS LINE
+
             currentProgress={{
               stars: sceneState.stars || 0,
               completed: sceneState.phase === PHASES.ALL_COMPLETE ? 1 : 0,
@@ -2606,118 +2615,113 @@ onComplete={() => {
             timestamp: Date.now()
           })}
 
-      <SceneCompletionCelebration
-  show={showSceneCompletion}
-  sceneName="Musical Mountain Adventure"
-  sceneNumber={1}
-  totalScenes={4}
-  starsEarned={9}
-  totalStars={9}
-  discoveredSymbols={[
-    'mooshika', 'modak', 'belly',    // Previous symbols (3)
-    'lotus', 'trunk',                // Pond scene symbols (2) 
-    'eyes', 'ears', 'tusk'           // Current scene symbols (3)
-  ]}
-  symbolImages={{
-    mooshika: symbolMooshikaColored,
-    modak: symbolModakColored,
-    belly: symbolBellyColored,
-    lotus: symbolLotusColored,
-    trunk: symbolTrunkColored,
-    eyes: symbolEyesColored,
-    ears: symbolEarColored,
-    tusk: symbolTuskColored
-  }}
-  nextSceneName="Next Adventure"
-  sceneId="symbol"
-  completionData={{
-    stars: 9,
-    symbols: { 
-      mooshika: true, modak: true, belly: true,
-      lotus: true, trunk: true,
-      eyes: true, ears: true, tusk: true 
-    },
-    completed: true,
-    totalStars: 9
-  }} // ADD THESE PROPS:
+{/* Scene Completion - FIXED: Single state control */}
+{showSceneCompletion && (
+  <SceneCompletionCelebration
+    show={true}  // Always true when rendered
+    sceneName="Musical Mountain Adventure"
+    sceneNumber={3}
+    totalScenes={4}
+    starsEarned={9}
+    totalStars={9}
+    discoveredSymbols={[
+      'mooshika', 'modak', 'belly',    // Previous symbols (3)
+      'lotus', 'trunk',                // Pond scene symbols (2)
+      'eyes', 'ears', 'tusk'           // Current scene symbols (3)
+    ].filter(symbol => sceneState.discoveredSymbols?.[symbol])}
+    symbolImages={{
+      mooshika: symbolMooshikaColored,
+      modak: symbolModakColored,
+      belly: symbolBellyColored,
+      lotus: symbolLotusColored,
+      trunk: symbolTrunkColored,
+      eyes: symbolEyesColored,
+      ears: symbolEarColored,
+      tusk: symbolTuskColored
+    }}
+    nextSceneName="Final Assembly"
+    sceneId="symbol"
+    completionData={{
+      stars: 9,
+      symbols: { 
+        mooshika: true, modak: true, belly: true,
+        lotus: true, trunk: true,
+        eyes: true, ears: true, tusk: true 
+      },
+      completed: true,
+      totalStars: 9
+    }}
+    onComplete={onComplete}
 
-
-            onComplete={onComplete}
-       
-            onReplay={() => {
-  console.log('🔧 NUCLEAR OPTION: Bulletproof Play Again');
-  
-  const profileId = localStorage.getItem('activeProfileId');
-  if (profileId) {
-    // Clear ALL storage
-  localStorage.removeItem(`temp_session_${profileId}_symbol-mountain_symbol`);
-localStorage.removeItem(`replay_session_${profileId}_symbol-mountain_symbol`);
-localStorage.removeItem(`play_again_${profileId}_symbol-mountain_symbol`);
-    
-SimpleSceneManager.setCurrentScene('symbol-mountain', 'symbol', false, false);
-    console.log('🗑️ NUCLEAR: All storage cleared');
-  }
-  
-  // Force clean reload
-  console.log('🔄 NUCLEAR: Forcing reload in 100ms');
-  setTimeout(() => {
-    window.location.reload();
-  }, 100);
+         onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);  // Hide completion screen
+  resetScene();  // Use the hook instead of all that complex logic
 }}
 
-            onContinue={() => {
-              console.log('🔧 CONTINUE: Going to next scene + preserving resume');
-              
-              if (clearManualCloseTracking) {
-                clearManualCloseTracking();
-                console.log('✅ CONTINUE: GameCoach manual tracking cleared');
-              }
-              if (hideCoach) {
-                hideCoach();
-                console.log('✅ CONTINUE: GameCoach hidden');
-              }
-              
-              setTimeout(() => {
-                console.log('🎭 CONTINUE: Forcing GameCoach fresh start for next scene');
-                if (clearManualCloseTracking) {
-                  clearManualCloseTracking();
-                  console.log('🎭 CONTINUE: GameCoach cleared again after delay');
-                }
-              }, 500);
-              
-              const profileId = localStorage.getItem('activeProfileId');
-              if (profileId) {
-                try {
-                  ProgressManager.updateSceneCompletion(profileId, 'symbol-mountain', 'symbol', {
-                    completed: true,
-                    stars: 9,
-                    symbols: { eyes: true, ears: true, tusk: true }
-                  });
-                  
-                  GameStateManager.saveGameState('symbol-mountain', 'symbol', {
-                    completed: true,
-                    stars: 9,
-                    symbols: { eyes: true, ears: true, tusk: true },
-                    unlocked: true,  // ✅ ADD: Missing unlocked property
-                    timestamp: Date.now()
-                  });
-                  
-                  console.log('✅ CONTINUE: Completion data saved');
-                } catch (error) {
-                  console.error('❌ CONTINUE SAVE ERROR:', error);
-                  console.log('🔄 CONTINUE: Navigation continues despite save error');
-                  // Continue with navigation even if save fails
-                }
-              }
+    onContinue={() => {
+      console.log('🔧 MUSICAL MOUNTAIN CONTINUE: Going to next scene + preserving resume');
+      
+      // 1. Enhanced GameCoach clearing
+      if (clearManualCloseTracking) {
+        clearManualCloseTracking();
+        console.log('✅ MUSICAL MOUNTAIN CONTINUE: GameCoach manual tracking cleared');
+      }
+      if (hideCoach) {
+        hideCoach();
+        console.log('✅ MUSICAL MOUNTAIN CONTINUE: GameCoach hidden');
+      }
+      
+      // Enhanced GameCoach timeout
+      setTimeout(() => {
+        console.log('🎭 MUSICAL MOUNTAIN CONTINUE: Forcing GameCoach fresh start for next scene');
+        if (clearManualCloseTracking) {
+          clearManualCloseTracking();
+          console.log('🎭 MUSICAL MOUNTAIN CONTINUE: GameCoach cleared again after delay');
+        }
+      }, 500);
+      
+      // 2. Save completion data
+      const profileId = localStorage.getItem('activeProfileId');
+      if (profileId) {
+        try {
+          ProgressManager.updateSceneCompletion(profileId, 'symbol-mountain', 'symbol', {
+            completed: true,
+            stars: 9,
+            symbols: { eyes: true, ears: true, tusk: true }
+          });
+          
+          GameStateManager.saveGameState('symbol-mountain', 'symbol', {
+            completed: true,
+            stars: 9,
+            symbols: { eyes: true, ears: true, tusk: true },
+            unlocked: true,
+            timestamp: Date.now()
+          });
+          
+          console.log('✅ MUSICAL MOUNTAIN CONTINUE: Completion data saved');
+        } catch (error) {
+          console.error('❌ MUSICAL MOUNTAIN CONTINUE SAVE ERROR:', error);
+          console.log('🔄 MUSICAL MOUNTAIN CONTINUE: Navigation continues despite save error');
+        }
+      }
 
-              setTimeout(() => {
-                SimpleSceneManager.setCurrentScene('symbol-mountain', 'pond', false, false);
-                console.log('✅ CONTINUE: Next scene (pond) set for resume tracking');
-                
-                onNavigate?.('scene-complete-continue');
-              }, 100);
-            }}
-          />
+      // 3. Set NEXT scene for resume tracking
+      setTimeout(() => {
+        SimpleSceneManager.setCurrentScene('symbol-mountain', 'final-scene', false, false);
+        console.log('✅ MUSICAL MOUNTAIN CONTINUE: Next scene (final-scene) set for resume tracking');
+        
+        onNavigate?.('scene-complete-continue');
+      }, 100);
+    }}
+  />
+)}
+<BackToMapButton 
+  onNavigate={onNavigate}
+  hideCoach={hideCoach}
+  clearManualCloseTracking={clearManualCloseTracking}
+  position="bottom-left"
+/>
 
           {/* 🧪 TESTING BUTTONS - Remove before production */}
           {process.env.NODE_ENV === 'development' && (

@@ -229,6 +229,16 @@
   text-align: center;
 }
 
+.menu-button.restart-button {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+  border: 2px solid #FF4444;
+}
+
+.menu-button.restart-button:hover {
+  background: linear-gradient(135deg, #FF5252 0%, #FF3333 100%);
+  transform: translateX(5px) scale(1.02);
+}
+
 .menu-divider {
   height: 1px;
   background: rgba(0, 0, 0, 0.1);

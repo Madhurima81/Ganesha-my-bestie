@@ -8,63 +8,40 @@ class GameStateManager {
     this.initializeProfiles();
   }
 
-  // Zone structure remains the same
-  static ZONES = {
-    'symbol-mountain': {
-      id: 1,
-      name: 'Symbol Mountain',
-      icon: '🏔️',
-scenes: ['modak', 'pond', 'symbol', 'final-scene']
-    },
-    'cave-of-secrets': {
-      id: 2,
-      name: 'Cave of Secrets',
-      icon: '🌈',
- scenes: [
+static ZONES = {
+  'symbol-mountain': {
+    id: 1,
+    name: 'Symbol Mountain',
+    icon: '🏔️',
+    scenes: ['modak', 'pond', 'symbol', 'final-scene']
+  },
+  'cave-of-secrets': {
+    id: 2,
+    name: 'Cave of Secrets',
+    icon: '🌈',
+    scenes: [
       'vakratunda-mahakaya', 
       'suryakoti-samaprabha', 
       'nirvighnam-kurumedeva',
-      'sarvakaryeshu-sarvada',    // ✅ Scene 4
-      'mantra-assembly'           // ✅ Scene 5 (final)
-    ],    },
-    
-    'ocean-depths': {
-      id: 3,
-      name: 'Ocean Depths',
-      icon: '🌊',
-      scenes: ['reef', 'trench', 'kelp-forest', 'shipwreck', 'atlantis']
-    },
-    'sky-kingdom': {
-      id: 4,
-      name: 'Sky Kingdom',
-      icon: '☁️',
-      scenes: ['cloud-palace', 'rainbow-bridge', 'wind-temple', 'star-observatory', 'sky-port']
-    },
-    'forest-haven': {
-      id: 5,
-      name: 'Forest Haven',
-      icon: '🌲',
-      scenes: ['ancient-tree', 'mushroom-circle', 'fairy-glen', 'bear-cave', 'owl-roost']
-    },
-    'desert-oasis': {
-      id: 6,
-      name: 'Desert Oasis',
-      icon: '🏜️',
-      scenes: ['pyramid', 'oasis-pool', 'camel-station', 'sand-dunes', 'mirage-city']
-    },
-    'ice-palace': {
-      id: 7,
-      name: 'Ice Palace',
-      icon: '❄️',
-      scenes: ['frozen-throne', 'crystal-cave', 'penguin-colony', 'aurora-hall', 'glacier-bridge']
-    },
-    'volcano-peak': {
-      id: 8,
-      name: 'Volcano Peak',
-      icon: '🌋',
-      scenes: ['lava-chamber', 'obsidian-path', 'fire-temple', 'dragon-lair', 'summit-crater']
-    }
-  };
+      'sarvakaryeshu-sarvada',
+      'mantra-assembly'
+    ]
+  },
+  'shloka-river': {
+    id: 3,
+    name: 'Shloka River',
+    icon: '🌊',
+    scenes: ['vakratunda-grove', 'suryakoti-bank', 'nirvighnam-chant', 'sarvakaryeshu-chant', 'shloka-river-finale']
+  },
+  // ✅ ADD: Festival Square - Fun Games Zone
+  'festival-square': {
+    id: 4,
+    name: 'Festival Square',
+    icon: '🎉',
+    scenes: ['game1', 'game2', 'game3', 'game4']
+  }
+  // ✅ REMOVE: All the placeholder zones (ocean-depths, sky-kingdom, etc.)
+};
 
   // Profile colors and avatars for kids
   static PROFILE_AVATARS = ['🦁', '🐧', '🦊', '🐼', '🦝', '🐯', '🐨', '🦉'];
@@ -193,7 +170,7 @@ scenes: ['modak', 'pond', 'symbol', 'final-scene']
           stars: 0,
           symbols: {},
           lastPlayed: null,
-          unlocked: index === 0  // ✅ DISNEY: First scene in each zone unlocked
+    unlocked: index === 0 || zoneId === 'festival-square'  // ✅ ADD: All Festival Square games unlocked
         };
       });
     });
@@ -949,7 +926,7 @@ getCompletionHistory(profileId = null) {
           stars: 0,
           symbols: {},
           lastPlayed: null,
-          unlocked: index === 0  // ✅ DISNEY: First scene unlocked
+    unlocked: index === 0 || zoneId === 'festival-square'  // ✅ ADD: All Festival Square games unlocked
         };
       });
     });

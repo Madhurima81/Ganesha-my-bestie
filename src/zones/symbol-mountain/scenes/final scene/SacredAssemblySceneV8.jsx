@@ -22,6 +22,10 @@ import ProgressiveHintSystem from '../../../../lib/components/interactive/Progre
 import MagicalCardFlip from '../../../../lib/components/animation/MagicalCardFlip';
 import SymbolSidebar from '../../shared/components/SymbolSidebar';
 
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
+
 // Images - Background
 import sacredBackground from './assets/images/final_symbol_background.png';
 
@@ -342,6 +346,9 @@ const SacredAssemblyContent = ({
   const [showZoneCompletion, setShowZoneCompletion] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [isOrbsRunning, setIsOrbsRunning] = useState(false); // Track orbs state (with built-in fireworks)
+
+  const { resetScene } = useSceneReset(sceneActions, 'symbol-mountain', 'final-scene', getSceneResetConfig('final-scene'));
+
 
   // Refs
   const timeoutsRef = useRef([]);
@@ -1424,6 +1431,13 @@ useEffect(() => {
             </div>
           </div>
 
+          <BackToMapButton 
+  onNavigate={onNavigate}
+  //hideCoach={hideCoach}
+  //clearManualCloseTracking={clearManualCloseTracking}
+  position="bottom-left"
+/>
+
           {/* UPDATED: Progressive Hint System with improved timing */}
           <ProgressiveHintSystem
             ref={progressiveHintRef}
@@ -1461,6 +1475,8 @@ useEffect(() => {
               console.log('🗺️ V8: Zones navigation');
               setTimeout(() => onNavigate?.('zones'), 100);
             }}
+                 onStartFresh={() => resetScene()}  // ← ADD THIS LINE
+
             currentProgress={{
               stars: sceneState.stars || 0,
               completed: sceneState.completed ? 1 : 0,
@@ -1512,19 +1528,11 @@ useEffect(() => {
               setShowSceneCompletion(false);
               onNavigate?.('zone-welcome');
             }}
-            onReplay={() => {
-              console.log('🔄 V8: Final scene replay');
-              setShowSceneCompletion(false);
-              const profileId = localStorage.getItem('activeProfileId');
-              if (profileId) {
-                    SimpleSceneManager.setCurrentScene('symbol-mountain', 'final-scene', false, false);
-
-                localStorage.setItem(`play_again_${profileId}_${zoneId}_${sceneId}`, 'true');
-              }
-              setTimeout(() => {
-                window.location.reload();
-              }, 100);
-            }}
+        onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);  // Hide completion screen
+  resetScene();  // Use the hook instead of all that complex logic
+}}
           />
 
           {/* Cultural Celebration Modal */}

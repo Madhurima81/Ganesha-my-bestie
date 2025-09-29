@@ -683,6 +683,17 @@
   filter: none !important;
 }
 
+
+.zone-welcome-container[data-zone="shloka-river"] .zone-scene-card {
+  background: linear-gradient(145deg, #e3f2fd, #bbdefb); /* Water blues */
+  border-color: #2196F3;
+}
+
+.zone-welcome-container[data-zone="shloka-river"] .stat-card.chants {
+  border-color: #00BCD4; /* Cyan for water theme */
+  background: rgba(224, 247, 250, 0.95);
+}
+
 /* ===== DYNAMIC CARD LAYOUTS ===== */
 
 .stats-cards {

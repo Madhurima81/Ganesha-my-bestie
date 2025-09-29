@@ -13,6 +13,9 @@ import { useGameCoach, TriggerCoach } from '../../../../lib/components/coach/Gam
 import ProgressManager from '../../../../lib/services/ProgressManager';
 import SimpleSceneManager from '../../../../lib/services/SimpleSceneManager';
 
+import useSceneReset from '../../../../lib/hooks/useSceneReset';
+import BackToMapButton from '../../../../lib/components/navigation/BackToMapButton';
+import { getSceneResetConfig } from '../../../../lib/config/SceneResetConfigs';
 
 // UI Components
 import TocaBocaNav from '../../../../lib/components/navigation/TocaBocaNav';
@@ -214,6 +217,7 @@ const PondSceneContent = ({
   // Access GameCoach functionality
 const { showMessage, hideCoach, isVisible, clearManualCloseTracking } = useGameCoach();
 
+const { resetScene } = useSceneReset(sceneActions, 'symbol-mountain', 'pond', getSceneResetConfig('pond'));
 
   const [showSparkle, setShowSparkle] = useState(null);
   const [activePopup, setActivePopup] = useState(-1);
@@ -1608,10 +1612,19 @@ case 'final':
 
 
 {/* 🧪 POND COMPLETION TEST BUTTON */}
+{/* 🗺️ Navigation & Debug Controls */}
+<BackToMapButton 
+  onNavigate={onNavigate}
+  hideCoach={hideCoach}
+  clearManualCloseTracking={clearManualCloseTracking}
+  position="bottom-left"
+/>
+
+{/* 🧪 POND COMPLETION TEST BUTTON - FIXED */}
 <div style={{
   position: 'fixed',
   top: '170px',
-  left: '200px', // Different position
+  left: '200px',
   zIndex: 9999,
   background: 'purple',
   color: 'white',
@@ -1634,20 +1647,21 @@ case 'final':
    
     // All symbols discovered
     discoveredSymbols: {
-  // Keep previous symbols from initial state
-  mooshika: true,
-  modak: true,
-  belly: true,
-  // Add current scene symbols
-  lotus: true,
-  trunk: true,
-  golden: true,
-},
+      // Keep previous symbols from initial state
+      mooshika: true,
+      modak: true,
+      belly: true,
+      // Add current scene symbols
+      lotus: true,
+      trunk: true,
+      golden: true,
+    },
+    
     // All messages shown
     welcomeShown: true,
     lotusWisdomShown: true,
     elephantWisdomShown: true,
-    masteryShown: false,  // Will trigger final message
+    masteryShown: false,
    
     // Set to final phase
     phase: PHASES.COMPLETE,
@@ -1675,16 +1689,39 @@ case 'final':
   setShowMagicalCard(false);
   setShowSceneCompletion(false);
  
-  // Trigger final celebration
+  // 🔥 FIXED: Trigger final celebration directly instead of showSymbolCelebration
   setTimeout(() => {
-    showSymbolCelebration('final');
+    console.log('🎯 Starting final fireworks celebration');
+    
+    // Clear all UI states before fireworks
+    setShowMagicalCard(false);
+    setShowPopupBook(false);
+    setShowSparkle(null);
+    setCardContent({});
+    setPopupBookContent({});
+
+    // Set completion state with fireworks
+    sceneActions.updateState({
+      showingCompletionScreen: true,
+      currentPopup: 'final_fireworks',
+      phase: PHASES.COMPLETE,
+      stars: 5,
+      completed: true,
+      progress: {
+        percentage: 100,
+        starsEarned: 5,
+        completed: true
+      }
+    });
+ 
+    setShowSparkle('final-fireworks');
   }, 1000);
 }}>
   COMPLETE
 </div>
 
 
-{/* 🆘 EMERGENCY: Start Fresh Button */}
+{/* 🆘 EMERGENCY: Start Fresh Button 
 <div style={{
   position: 'fixed',
   bottom: '20px',
@@ -1769,7 +1806,7 @@ case 'final':
   }
 }}>
   🔄 Start Fresh
-</div>
+</div>*/}
 
 
            
@@ -1952,22 +1989,20 @@ case 'final':
           `}</style>
 
 
-        <TocaBocaNav
+<TocaBocaNav
   onHome={() => {
     console.log('🧹 HOME: Cleaning GameCoach before navigation');
     if (hideCoach) hideCoach();
     if (clearManualCloseTracking) clearManualCloseTracking();
     setTimeout(() => onNavigate?.('home'), 100);
   }}
- onProgress={() => {
-  const activeProfile = GameStateManager.getActiveProfile();
-  const name = activeProfile?.name || 'little explorer';
-  
-  console.log(`Great progress, ${name}!`);
-  if (hideCoach) hideCoach();
-  setShowCulturalCelebration(true);
-
-}}
+  onProgress={() => {
+    const activeProfile = GameStateManager.getActiveProfile();
+    const name = activeProfile?.name || 'little explorer';
+    console.log(`Great progress, ${name}!`);
+    if (hideCoach) hideCoach();
+    setShowCulturalCelebration(true);
+  }}
   onHelp={() => console.log('Show help')}
   onParentMenu={() => console.log('Parent menu')}
   isAudioOn={true}
@@ -1978,6 +2013,9 @@ case 'final':
     if (clearManualCloseTracking) clearManualCloseTracking();
     setTimeout(() => onNavigate?.('zones'), 100);
   }}
+  
+     onStartFresh={() => resetScene()}  // ← ADD THIS LINE
+
   currentProgress={{
     stars: sceneState.celebrationStars || 0,
     completed: sceneState.phase === PHASES.COMPLETE ? 1 : 0,
@@ -2038,7 +2076,93 @@ case 'final':
 }}
   />
 )}
-          {/* Scene Completion - For moving to next scene */}
+
+{/* Scene Completion - FIXED: Single state control */}
+{showSceneCompletion && (
+  <SceneCompletionCelebration
+    show={true}  // Always true when rendered
+    sceneName="Pond Adventure"
+    sceneNumber={2}
+    totalScenes={4}
+    starsEarned={sceneState.progress?.starsEarned || 5}
+    totalStars={5}
+    discoveredSymbols={['mooshika', 'modak', 'belly', 'lotus', 'trunk'].filter(symbol =>
+      sceneState.discoveredSymbols?.[symbol]
+    )}
+    symbolImages={{
+      mooshika: symbolMooshikaColored,
+      modak: symbolModakColored,
+      belly: symbolBellyColored,
+      lotus: symbolLotusColored,
+      trunk: symbolTrunkColored
+    }}
+    nextSceneName="Temple Discovery"
+    sceneId="pond"
+    completionData={{
+      stars: 5,
+      symbols: { lotus: true, trunk: true, golden: true },
+      completed: true,
+      totalStars: 5
+    }}
+    onComplete={onComplete}
+
+      onReplay={() => {
+  console.log('🔄 INSTANT REPLAY: Garden Adventure restart');
+  setShowSceneCompletion(false);  // Hide completion screen
+  resetScene();  // Use the hook instead of all that complex logic
+}}
+
+    onContinue={() => {
+      console.log('🔧 POND CONTINUE: Going to next scene + preserving resume');
+      
+      // 1. Enhanced GameCoach clearing
+      if (clearManualCloseTracking) {
+        clearManualCloseTracking();
+        console.log('✅ POND CONTINUE: GameCoach manual tracking cleared');
+      }
+      if (hideCoach) {
+        hideCoach();
+        console.log('✅ POND CONTINUE: GameCoach hidden');
+      }
+      
+      // Enhanced GameCoach timeout
+      setTimeout(() => {
+        console.log('🎭 POND CONTINUE: Forcing GameCoach fresh start for next scene');
+        if (clearManualCloseTracking) {
+          clearManualCloseTracking();
+          console.log('🎭 POND CONTINUE: GameCoach cleared again after delay');
+        }
+      }, 500);
+      
+      // 2. Save completion data
+      const profileId = localStorage.getItem('activeProfileId');
+      if (profileId) {
+        ProgressManager.updateSceneCompletion(profileId, 'symbol-mountain', 'pond', {
+          completed: true,
+          stars: 5,
+          symbols: { lotus: true, trunk: true, golden: true }
+        });
+        
+        GameStateManager.saveGameState('symbol-mountain', 'pond', {
+          completed: true,
+          stars: 5,
+          symbols: { lotus: true, trunk: true, golden: true }
+        });
+        
+        console.log('✅ POND CONTINUE: Completion data saved');
+      }
+
+      // 3. Set NEXT scene for resume tracking
+      setTimeout(() => {
+        SimpleSceneManager.setCurrentScene('symbol-mountain', 'temple', false, false);
+        console.log('✅ POND CONTINUE: Next scene (temple) set for resume tracking');
+        
+        onNavigate?.('scene-complete-continue');
+      }, 100);
+    }}
+  />
+)}
+          {/* Scene Completion - For moving to next scene 
           <SceneCompletionCelebration
             show={showSceneCompletion}
             sceneName="Pond Adventure"
@@ -2067,7 +2191,7 @@ completionData={{        // ← ADD THIS BLOCK
 onComplete={onComplete}  // ← ADD THIS LINE
 
 
-onReplay={() => {
+/*onReplay={() => {
   console.log('🔧 NUCLEAR OPTION: Bulletproof Play Again');
   
   const profileId = localStorage.getItem('activeProfileId');
@@ -2086,6 +2210,80 @@ onReplay={() => {
   setTimeout(() => {
     window.location.reload();
   }, 100);
+}}
+
+onReplay={() => {
+  console.log('🔄 PLAY AGAIN: Setting App.jsx flag + immediate reset');
+  
+  // ✅ SIGNAL TO APP.JSX: We're doing a play again
+  const profileId = localStorage.getItem('activeProfileId');
+  const tempKey = `temp_session_${profileId}_symbol-mountain_pond`;
+  localStorage.setItem(tempKey, JSON.stringify({ playAgainRequested: true }));
+  
+  // ✅ IMMEDIATE: Hide completion screen in parent
+  setShowSceneCompletion(false);
+  
+  // ✅ IMMEDIATE: Clear all UI states
+  setShowSparkle(null);
+  setShowPopupBook(false);
+  setShowMagicalCard(false);
+  setActivePopup(-1);
+  setPopupAnimation('');
+  setCurrentSourceElement(null);
+  setPopupBookContent({});
+  setCardContent({});
+  setPendingAction(null);
+  
+  // ✅ IMMEDIATE: Hide GameCoach
+  if (hideCoach) hideCoach();
+  if (clearManualCloseTracking) clearManualCloseTracking();
+  
+  // ✅ IMMEDIATE: Reset scene state (no setTimeout)
+  sceneActions.updateState({
+    lotusStates: [0, 0, 0],
+    goldenLotusVisible: false,
+    goldenLotusBloom: false,
+    elephantVisible: false,
+    elephantTransformed: false,
+    trunkActive: false,
+    waterDrops: [],
+    celebrationStars: 0,
+    phase: 'initial',
+    currentFocus: 'lotus',
+    
+    discoveredSymbols: {
+      mooshika: true,
+      modak: true,
+      belly: true,
+    },
+    
+    // Clear ALL completion flags
+    welcomeShown: false,
+    lotusWisdomShown: false,
+    elephantWisdomShown: false,
+    masteryShown: false,
+    readyForWisdom: false,
+    currentPopup: null,
+    showingCompletionScreen: false,
+    symbolDiscoveryState: null,
+    sidebarHighlightState: null,
+    gameCoachState: null,
+    isReloadingGameCoach: false,
+    lastGameCoachTime: 0,
+    
+    stars: 0,
+    completed: false,
+    progress: {
+      percentage: 0,
+      starsEarned: 0,
+      completed: false
+    },
+    
+    showLotusText: false,
+    showTrunkText: false,
+  });
+  
+  console.log('✅ PLAY AGAIN: Complete reset applied');
 }}
  
  

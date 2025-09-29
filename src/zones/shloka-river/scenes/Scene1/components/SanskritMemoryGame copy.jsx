@@ -1,5 +1,5 @@
 // zones/shloka-river/scenes/Scene1/components/SanskritMemoryGame.jsx
-// Enhanced Sanskrit memory game with automatic flow, sleek progress bar, and engaging animations
+// ENHANCED: Improved reload functionality with better state management and cleanup
 
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -67,7 +67,7 @@ const SanskritMemoryGame = ({
   // Water spray component prop
   WaterSprayComponent,
   
-  // Reload support props
+  // ENHANCED: Reload support props with better state management
   isReload = false,
   initialGamePhase = 'waiting',
   initialCurrentPhase = 'vakratunda',
@@ -75,8 +75,18 @@ const SanskritMemoryGame = ({
   initialPlayerInput = [],
   initialCurrentSequence = [],
   initialSequenceItemsShown = 0,
+  initialPermanentlyBloomed = {},
+  initialComboStreak = 0,
+  initialMistakeCount = 0,
   phaseJustCompleted = false,
   lastCompletedPhase = null,
+  gameJustCompleted = false,
+    initialIsCountingDown = false,    // ADD THIS
+  initialCountdown = 0,             // ADD THIS
+
+    // ADD THIS LINE:
+  forcePhase = null,
+  
 
   // Assets - passed from parent component
   getLotusImage,
@@ -84,16 +94,22 @@ const SanskritMemoryGame = ({
   getBabyElephantImage,
   getAdultElephantImage,
   
-  // Callback to save state for reload support
-  onSaveGameState
+  // ENHANCED: Callback to save state for reload support
+  onSaveGameState,
+  
+  // NEW: Callback for cleanup on component hide/unmount
+  onCleanup
+
 }) => {
-  console.log('Enhanced SanskritMemoryGame render:', { 
+  console.log('🎮 Enhanced SanskritMemoryGame render:', { 
     isActive, 
     hideElements,
     isReload,
     initialCurrentPhase,
     initialCurrentRound,
-    powerGained
+    powerGained,
+    phaseJustCompleted,
+    gameJustCompleted
   });
 
   // Core game state
@@ -115,40 +131,123 @@ const SanskritMemoryGame = ({
   const [lotusGlow, setLotusGlow] = useState({});
   const [mistakeCount, setMistakeCount] = useState(0);
   const [comboStreak, setComboStreak] = useState(0);
+  const [lastClickTime, setLastClickTime] = useState(0);
+
+  const [hasGameStarted, setHasGameStarted] = useState(false);
+  const [showInitialPlayButton, setShowInitialPlayButton] = useState(false);
 
   // Water spray state
   const [activeWaterSpray, setActiveWaterSpray] = useState(null);
   const [permanentlyBloomed, setPermanentlyBloomed] = useState({});
   const elementsRef = useRef({});
-  const [lastClickTime, setLastClickTime] = useState(0);
 
-
-  // Refs for cleanup
+  // ENHANCED: Refs for better cleanup and state management
   const timeoutsRef = useRef([]);
+  const intervalsRef = useRef([]);
+  const isComponentMountedRef = useRef(true);
+  const currentStateRef = useRef(null);
 
-  // Safe timeout function
+  // Safe timeout function with component mount check
   const safeSetTimeout = (callback, delay) => {
-    const timeout = setTimeout(callback, delay);
+    const timeout = setTimeout(() => {
+      if (isComponentMountedRef.current) {
+        callback();
+      }
+    }, delay);
     timeoutsRef.current.push(timeout);
     return timeout;
   };
 
-  // Clear all timeouts
-  const clearAllTimeouts = () => {
-    timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
-    timeoutsRef.current = [];
+  // Safe interval function with component mount check
+  const safeSetInterval = (callback, delay) => {
+    const interval = setInterval(() => {
+      if (isComponentMountedRef.current) {
+        callback();
+      }
+    }, delay);
+    intervalsRef.current.push(interval);
+    return interval;
   };
 
-  // Cleanup on unmount
+  // ENHANCED: Clear all timeouts and intervals
+  const clearAllTimers = () => {
+    timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+    intervalsRef.current.forEach(interval => clearInterval(interval));
+    timeoutsRef.current = [];
+    intervalsRef.current = [];
+  };
+
+  // ENHANCED: Cleanup on unmount/hide with callback
   useEffect(() => {
+    isComponentMountedRef.current = true;
+    
     return () => {
-      clearAllTimeouts();
+      console.log('🧹 SanskritMemoryGame: Component unmounting - cleaning up');
+      isComponentMountedRef.current = false;
+      clearAllTimers();
+      
+      // Cleanup global references
+      if (window.sanskritMemoryGame) {
+        window.sanskritMemoryGame.isReady = false;
+        delete window.sanskritMemoryGame.startMahakayaPhase;
+        delete window.sanskritMemoryGame.clearCompletionState;
+      }
+      
+      // Call cleanup callback if provided
+      if (onCleanup) {
+        onCleanup();
+      }
     };
   }, []);
 
+  // ENHANCED: Cleanup when component becomes inactive
+  useEffect(() => {
+    if (!isActive) {
+      console.log('🛑 SanskritMemoryGame: Component deactivated - clearing timers');
+      clearAllTimers();
+      setIsCountingDown(false);
+      setIsSequencePlaying(false);
+      
+      if (window.sanskritMemoryGame) {
+        window.sanskritMemoryGame.isReady = false;
+      }
+    } else {
+      if (window.sanskritMemoryGame) {
+        window.sanskritMemoryGame.isReady = true;
+      }
+    }
+  }, [isActive]);
+
+  // ENHANCED: Save state for reload support with better data structure
+  const saveGameState = (additionalState = {}) => {
+    const currentState = {
+      gamePhase,
+      currentPhase,
+      currentRound,
+      playerInput,
+      currentSequence,
+      sequenceItemsShown,
+      permanentlyBloomed,
+      comboStreak,
+      mistakeCount,
+      hasGameStarted,
+       isCountingDown,        // ADD THIS
+    countdown,             // ADD THIS
+      timestamp: Date.now(),
+      ...additionalState
+    };
+    
+    // Update ref for quick access
+    currentStateRef.current = currentState;
+    
+    if (onSaveGameState) {
+      onSaveGameState(currentState);
+    }
+  };
+
   // Register element positions for water spray targeting
   const registerElementPosition = (id, element) => {
-    if (element) {
+    if (element && isComponentMountedRef.current) {
       const rect = element.getBoundingClientRect();
       const container = element.closest('.vakratunda-grove-container');
       if (container) {
@@ -165,7 +264,7 @@ const SanskritMemoryGame = ({
   // Audio playback functions
   const playSyllableAudio = (syllable) => {
     try {
-      console.log(`Playing syllable: ${syllable}`);
+      console.log(`🔊 Playing syllable: ${syllable}`);
       
       const syllableFileMap = {
         'va': 'vakratunda-va',
@@ -184,7 +283,6 @@ const SanskritMemoryGame = ({
         return;
       }
       
-      // Adjust playback speed based on mistake count for adaptive difficulty
       const playbackRate = Math.max(0.7, 1 - (mistakeCount * 0.1));
       
       const audio = new Audio(`/audio/syllables/${fileName}.mp3`);
@@ -245,27 +343,39 @@ const SanskritMemoryGame = ({
     return SYLLABLE_SEQUENCES[phase][round] || [];
   };
 
-  // Automatic countdown system
-  const startCountdownToSequence = () => {
-    console.log('Starting automatic countdown to sequence');
-    setIsCountingDown(true);
-    setCountdown(3);
-    
-    const countdownInterval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownInterval);
-          setIsCountingDown(false);
+const startCountdownToSequence = () => {
+  if (!isComponentMountedRef.current) return;
+  
+  console.log('⏱️ Starting automatic countdown to sequence');
+  setIsCountingDown(true);
+  setCountdown(3);
+  
+  // ADD THIS LINE:
+  saveGameState({ isCountingDown: true, countdown: 3 });
+  
+  const countdownInterval = safeSetInterval(() => {
+    setCountdown(prev => {
+      const newCount = prev - 1;
+      // ADD THIS LINE:
+      saveGameState({ isCountingDown: newCount > 0, countdown: newCount });
+      
+      if (newCount <= 0) {
+        clearInterval(countdownInterval);
+        setIsCountingDown(false);
+        if (isComponentMountedRef.current) {
           handlePlaySequence(); // Auto-start sequence
-          return 0;
         }
-        return prev - 1;
-      });
-    }, 800);
-  };
+        return 0;
+      }
+      return newCount;
+    });
+  }, 800);
+};
 
   // Dynamic elephant moods
   const updateElephantMoods = () => {
+    if (!isComponentMountedRef.current) return;
+    
     const moods = {};
     currentSequence.forEach((syllable, index) => {
       if (gamePhase === 'listening' && index < playerInput.length) {
@@ -285,6 +395,8 @@ const SanskritMemoryGame = ({
 
   // Progressive lotus/stone glow effects
   const updateLotusGlow = () => {
+    if (!isComponentMountedRef.current) return;
+    
     const glowStates = {};
     currentSequence.forEach((syllable, index) => {
       const targetId = `${currentPhase === 'vakratunda' ? 'lotus' : 'stone'}-${syllable}`;
@@ -310,78 +422,232 @@ const SanskritMemoryGame = ({
     updateLotusGlow();
   }, [gamePhase, playerInput, sequenceItemsShown, singingSyllable, isCountingDown, permanentlyBloomed]);
 
-  // Initialize game when activated or on reload
+  // ENHANCED: Initialize game when activated or on reload with better state restoration
   useEffect(() => {
     if (!isActive) return;
 
-    if (isReload && initialCurrentSequence.length > 0) {
-      console.log('RELOAD: Restoring Sanskrit game state');
+if (isReload && (initialCurrentSequence.length > 0 || forcePhase)) {      
+  console.log('🔄 RELOAD: Restoring Sanskrit game state');
       
+      // Restore all state
       setCurrentPhase(initialCurrentPhase);
       setCurrentRound(initialCurrentRound);
       setCurrentSequence(initialCurrentSequence);
       setPlayerInput(initialPlayerInput);
       setGamePhase(initialGamePhase);
-      setSequenceItemsShown(initialCurrentSequence.length);
-      setCanPlayerClick(initialGamePhase === 'listening');
+
+      // FIXED: Better handling of celebration phase reload
+if (initialGamePhase === 'celebration') {
+  console.log('🎉 RELOAD: Was celebrating - resuming auto-continuation');
+  setGamePhase('celebration');
+  setCanPlayerClick(false);
+  
+  // Trigger auto-continuation after 2 seconds
+  safeSetTimeout(() => {
+    if (!isComponentMountedRef.current) return;
+    
+    if (initialCurrentRound < 3) {
+      console.log(`➡️ AUTO-RESUME: Continuing to round ${initialCurrentRound + 1} of ${initialCurrentPhase}`);
       
-      if (phaseJustCompleted && lastCompletedPhase) {
-        console.log('POST-PHASE COMPLETION: Auto-continuing');
+      setRoundTransition(true);
+      
+      safeSetTimeout(() => {
+        if (!isComponentMountedRef.current) return;
+        
+        const nextRound = initialCurrentRound + 1;
+        const nextSequence = getSequenceForRound(initialCurrentPhase, nextRound);
+        
+        setCurrentRound(nextRound);
+        setCurrentSequence(nextSequence);
+        setPlayerInput([]);
+        setGamePhase('waiting');
+        setCanPlayerClick(false);
+        setSequenceItemsShown(0);
+        setRoundTransition(false);
+        
+        saveGameState({
+          currentRound: nextRound,
+          currentSequence: nextSequence,
+          gamePhase: 'waiting',
+          playerInput: []
+        });
+      }, 1500);
+      
+    } else {
+      console.log('🏆 AUTO-RESUME: Completing phase after reload');
+      handlePhaseComplete(initialCurrentPhase);
+    }
+  }, 2000);
+  
+} else {
+  // Handle other phases normally  
+  setGamePhase(initialGamePhase);
+  setCanPlayerClick(initialGamePhase === 'listening');
+}
+
+      setPermanentlyBloomed(initialPermanentlyBloomed || {});
+      setComboStreak(initialComboStreak || 0);
+      setMistakeCount(initialMistakeCount || 0);
+      setHasGameStarted(true); // Always true on reload
+
+        // ADD THESE LINES FOR COUNTDOWN RELOAD:
+  setIsCountingDown(initialIsCountingDown);
+  setCountdown(initialCountdown);
+
+    // IF WE WERE COUNTING DOWN, RESTART THE COUNTDOWN
+  if (initialIsCountingDown && initialCountdown > 0) {
+    console.log('🔄 RELOAD: Restarting countdown from', initialCountdown);
+    
+    const countdownInterval = safeSetInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          setIsCountingDown(false);
+          if (isComponentMountedRef.current) {
+            handlePlaySequence(); // This will play the audio
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 800);
+  }
+      
+      // Handle special reload scenarios
+      if (gameJustCompleted) {
+        console.log('🎉 Game just completed during reload - calling onGameComplete');
+        safeSetTimeout(() => {
+          if (onGameComplete) {
+            onGameComplete();
+          }
+        }, 1000);
+      } else if (phaseJustCompleted && lastCompletedPhase) {
+        console.log('✅ Phase just completed during reload - auto-continuing');
         safeSetTimeout(() => {
           handlePhaseComplete(lastCompletedPhase);
         }, 1000);
       }
       
     } else {
-      console.log('NEW GAME: Starting Vakratunda phase');
+      console.log('🆕 NEW GAME: Starting Vakratunda phase immediately');
       const sequence = getSequenceForRound('vakratunda', 1);
       setCurrentPhase('vakratunda');
       setCurrentRound(1);
       setCurrentSequence(sequence);
-      setPlayerInput([]);
-      setGamePhase('waiting');
-      setCanPlayerClick(false);
-      setSequenceItemsShown(0);
-      clearAllTimeouts();
+      setHasGameStarted(true);
+      setPermanentlyBloomed({});
+      setComboStreak(0);
+      setMistakeCount(0);
+      
+      // Save initial state
+      saveGameState({
+        gamePhase: 'waiting',
+        currentPhase: 'vakratunda',
+        currentRound: 1,
+        currentSequence: sequence,
+        playerInput: [],
+        sequenceItemsShown: 0,
+        permanentlyBloomed: {},
+        comboStreak: 0,
+        mistakeCount: 0,
+        hasGameStarted: true
+      });
     }
-  }, [isActive, isReload]);
+}, [isActive, isReload, forcePhase]);
 
-  // Automatic sequence start when entering waiting phase
+  // ENHANCED: Auto-start logic with better state management
+  useEffect(() => {
+    if (!isActive || !isComponentMountedRef.current) return;
+    
+    if (gamePhase === 'waiting' && currentSequence.length > 0 && !isCountingDown) {
+      if (!hasGameStarted && !isReload) {
+        console.log('🎮 FIRST TIME: Auto-starting for new game');
+        safeSetTimeout(() => {
+          if (isComponentMountedRef.current) {
+            startCountdownToSequence();
+          }
+        }, 1200);
+      } else if (hasGameStarted) {
+        console.log('🔄 AUTO-FLOW: Starting countdown automatically for subsequent round');
+        safeSetTimeout(() => {
+          if (isComponentMountedRef.current) {
+            startCountdownToSequence();
+          }
+        }, 1200);
+      }
+    }
+  }, [gamePhase, isActive, currentSequence, isCountingDown, hasGameStarted, isReload]);
+
+  // ENHANCED: Mahakaya phase starter with better integration
+  const startMahakayaPhase = () => {
+    if (!isComponentMountedRef.current) return;
+    
+    console.log('🐘 Starting Mahakaya phase - direct game start');
+    
+    const nextSequence = getSequenceForRound('mahakaya', 1);
+    
+    // Clear all timers before phase transition
+    clearAllTimers();
+    
+    // Update state
+    setCurrentPhase('mahakaya');
+    setCurrentRound(1);
+    setCurrentSequence(nextSequence);
+    setPlayerInput([]);
+    setGamePhase('waiting');
+    setCanPlayerClick(false);
+    setSequenceItemsShown(0);
+    setComboStreak(0);
+    setPermanentlyBloomed({});
+    
+    saveGameState({
+      currentPhase: 'mahakaya',
+      currentRound: 1,
+      currentSequence: nextSequence,
+      gamePhase: 'waiting',
+      playerInput: [],
+      phaseJustCompleted: false
+    });
+  };
+
+  // ENHANCED: Global function exposure with better lifecycle management
   useEffect(() => {
     if (!isActive) return;
     
-    if (gamePhase === 'waiting' && currentSequence.length > 0 && !isCountingDown) {
-      console.log('AUTO-FLOW: Starting countdown automatically');
-      // Brief pause before countdown starts
-      const timer = safeSetTimeout(() => {
-        startCountdownToSequence();
-      }, 1200); // 1.2 second pause before countdown
-      
-      return () => clearTimeout(timer);
+    // Ensure the global object exists
+    if (!window.sanskritMemoryGame) {
+      window.sanskritMemoryGame = {};
     }
-  }, [gamePhase, isActive, currentSequence]);
-
-  // Save state for reload support
-  const saveGameState = (additionalState = {}) => {
-    if (onSaveGameState) {
-      onSaveGameState({
-        gamePhase,
-        currentPhase,
-        currentRound,
-        playerInput,
-        currentSequence,
-        sequenceItemsShown,
-        permanentlyBloomed,
-        ...additionalState
-      });
-    }
-  };
+    
+    // Expose functions and set ready flag
+    window.sanskritMemoryGame.startMahakayaPhase = startMahakayaPhase;
+    window.sanskritMemoryGame.isReady = true;
+    window.sanskritMemoryGame.clearCompletionState = () => {
+      if (isComponentMountedRef.current) {
+        setGamePhase('waiting');
+        setSequenceItemsShown(0);
+        console.log('🧹 Memory game completion state cleared');
+      }
+    };
+    
+    console.log('🌐 SanskritMemoryGame: Global functions exposed and ready flag set');
+    
+    // Cleanup on unmount or deactivation
+    return () => {
+      if (window.sanskritMemoryGame) {
+        window.sanskritMemoryGame.isReady = false;
+        delete window.sanskritMemoryGame.startMahakayaPhase;
+        delete window.sanskritMemoryGame.clearCompletionState;
+        console.log('🧹 SanskritMemoryGame: Global functions cleaned up');
+      }
+    };
+  }, [isActive]);
 
   // Play the syllable sequence
   const handlePlaySequence = async () => {
-    if (isSequencePlaying || currentSequence.length === 0) return;
+    if (isSequencePlaying || currentSequence.length === 0 || !isComponentMountedRef.current) return;
 
-    console.log('Playing syllable sequence:', currentSequence);
+    console.log('🎵 Playing syllable sequence:', currentSequence);
     setIsSequencePlaying(true);
     setGamePhase('playing');
     setCanPlayerClick(false);
@@ -393,23 +659,29 @@ const SanskritMemoryGame = ({
     
     currentSequence.forEach((syllable, index) => {
       safeSetTimeout(() => {
-        console.log(`Playing syllable ${index + 1}/${currentSequence.length}: ${syllable}`);
+        if (!isComponentMountedRef.current) return;
+        
+        console.log(`🔊 Playing syllable ${index + 1}/${currentSequence.length}: ${syllable}`);
         
         setSequenceItemsShown(index + 1);
         setSingingSyllable(syllable);
         playSyllableAudio(syllable);
         
         safeSetTimeout(() => {
-          setSingingSyllable(null);
+          if (isComponentMountedRef.current) {
+            setSingingSyllable(null);
+          }
         }, 600);
         
         if (index === currentSequence.length - 1) {
           safeSetTimeout(() => {
-            setIsSequencePlaying(false);
-            setGamePhase('listening');
-            setCanPlayerClick(true);
-            saveGameState({ gamePhase: 'listening' });
-            console.log('Sequence complete, player can now click elephants');
+            if (isComponentMountedRef.current) {
+              setIsSequencePlaying(false);
+              setGamePhase('listening');
+              setCanPlayerClick(true);
+              saveGameState({ gamePhase: 'listening' });
+              console.log('👂 Sequence complete, player can now click elephants');
+            }
           }, 800);
         }
       }, index * 1200);
@@ -418,7 +690,7 @@ const SanskritMemoryGame = ({
 
   // Trigger water spray effect on correct click
   const triggerWaterSpray = (syllableIndex) => {
-    if (!WaterSprayComponent) return;
+    if (!WaterSprayComponent || !isComponentMountedRef.current) return;
     
     const syllable = currentSequence[syllableIndex];
     const sourceId = `${currentPhase === 'vakratunda' ? 'baby' : 'adult'}-elephant-${syllable}`;
@@ -437,23 +709,31 @@ const SanskritMemoryGame = ({
       });
       
       safeSetTimeout(() => {
-        setActiveWaterSpray(null);
+        if (isComponentMountedRef.current) {
+          setActiveWaterSpray(null);
+        }
       }, 1500);
       
       safeSetTimeout(() => {
-        setPermanentlyBloomed(prev => ({ ...prev, [targetId]: true }));
+        if (isComponentMountedRef.current) {
+          setPermanentlyBloomed(prev => ({ ...prev, [targetId]: true }));
+        }
       }, 800);
     }
   };
 
   // Success celebration with multiple effects
   const triggerSuccessCelebration = () => {
-    console.log('Triggering success celebration');
+    if (!isComponentMountedRef.current) return;
+    
+    console.log('🎉 Triggering success celebration');
     
     // Water spray celebration for all syllables
     currentSequence.forEach((syllable, index) => {
       safeSetTimeout(() => {
-        triggerWaterSpray(index);
+        if (isComponentMountedRef.current) {
+          triggerWaterSpray(index);
+        }
       }, index * 200);
     });
     
@@ -467,57 +747,69 @@ const SanskritMemoryGame = ({
     setComboStreak(prev => prev + 1);
   };
 
- const handleElephantClick = (syllableIndex) => {
-  const currentTime = Date.now();
-  
-  // Prevent rapid clicking (300ms minimum between clicks)
-  if (currentTime - lastClickTime < 300) {
-    console.log('Click ignored - too fast!');
-    return;
-  }
-  
-  if (!canPlayerClick || isSequencePlaying) {
-    console.log('Elephant click ignored - not ready');
-    return;
-  }
-  
-  setLastClickTime(currentTime);
+  // ENHANCED: Handle elephant click with better state management
+  const handleElephantClick = (syllableIndex) => {
+    const currentTime = Date.now();
+    
+    // Prevent rapid clicking and ensure component is active
+    if (currentTime - lastClickTime < 300 || !isComponentMountedRef.current) {
+      console.log('Click ignored - too fast or component unmounted!');
+      return;
+    }
+    
+    if (!canPlayerClick || isSequencePlaying) {
+      console.log('Elephant click ignored - not ready');
+      return;
+    }
 
     const clickedSyllable = currentSequence[syllableIndex];
     if (!clickedSyllable) return;
 
-    console.log(`Player clicked elephant for syllable: ${clickedSyllable}`);
+    // Sequential clicking validation
+    const expectedIndex = playerInput.length;
+    
+    if (syllableIndex !== expectedIndex) {
+      const expectedSyllable = currentSequence[expectedIndex];
+      console.log(`❌ Wrong order! Expected syllable ${expectedIndex + 1} (${expectedSyllable}), but clicked syllable ${syllableIndex + 1} (${clickedSyllable})`);
+      
+      setGamePhase('order_error');
+      safeSetTimeout(() => {
+        if (isComponentMountedRef.current) {
+          setGamePhase('listening');
+        }
+      }, 1500);
+      
+      return;
+    }
+
+    setLastClickTime(currentTime);
+
+    console.log(`✅ Player clicked elephant for syllable: ${clickedSyllable} (position ${syllableIndex + 1})`);
     
     playSyllableAudio(clickedSyllable);
     
     const newPlayerInput = [...playerInput, clickedSyllable];
-    const currentIndex = newPlayerInput.length - 1;
+    setPlayerInput(newPlayerInput);
     
-    if (newPlayerInput[currentIndex] === currentSequence[currentIndex]) {
-      console.log(`Correct! Position ${currentIndex + 1}/${currentSequence.length}`);
-      setPlayerInput(newPlayerInput);
-      
-      triggerWaterSpray(syllableIndex);
-      
-      saveGameState({
-        gamePhase: 'listening',
-        playerInput: newPlayerInput,
-        currentSequence: currentSequence,
-        sequenceItemsShown: sequenceItemsShown
-      });
-      
-      if (newPlayerInput.length === currentSequence.length) {
-        handleSequenceSuccess();
-      }
-    } else {
-      console.log(`Wrong! Expected: ${currentSequence[currentIndex]}, Got: ${clickedSyllable}`);
-      handleSequenceError();
+    triggerWaterSpray(syllableIndex);
+    
+    saveGameState({
+      gamePhase: 'listening',
+      playerInput: newPlayerInput,
+      currentSequence: currentSequence,
+      sequenceItemsShown: sequenceItemsShown
+    });
+    
+    if (newPlayerInput.length === currentSequence.length) {
+      handleSequenceSuccess();
     }
   };
 
-  // Automatic sequence success with celebration
+  // ENHANCED: Automatic sequence success with better flow control
   const handleSequenceSuccess = () => {
-    console.log(`Round ${currentRound} of ${currentPhase} completed successfully!`);
+    if (!isComponentMountedRef.current) return;
+    
+    console.log(`🎊 Round ${currentRound} of ${currentPhase} completed successfully!`);
     
     setCanPlayerClick(false);
     triggerSuccessCelebration();
@@ -531,19 +823,23 @@ const SanskritMemoryGame = ({
     
     // Automatic progression with smooth transitions
     safeSetTimeout(() => {
+      if (!isComponentMountedRef.current) return;
+      
       if (currentRound < 3) {
-  const nextRoundNumber = currentRound + 1;
-  console.log(`AUTO-ADVANCE: Starting round ${nextRoundNumber} of ${currentPhase}`);        
+        console.log(`➡️ AUTO-ADVANCE: Starting round ${currentRound + 1} of ${currentPhase}`);
+        
         setRoundTransition(true);
         
         safeSetTimeout(() => {
+          if (!isComponentMountedRef.current) return;
+          
           const nextRound = currentRound + 1;
           const nextSequence = getSequenceForRound(currentPhase, nextRound);
           
           setCurrentRound(nextRound);
           setCurrentSequence(nextSequence);
           setPlayerInput([]);
-          setGamePhase('waiting'); // Will trigger auto-countdown
+          setGamePhase('waiting');
           setCanPlayerClick(false);
           setSequenceItemsShown(0);
           setRoundTransition(false);
@@ -554,18 +850,19 @@ const SanskritMemoryGame = ({
             gamePhase: 'waiting',
             playerInput: []
           });
-        }, 1500); // Smooth transition time
+        }, 1500);
         
       } else {
-        // Phase completion
         handlePhaseComplete(currentPhase);
       }
-    }, 2000); // Celebration duration
+    }, 2000);
   };
 
-  // Handle phase completion
+  // ENHANCED: Handle phase completion with better state tracking
   const handlePhaseComplete = (completedPhase) => {
-    console.log(`Phase ${completedPhase} completed!`);
+    if (!isComponentMountedRef.current) return;
+    
+    console.log(`🏆 Phase ${completedPhase} completed!`);
     setGamePhase('phase_complete');
     
     playCompleteWord(completedPhase);
@@ -580,96 +877,21 @@ const SanskritMemoryGame = ({
       onPhaseComplete(completedPhase);
     }
     
-    // CHANGED: Only auto-advance for Mahakaya completion, not Vakratunda
+    // Only auto-advance for Mahakaya completion
     if (completedPhase === 'mahakaya') {
       safeSetTimeout(() => {
-        console.log('Game complete!');
+        if (!isComponentMountedRef.current) return;
+        
+        console.log('🎯 Game complete!');
+        saveGameState({
+          gameJustCompleted: true
+        });
+        
         if (onGameComplete) {
           onGameComplete();
         }
       }, 3000);
     }
-    // For Vakratunda completion, wait for external signal (Continue Learning button)
-  };
-
-  // Function to start Mahakaya phase (called from parent when Continue Learning clicked)
-  const startMahakayaPhase = () => {
-    console.log('Starting Mahakaya phase after Continue Learning clicked');
-    const nextSequence = getSequenceForRound('mahakaya', 1);
-    
-    // IMPORTANT: Clear phase_complete state first
-    setGamePhase('transition');
-    
-    // Use setTimeout to ensure state updates happen in correct order
-    setTimeout(() => {
-      setCurrentPhase('mahakaya');
-      setCurrentRound(1);
-      setCurrentSequence(nextSequence);
-      setPlayerInput([]);
-      setGamePhase('waiting'); // Will trigger auto-countdown
-      setCanPlayerClick(false);
-      setSequenceItemsShown(0);
-      setComboStreak(0);
-      setPermanentlyBloomed({});
-      
-      console.log('Mahakaya phase state updated - should show waiting phase');
-      
-      saveGameState({
-        currentPhase: 'mahakaya',
-        currentRound: 1,
-        currentSequence: nextSequence,
-        gamePhase: 'waiting',
-        playerInput: [],
-        phaseJustCompleted: false
-      });
-    }, 100);
-  };
-
-// NEW VERSION - More robust function exposure
-useEffect(() => {
-  console.log('Setting up sanskritMemoryGame communication...');
-  
-  // Ensure the global object exists
-  window.sanskritMemoryGame = window.sanskritMemoryGame || {};
-  
-  // Always expose the function
-  window.sanskritMemoryGame.startMahakayaPhase = startMahakayaPhase;
-  window.sanskritMemoryGame.isReady = true;
-  
-  console.log('sanskritMemoryGame functions exposed:', {
-    startMahakayaPhase: typeof window.sanskritMemoryGame.startMahakayaPhase,
-    isReady: window.sanskritMemoryGame.isReady
-  });
-  
-  // Cleanup on unmount
-  return () => {
-    console.log('Cleaning up sanskritMemoryGame communication...');
-    if (window.sanskritMemoryGame) {
-      delete window.sanskritMemoryGame.startMahakayaPhase;
-      delete window.sanskritMemoryGame.isReady;
-    }
-  };
-}, [startMahakayaPhase]); // Add dependency to ensure function is current
-
-  // Enhanced error handling with adaptive difficulty
-  const handleSequenceError = () => {
-    setGamePhase('error');
-    setCanPlayerClick(false);
-    setPlayerInput([]);
-    setMistakeCount(prev => prev + 1);
-    setComboStreak(0); // Reset combo on error
-    
-    safeSetTimeout(() => {
-      console.log('AUTO-RETRY: Replaying sequence after error');
-      setSequenceItemsShown(0);
-      
-      // Slight delay before replay for adaptive difficulty
-      const retryDelay = mistakeCount >= 2 ? 3000 : 2000;
-      
-      safeSetTimeout(() => {
-        setGamePhase('waiting'); // Will trigger auto-countdown
-      }, retryDelay);
-    }, 1000);
   };
 
   // Helper functions
@@ -698,20 +920,57 @@ useEffect(() => {
     return permanentlyBloomed[targetId];
   };
 
+  const shouldHighlightElephant = (syllableIndex) => {
+    if (!canPlayerClick) return false;
+    const expectedIndex = playerInput.length;
+    return syllableIndex === expectedIndex;
+  };
+
+  const isElephantDisabled = (syllableIndex) => {
+    if (!canPlayerClick) return true;
+    const expectedIndex = playerInput.length;
+    return syllableIndex !== expectedIndex;
+  };
+
+  const hasBeenClicked = (syllableIndex) => {
+    return syllableIndex < playerInput.length;
+  };
+
   // Dynamic status messages
   const getStatusMessage = () => {
-if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
+    if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
     if (gamePhase === 'transition') return 'Starting new phase...';
     if (isCountingDown) return `Get Ready... ${countdown}`;
     if (gamePhase === 'playing') return 'Listen carefully to the sacred sounds...';
     if (gamePhase === 'listening') return `Repeat the sequence! (${playerInput.length}/${currentSequence.length})`;
     if (gamePhase === 'celebration') return comboStreak >= 3 ? 'Amazing streak! Perfect!' : 'Excellent! Well done!';
-    if (gamePhase === 'phase_complete') return `${currentPhase.toUpperCase()} mastered!`;
+    if (gamePhase === 'phase_complete') return '';
     if (gamePhase === 'error') return mistakeCount >= 3 ? 'Take your time, listen more carefully...' : 'Try again!';
+    if (gamePhase === 'order_error') return 'Click the elephants in order!';
     return `Round ${currentRound} - ${currentPhase.toUpperCase()}`;
   };
 
-  // Sleek integrated progress bar - replaces both old progress bar and sequence display
+  // Quick jump to round (for testing/development)
+  const jumpToRound = (phase, round) => {
+    if (!isComponentMountedRef.current) return;
+    
+    const newSequence = getSequenceForRound(phase, round);
+    setCurrentRound(round);
+    setCurrentSequence(newSequence);
+    setPlayerInput([]);
+    setGamePhase('waiting');
+    setCanPlayerClick(false);
+    setSequenceItemsShown(0);
+    
+    saveGameState({
+      currentRound: round,
+      currentSequence: newSequence,
+      gamePhase: 'waiting',
+      playerInput: []
+    });
+  };
+
+  // Integrated progress bar component
   const renderIntegratedProgressBar = () => (
     <div style={{
       position: 'absolute',
@@ -731,6 +990,21 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
       minWidth: '140px',
       transition: 'all 0.3s ease'
     }}>
+      
+      {/* Reload Indicator */}
+      {isReload && (
+        <div style={{
+          fontSize: '10px',
+          color: '#2196F3',
+          fontWeight: 'bold',
+          background: 'rgba(33, 150, 243, 0.15)',
+          padding: '2px 6px',
+          borderRadius: '8px',
+          animation: 'fadeOut 4s ease-out forwards'
+        }}>
+          RESTORED
+        </div>
+      )}
       
       {/* Phase Header with Round Dots */}
       <div style={{
@@ -767,7 +1041,7 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
         </div>
       </div>
 
-      {/* Sequence Syllables - Only show when revealed */}
+      {/* Sequence Syllables */}
       {sequenceItemsShown > 0 && (
         <div style={{
           display: 'flex',
@@ -803,7 +1077,7 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
         </div>
       )}
 
-      {/* Progress Bar for Current Input */}
+      {/* Progress Bar */}
       {canPlayerClick && (
         <div style={{
           width: '100%',
@@ -839,12 +1113,16 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
     </div>
   );
 
-  // Enhanced elephant rendering with mood system
+  // Render functions for elephants and lotus/stones (implementation continues as before...)
   const renderElephant = (syllable, index) => {
     const mood = elephantMoods[syllable] || 'idle';
     const position = phaseData.positions.clickers[index];
     const clickable = isClickable(index);
     const getImage = currentPhase === 'vakratunda' ? getBabyElephantImage : getAdultElephantImage;
+    
+    const isNextExpected = shouldHighlightElephant(index);
+    const isDisabled = isElephantDisabled(index);
+    const alreadyClicked = hasBeenClicked(index);
     
     const moodStyles = {
       idle: { 
@@ -879,6 +1157,19 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
       }
     };
 
+    let finalStyle = { ...moodStyles[mood] };
+    
+    if (alreadyClicked) {
+      finalStyle.filter = 'brightness(0.8)';
+      finalStyle.opacity = 1;
+    } else if (isNextExpected) {
+      finalStyle.filter = 'brightness(1.05) drop-shadow(0 0 3px #e6c715ff)';
+      finalStyle.animation = 'none';
+    } else if (isDisabled) {
+      finalStyle.filter = 'brightness(0.75) saturate(0.7) grayscale(0.2)';
+      finalStyle.opacity = 0.65;
+    }
+
     return (
       <button
         key={`elephant-${syllable}-${index}`}
@@ -891,14 +1182,13 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
           height: '170px',
           border: 'none',
           background: 'transparent',
-          cursor: clickable ? 'pointer' : 'default',
-          opacity: clickable ? 1 : 0.7,
+          cursor: (clickable && !isDisabled) ? 'pointer' : 'default',
           transition: 'all 0.3s ease',
           zIndex: 20,
-          ...moodStyles[mood]
+          ...finalStyle
         }}
         onClick={() => handleElephantClick(index)}
-        disabled={!clickable}
+        disabled={!clickable || isDisabled}
       >
         {getImage && (
           <img
@@ -908,13 +1198,17 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
           />
         )}
         
-        {/* Syllable label */}
         <div style={{
           position: 'absolute',
           bottom: '85px',
           left: '60%',
           transform: 'translateX(-50%)',
-          background: 'rgba(255, 255, 255, 0.95)',
+          background: alreadyClicked 
+            ? 'rgba(76, 175, 80, 0.9)' 
+            : isNextExpected 
+            ? 'rgba(255, 215, 0, 0.9)' 
+            : 'rgba(255, 255, 255, 0.95)',
+          color: alreadyClicked || isNextExpected ? 'white' : '#333',
           padding: '2px 6px',
           borderRadius: '8px',
           fontSize: '10px',
@@ -924,55 +1218,55 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
           {syllable.toUpperCase()}
         </div>
         
-        {/* Dynamic mood indicators */}
-        {mood === 'happy' && (
+        {alreadyClicked && (
           <div style={{
             position: 'absolute',
             top: '10px',
             left: '50%',
             transform: 'translateX(-50%)',
             fontSize: '24px',
-            animation: 'float 1s ease-in-out infinite'
+            color: '#4CAF50'
           }}>
-            ✨
+            ✓
           </div>
         )}
         
-        {mood === 'celebrating' && (
-          <div style={{
-            position: 'absolute',
-            top: '5px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            fontSize: '20px',
-            animation: 'celebrate 0.8s ease-in-out infinite'
-          }}>
-            🎉
-          </div>
-        )}
-        
-        {clickable && gamePhase === 'listening' && (
+        {isNextExpected && !alreadyClicked && (
           <div style={{
             position: 'absolute',
             bottom: '10px',
             left: '50%',
             transform: 'translateX(-50%)',
-            background: 'rgba(76, 175, 80, 0.9)',
-            color: 'white',
+            background: 'rgba(208, 148, 29, 0.8)',
+            color: '#fefcf0ff',
             padding: '4px 8px',
             borderRadius: '12px',
             fontSize: '11px',
-            animation: 'pulse 2s infinite',
             fontWeight: 'bold'
           }}>
-            Click me!
+            Click me next!
+          </div>
+        )}
+        
+        {isDisabled && !alreadyClicked && (
+          <div style={{
+            position: 'absolute',
+            bottom: '10px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(0, 0, 0, 0.6)',
+            color: 'white',
+            padding: '2px 6px',
+            borderRadius: '8px',
+            fontSize: '10px'
+          }}>
+            Wait...
           </div>
         )}
       </button>
     );
   };
 
-  // Enhanced lotus/stone rendering with glow states
   const renderLotusOrStone = (syllable, index) => {
     const glowState = lotusGlow[syllable] || 'dormant';
     const position = phaseData.positions.singers[index];
@@ -1063,11 +1357,11 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
   return (
     <div className="enhanced-sanskrit-game" style={containerStyle}>
       
-      {/* Sleek Integrated Progress Bar - hide when elements are hidden */}
+      {/* Progress Bar */}
       {!hideElements && renderIntegratedProgressBar()}
       
-      {/* Dynamic Status Display - hide when elements are hidden */}
-      {!hideElements && (
+      {/* Status Display */}
+      {!hideElements && gamePhase !== 'phase_complete' && (
         <div style={{
           position: 'absolute',
           top: '20px',
@@ -1077,7 +1371,7 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
             ? 'rgba(255, 152, 0, 0.95)' 
             : gamePhase === 'celebration'
             ? 'rgba(76, 175, 80, 0.95)'
-            : gamePhase === 'error'
+            : gamePhase === 'error' || gamePhase === 'order_error'
             ? 'rgba(244, 67, 54, 0.95)'
             : 'rgba(33, 150, 243, 0.95)',
           color: 'white',
@@ -1095,7 +1389,7 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
         </div>
       )}
 
-      {/* Countdown Display - hide when elements are hidden */}
+      {/* Countdown Display */}
       {!hideElements && isCountingDown && (
         <div style={{
           position: 'absolute',
@@ -1113,10 +1407,36 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
         </div>
       )}
 
-      {/* Enhanced Game Elements */}
+      {/* Development Round Selector */}
+      {!hideElements && (gamePhase === 'waiting' || gamePhase === 'listening') && process.env.NODE_ENV === 'development' && (
+        <div style={{
+          position: 'absolute',
+          top: '80px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '10px',
+          zIndex: 45
+        }}>
+          <button onClick={() => jumpToRound(currentPhase, 1)} 
+                  style={{fontSize: '10px', padding: '4px 8px', borderRadius: '10px'}}>
+            Round 1
+          </button>
+          <button onClick={() => jumpToRound(currentPhase, 2)}
+                  style={{fontSize: '10px', padding: '4px 8px', borderRadius: '10px'}}>
+            Round 2
+          </button>
+          <button onClick={() => jumpToRound(currentPhase, 3)}
+                  style={{fontSize: '10px', padding: '4px 8px', borderRadius: '10px'}}>
+            Round 3
+          </button>
+        </div>
+      )}
+
+      {/* Game Elements */}
       {!hideElements && ((currentPhase === 'vakratunda') || (currentPhase === 'mahakaya' && powerGained)) && (
         <>
-          {/* Singing Elements with Enhanced Effects */}
+          {/* Singing Elements */}
           {currentSequence.map((syllable, index) => {
             if (currentPhase === 'mahakaya' && !powerGained) {
               return null;
@@ -1124,7 +1444,7 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
             return renderLotusOrStone(syllable, index);
           })}
           
-          {/* Clickable Elephants with Mood System */}
+          {/* Clickable Elephants */}
           {currentSequence.map((syllable, index) => {
             if (currentPhase === 'mahakaya' && !powerGained) {
               return null;
@@ -1132,7 +1452,7 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
             return renderElephant(syllable, index);
           })}
 
-          {/* Player Progress Indicator - moved to bottom and hide when elements are hidden */}
+          {/* Player Progress */}
           {!hideElements && canPlayerClick && (
             <div style={{
               position: 'absolute',
@@ -1172,30 +1492,14 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
         />
       )}
       
-<button 
-  style={{
-    position: 'fixed',
-    top: '100px',
-    right: '20px',
-    background: 'orange',
-    padding: '10px',
-    zIndex: 9999
-  }}
-  onClick={() => {
-    console.log('Testing rapid clicks...');
-    // Simulate rapid clicks
-    for(let i = 0; i < 5; i++) {
-      setTimeout(() => {
-        handleElephantClick(0);
-      }, i * 50); // 50ms apart - should be blocked
-    }
-  }}
->
-  Test Rapid Clicks
-</button>
-
       {/* Enhanced CSS Animations */}
       <style>{`
+        @keyframes fadeOut {
+          0% { opacity: 1; }
+          70% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        
         @keyframes countdownPulse {
           0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
           50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
@@ -1253,16 +1557,6 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
           75% { transform: translate(-50%, -50%) translateX(5px); }
         }
         
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-          50% { opacity: 0.7; transform: translateX(-50%) scale(1.05); }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateX(-50%) translateY(0); }
-          50% { transform: translateX(-50%) translateY(-6px); }
-        }
-        
         @keyframes musicalNote {
           0% { transform: translateX(-50%) translateY(0) scale(0.8); opacity: 0; }
           50% { transform: translateX(-50%) translateY(-10px) scale(1.2); opacity: 1; }
@@ -1284,7 +1578,7 @@ if (roundTransition) return `Preparing Round ${currentRound + 1}...`;
   );
 };
 
-// Enhanced inline styles
+// Container styles
 const containerStyle = {
   position: 'absolute',
   top: 0,

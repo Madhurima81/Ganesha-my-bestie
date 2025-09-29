@@ -5,6 +5,16 @@ import './App.css';
 // Import Elephant Grove Scene
 //import ElephantGroveScene from './zones/shloka-river/scenes/Scene1/ElephantGroveScene.jsx';
 import VakratundaGroveV2 from './zones/shloka-river/scenes/Scene1/VakratundaGroveV2.jsx';
+//import SuryakotiBank from './zones/shloka-river/scenes/Scene2/SuryakotiBank.jsx';
+import NirvighnamChant from './zones/shloka-river/scenes/Scene3/NirvighnamChant.jsx';
+import SarvakaryeshuChant from './zones/shloka-river/scenes/Scene4/SarvakaryeshuChant.jsx';
+import ShlokaRiverFinale from './zones/shloka-river/scenes/Scene5/ShlokaRiverFinale.jsx';
+import FestivalPianoGame from './zones/festival-square/Game1-piano/FestivalPianoGame.jsx';
+import RangoliArtBooth from './zones/festival-square/Game2-Rangoli/RangoliArtBooth.jsx';
+import FestivalRangoliGame from './zones/festival-square/Game2-Rangoli/FestivalRangoliGame.jsx';
+import GaneshaColoringActivity from './lib/components/games/GaneshaColoringActivity.jsx';
+import ModakCookingGame from './zones/festival-square/game3-cooking/ModakCookingGame.jsx';
+import MandapDecorationGame from './zones/festival-square/Game4-mandapdecor/MandapDecorationGame.jsx';
 
 
 // Import GameCoach Provider
@@ -190,7 +200,7 @@ function App() {
 
       {/* Elephant Grove Scene */}
       <GameCoachProvider>
-        <VakratundaGroveV2
+        <FestivalPianoGame //FestivalRangoliGame //ModakCookingGame  //FestivalPianoGame MandapDecorationGame
           key={reloadKey}
           onComplete={handleComplete}
           onNavigate={handleNavigate}

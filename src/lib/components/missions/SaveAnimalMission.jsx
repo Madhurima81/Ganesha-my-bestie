@@ -1,48 +1,103 @@
-// STEP 1: Create this file: lib/components/missions/SaveAnimalMission.jsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HelperSignatureAnimation from '../animation/HelperSignatureAnimation';
 import './SaveAnimalMission.css';
 
 const SaveAnimalMission = ({
   show,
-  word, // 'vakratunda' or 'mahakaya'
+  word,
   beforeImage,
   afterImage,
-  powerConfig, // { name: 'Flexibility', icon: '🌀', color: '#FFD700' }
+  powerConfig,
   smartwatchBase,
   smartwatchScreen,
   appImage,
   boyCharacter,
   onComplete,
-  onCancel
+  onCancel,
+  hideExternalElements = true,
+  
+  // Reload support props
+  isReload = false,
+  initialRescuePhase = 'problem',
+  initialShowParticles = false,
+  missionJustCompleted = false,
+  onSaveMissionState
 }) => {
-  const [rescuePhase, setRescuePhase] = useState('problem'); // 'problem', 'action', 'success'
+  const [rescuePhase, setRescuePhase] = useState('problem');
   const [showParticles, setShowParticles] = useState(false);
 
-  // FIXED: Reset state when component shows/hides
-  React.useEffect(() => {
-    if (show) {
-      console.log('🎯 Save Animal Mission: Resetting to problem phase for', word);
+  // SIMPLIFIED: Just detect device type for conditional logic
+  const [deviceType, setDeviceType] = useState('mobile');
+  
+  useEffect(() => {
+    const updateDeviceType = () => {
+      const width = window.innerWidth;
+      if (width >= 1024) setDeviceType('desktop');
+      else if (width >= 768) setDeviceType('tablet');
+      else setDeviceType('mobile');
+    };
+
+    updateDeviceType();
+    window.addEventListener('resize', updateDeviceType);
+    return () => window.removeEventListener('resize', updateDeviceType);
+  }, []);
+
+  // Handle reload state restoration
+  useEffect(() => {
+    if (show && isReload) {
+      console.log('🔄 Save Animal Mission: Restoring state from reload', {
+        initialRescuePhase,
+        initialShowParticles,
+        missionJustCompleted
+      });
+      
+      setRescuePhase(initialRescuePhase);
+      setShowParticles(initialShowParticles);
+      
+      if (missionJustCompleted) {
+        setTimeout(() => {
+          handleRescueComplete();
+        }, 1000);
+      }
+    } else if (show) {
+      console.log('🎯 Save Animal Mission: Fresh start for', word);
       setRescuePhase('problem');
       setShowParticles(false);
     }
-  }, [show, word]);
+  }, [show, word, isReload]);
+
+  // Save state for reload support
+  const saveMissionState = (additionalState = {}) => {
+    const currentState = {
+      rescuePhase,
+      showParticles,
+      word,
+      ...additionalState
+    };
+    
+    if (onSaveMissionState) {
+      onSaveMissionState(currentState);
+    }
+  };
 
   const handleRescueAction = () => {
     console.log('🔥 RESCUE ACTION: Using power to help');
     setRescuePhase('action');
+    saveMissionState({ rescuePhase: 'action' });
     
-    // Show power effect
     setShowParticles(true);
+    saveMissionState({ rescuePhase: 'action', showParticles: true });
+    
     setTimeout(() => {
       setShowParticles(false);
       setRescuePhase('success');
+      saveMissionState({ rescuePhase: 'success', showParticles: false });
     }, 3000);
   };
 
   const handleRescueComplete = () => {
     console.log('✅ Rescue complete for:', word);
+    saveMissionState({ missionJustCompleted: true });
     onComplete?.(word);
   };
 
@@ -52,32 +107,49 @@ const SaveAnimalMission = ({
 
   if (!show) return null;
 
+  // Message objects
   const problemMessages = {
+    nirvighnam: "Help! I want to eat that fruit!",
+    kurumedeva: "I'm so frightened, please help me!",
     vakratunda: "Help! I want to eat that fruit!",
-    mahakaya: "I'm so frightened, please help me!"
+    mahakaya: "I'm so frightened, please help me!",
+    suryakoti: "It's so dark, I can't see anything!",
+    samaprabha: "I'm lost in this gloomy forest!"
   };
 
   const actionMessages = {
+    nirvighnam: "My sacred wisdom is flowing to you!",
+    kurumedeva: "Feel my divine grace!",
     vakratunda: "My flexibility is flowing to you!",
-    mahakaya: "Feel my inner strength!"
+    mahakaya: "Feel my inner strength!",
+    suryakoti: "My solar clarity is shining on you!",
+    samaprabha: "My radiant light is guiding you!"
   };
 
   const successMessages = {
+    nirvighnam: "Thank you! I feel so wise now!",
+    kurumedeva: "Your grace helped me feel blessed!",
     vakratunda: "Thank you! I feel so brave now!",
-    mahakaya: "Your strength helped me feel safe!"
+    mahakaya: "Your strength helped me feel safe!",
+    suryakoti: "Amazing! Now I can see clearly!",
+    samaprabha: "Wonderful! The path is bright now!"
   };
 
   const buttonTexts = {
+    nirvighnam: "Amazing! Continue Learning",
+    kurumedeva: "Awesome! End Scene",
     vakratunda: "Amazing! Continue Learning",
-    mahakaya: "Awesome! End Scene"
+    mahakaya: "Awesome! End Scene",
+    suryakoti: "Brilliant! Continue Learning", 
+    samaprabha: "Radiant! End Scene"
   };
 
   return (
-    <div className="save-animal-mission">
+    <div className={`save-animal-mission ${deviceType}`}>
       {/* Scene Darkening Effect */}
       <div className="mission-overlay" />
       
-      {/* Animal Scene Content */}
+      {/* Animal Scene Content - CSS handles all responsive scaling */}
       <div className="mission-content">
         
         {rescuePhase === 'problem' && (
@@ -88,10 +160,9 @@ const SaveAnimalMission = ({
               className="mission-animal-image"
             />
             
-            {/* Speech Bubble from Animal */}
             <div className="animal-speech-bubble">
               <div className="speech-text">
-                {problemMessages[word]}
+                {problemMessages[word] || "Help me, please!"}
               </div>
               <div className="speech-pointer" />
             </div>
@@ -106,15 +177,13 @@ const SaveAnimalMission = ({
               className="mission-animal-image glowing"
             />
             
-            {/* Child's Speech Bubble */}
             <div className="child-speech-bubble">
               <div className="speech-text">
-                {actionMessages[word]}
+                {actionMessages[word] || "My power is helping you!"}
               </div>
               <div className="speech-pointer-child" />
             </div>
             
-            {/* YES - HelperSignatureAnimation is included here */}
             <HelperSignatureAnimation
               helperId={word === 'vakratunda' ? 'snuggyshawl' : 'hammerhero'}
               fromPosition={{ x: 80, y: 80 }}
@@ -122,6 +191,7 @@ const SaveAnimalMission = ({
               onAnimationComplete={() => {
                 setTimeout(() => {
                   setRescuePhase('success');
+                  saveMissionState({ rescuePhase: 'success' });
                 }, 1000);
               }}
             />
@@ -136,10 +206,9 @@ const SaveAnimalMission = ({
               className="mission-animal-image celebrating"
             />
             
-            {/* Happy Animal Speech Bubble */}
             <div className="animal-speech-bubble success">
               <div className="speech-text">
-                {successMessages[word]}
+                {successMessages[word] || "Thank you for helping me!"}
               </div>
               <div className="speech-pointer" />
             </div>
@@ -148,13 +217,13 @@ const SaveAnimalMission = ({
               className="mission-complete-btn"
               onClick={handleRescueComplete}
             >
-              {buttonTexts[word]}
+              {buttonTexts[word] || "Continue!"}
             </button>
           </div>
         )}
       </div>
 
-      {/* Boy Character - Separate Positioning */}
+      {/* Boy Character */}
       <div className="mission-boy-character">
         <img 
           src={boyCharacter}
@@ -163,23 +232,20 @@ const SaveAnimalMission = ({
         />
       </div>
 
-      {/* Smartwatch - Separate Components */}
+      {/* Smartwatch */}
       <div className="mission-smartwatch">
-        {/* Base */}
         <img 
           src={smartwatchBase}
           alt="Smartwatch Base"
           className="smartwatch-base"
         />
         
-        {/* Screen */}
         <img 
           src={smartwatchScreen}
           alt="Screen"
           className="smartwatch-screen"
         />
         
-        {/* App */}
         <img 
           src={appImage}
           alt="Power App"
@@ -198,10 +264,9 @@ const SaveAnimalMission = ({
           }}
         />
         
-        {/* Instruction Bubble */}
         {rescuePhase === 'problem' && (
           <div className="instruction-bubble">
-            Tap your {powerConfig?.name} app!
+            Tap your {powerConfig?.name || 'Power'} app!
             <div className="instruction-pointer" />
           </div>
         )}
@@ -225,9 +290,12 @@ const SaveAnimalMission = ({
         </div>
       )}
 
-      {/* Cancel Button (Optional) */}
+      {/* Cancel Button */}
       {rescuePhase === 'problem' && onCancel && (
-        <button className="mission-cancel-btn" onClick={handleCancel}>
+        <button 
+          className="mission-cancel-btn" 
+          onClick={handleCancel}
+        >
           ✕
         </button>
       )}

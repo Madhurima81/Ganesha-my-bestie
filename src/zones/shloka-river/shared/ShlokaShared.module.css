@@ -1,0 +1,312 @@
+/* zones/shloka-river/shared/ShlokaShared.module.css */
+/* Shared styles for all Shloka River scenes */
+
+/* CSS Variables - Shared across all scenes */
+:global(:root) {
+  /* Spacing variables */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  /* Font sizes */
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  
+  /* Shloka River Theme Colors */
+  --lotus-pink: #ff9ebd;
+  --lotus-gold: #ffd700;
+  --water-blue: #6ab7ff;
+  --river-green: #4CAF50;
+  --elephant-gray: #8a8a8a;
+  --sanskrit-orange: #ff6b35;
+  --stone-brown: #8b4513;
+  --solar-orange: #FF8C00;
+  --solar-yellow: #FFD700;
+  --rainbow-purple: #DDA0DD;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  
+  /* Transitions */
+  --transition-fast: 0.2s;
+  --transition-medium: 0.3s;
+  --transition-slow: 0.5s;
+}
+
+/* Base scene container - used by all scenes */
+.sceneContainer {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.riverBackground {
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+/* Shared Ganesha Avatar - Base positioning and animations */
+.ganeshaAvatar {
+  position: absolute;
+  left: 30%;
+  top: 35%;
+  transform: translateX(-50%) scaleX(-1);
+  z-index: 30;
+  transition: all 1.5s ease-in-out;
+}
+
+.ganeshaImage {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  transition: all 1.5s ease-in-out;
+  filter: brightness(1.2) drop-shadow(0 0 30px #FFD700);
+  transform: scaleX(-1);
+}
+
+/* Shared Character - Base positioning */
+.characterBase {
+  position: absolute;
+  right: 15%;
+  top: 75%;
+  transition: all 1.5s ease-in-out;
+  z-index: 5;
+}
+
+.characterImage {
+  width: 180px;
+  height: 240px;
+  transition: all 1.5s ease-in-out;
+}
+
+/* Shared Smartwatch - Base positioning */
+.smartwatchWidget {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 120px;
+  height: 120px;
+  z-index: 1500;
+  cursor: pointer;
+}
+
+.smartwatchBase {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Shared Speech Bubble - Base styling */
+.speechBubbleBase {
+  position: absolute;
+  left: 25%;
+  top: 10%;
+  max-width: 350px;
+  opacity: 0;
+  transform: translateY(30px) scale(0.8);
+  transition: all 1s ease-out;
+  z-index: 20;
+}
+
+.speechBubbleContent {
+  background: rgba(255, 255, 255, 0.98);
+  border: 4px solid #FFD700;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  text-align: center;
+  position: relative;
+}
+
+.speechBubbleContent::before {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 40px;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid #FFD700;
+}
+
+.speechBubbleContent::after {
+  content: '';
+  position: absolute;
+  bottom: -16px;
+  left: 44px;
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 16px solid rgba(255, 255, 255, 0.98);
+}
+
+/* Shared Button Styles */
+.buttonBase {
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.primaryButton {
+  composes: buttonBase;
+  background: linear-gradient(45deg, #4ECDC4, #44A08D);
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+.primaryButton:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(78, 205, 196, 0.5);
+}
+
+.secondaryButton {
+  composes: buttonBase;
+  background: linear-gradient(45deg, #CCC, #AAA);
+  color: #666;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.secondaryButton:hover {
+  background: linear-gradient(45deg, #BBB, #999);
+  transform: translateY(-3px);
+}
+
+/* Shared Animations */
+.breathingAnimation {
+  animation: gentle-breathing 4s ease-in-out infinite;
+}
+
+@keyframes gentle-breathing {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.floatingAnimation {
+  animation: floating 6s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Shared particle effects */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.particle {
+  position: absolute;
+  font-size: 28px;
+  color: #FFD700;
+  animation: particle-flow 3s ease-out infinite;
+  opacity: 0;
+}
+
+@keyframes particle-flow {
+  0% {
+    transform: translate(0, 0) scale(0.8) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translate(100px, -30px) scale(1.2) rotate(90deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(300px, -60px) scale(1.5) rotate(180deg);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(500px, -90px) scale(1.8) rotate(270deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(700px, -120px) scale(2) rotate(360deg);
+  }
+}
+
+/* Shared loading states */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 24px;
+  color: var(--sanskrit-orange);
+  background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+}
+
+/* Shared error boundary */
+.errorBoundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  padding: 2rem;
+  text-align: center;
+}
+
+.errorBoundary h2 {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.errorBoundary button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 1rem;
+}
+
+.errorBoundary button:hover {
+  background-color: #2980b9;
+}
