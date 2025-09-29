@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import smartwatchScreen from '../../assets/images/smartwatch-screen.png';
 
 // Import gray and colored app icons
-import appVakratundaGray from '../../assets/images/apps/app-gray-Vakratunda.png';
+import appVakratundaGray from '../../assets/images/apps/app-gray-vakratunda.png';
 import appVakratunda from '../../assets/images/apps/app-Vakratunda.png';
 import appMahakayaGray from '../../assets/images/apps/app-gray-mahakaya.png';
 import appMahakaya from '../../assets/images/apps/app-mahakaya.png';
