@@ -28,7 +28,7 @@ import bgImage from './assets/images/bg.png';
 import raftImage from './assets/images/raft.png';
 
 // Animal assets
-import vakratundaElephant from './assets/images/vakratunda-elephant.png';
+import vakratundaElephant from './assets/images/Vakratunda-elephant.png';
 import mahakayaElephant from './assets/images/mahakaya-elephant.png';
 import samaprabhaKitten from './assets/images/samaprabha-kitten.png';
 import suryakotiFairy from './assets/images/suryakoti-fairy.png';
