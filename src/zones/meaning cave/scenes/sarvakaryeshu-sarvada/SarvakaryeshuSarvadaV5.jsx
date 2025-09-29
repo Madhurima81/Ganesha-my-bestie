@@ -162,7 +162,7 @@ import parkSparklestar from './assets/images/game 2/helpers/park_sparklestar.png
 import meaningJournal from '../../assets/images/meaning-journal.png';
 
 // All 8 app images
-import appVakratunda from '../../assets/images/apps/app-vakratunda.png';
+import appVakratunda from '../../assets/images/apps/app-Vakratunda.png';
 import appMahakaya from '../../assets/images/apps/app-mahakaya.png';
 import appSuryakoti from "../../assets/images/apps/app-suryakoti.png";
 import appSamaprabha from "../../assets/images/apps/app-samaprabha.png";

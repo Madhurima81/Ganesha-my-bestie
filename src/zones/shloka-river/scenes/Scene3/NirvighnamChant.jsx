@@ -72,7 +72,7 @@ import decor5Va from './assets/images/Kurumedeva/decor5-va.png';
 import ganeshaWithHeadphones from '../assets/images/ganesha_with_headphones.png';
 import smartwatchBase from '../assets/images/smartwatch-base.png';
 import smartwatchScreen from '../assets/images/smartwatch-screen.png';
-import appVakratunda from '../assets/images/apps/app-vakratunda.png';
+import appVakratunda from '../assets/images/apps/app-Vakratunda.png';
 import appMahakaya from '../assets/images/apps/app-mahakaya.png';
 import appSuryakoti from '../assets/images/apps/app-suryakoti.png';
 import appSamaprabha from '../assets/images/apps/app-samaprabha.png';

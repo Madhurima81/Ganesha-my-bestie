@@ -69,7 +69,7 @@ import flowerYa from './assets/images/mahakaya/ya-flower.png';
 import ganeshaWithHeadphones from '../assets/images/ganesha_with_headphones.png';
 import smartwatchBase from '../assets/images/smartwatch-base.png';
 import smartwatchScreen from '../assets/images/smartwatch-screen.png';
-import appVakratunda from '../assets/images/apps/app-vakratunda.png';
+import appVakratunda from '../assets/images/apps/app-Vakratunda.png';
 import appMahakaya from '../assets/images/apps/app-mahakaya.png';
 import boyNamaste from '../assets/images/boy-namaste.png';
 
