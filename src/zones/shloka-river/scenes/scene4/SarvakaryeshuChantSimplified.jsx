@@ -18,11 +18,9 @@ import SparkleAnimation from '../../../../lib/components/animation/SparkleAnimat
 import Fireworks from '../../../../lib/components/feedback/Fireworks';
 import SceneCompletionCelebration from '../../../../lib/components/celebration/SceneCompletionCelebration';
 
-// Import the actual game components
-//import SarvakaryeshuGame from './components/SarvakaryeshuGame';
-//import SarvadaGame from './components/SarvadaGame';
-
-import SarvakaryeshuSarvadaGame from './components/SarvakaryeshuSarvadaGame';
+// Import the actual game components (thin wrappers with MemoryGameEngine)
+import SarvakaryeshuGame from './components/SarvakaryeshuGame';
+import SarvadaGame from './components/SarvadaGame';
 import SanskritVoiceRecorder from '../../../../lib/components/audio/SanskritVoiceRecorder';
 import SmartwatchWidget from '../Scene1/components/SmartwatchWidget';
 import HelperSignatureAnimation from '../../../../lib/components/animation/HelperSignatureAnimation';
@@ -264,6 +262,12 @@ const SarvakaryeshuChantContent = ({
   const [showSarvadaStory, setShowSarvadaStory] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAudioOn, setIsAudioOn] = useState(true);
+
+  // ⭐ Mode selection state for both games
+  const [showSarvakaryeshuModeModal, setShowSarvakaryeshuModeModal] = useState(false);
+  const [showSarvadaModeModal, setShowSarvadaModeModal] = useState(false);
+  const [sarvakaryeshuMode, setSarvakaryeshuMode] = useState(null);
+  const [sarvadaMode, setSarvadaMode] = useState(null);
 
   const [showCenteredWord, setShowCenteredWord] = useState(null);
 const [showPowerModal, setShowPowerModal] = useState(false);
@@ -1051,15 +1055,8 @@ const handlePhaseComplete = (word) => {
     }
   ];
 
-  // Auto-start memory game after welcome
-  useEffect(() => {
-    if (sceneState?.phase === PHASES.INITIAL && sceneState?.welcomeShown) {
-      console.log('Starting Sarvakaryeshu memory game');
-      safeSetTimeout(() => {
-        sceneActions.updateState({ phase: PHASES.SARVAKARYESHU_GAME_ACTIVE });
-      }, 1000);
-    }
-  }, [sceneState?.phase, sceneState?.welcomeShown]);
+  // ⭐ Auto-start removed - using mode selection modals instead
+  // The mode modal buttons now handle starting the game
 
   // Progress counter for syllables
   const renderProgressCounter = () => {
@@ -1169,13 +1166,12 @@ const combinedGameReloadProps = sceneState.combinedGameState ? {
       <p className="sarvakaryeshu-mission-description">
         First, learn to chant <strong>SARVAKARYESHU</strong> to unlock divine action power and save animals!
       </p>
-      <button 
+      <button
         className="sarvakaryeshu-mission-start-btn"
         onClick={() => {
-          sceneActions.updateState({ 
-            welcomeShown: true,
-            phase: PHASES.SARVAKARYESHU_GAME_ACTIVE 
-          });
+          console.log('Starting Sarvakaryeshu - showing mode selection modal');
+          sceneActions.updateState({ welcomeShown: true });
+          setShowSarvakaryeshuModeModal(true);
         }}
       >
         Start Learning!
@@ -1203,31 +1199,10 @@ const combinedGameReloadProps = sceneState.combinedGameState ? {
  <button
         className="sarvakaryeshu-story-continue-btn"
         onClick={() => {
-          console.log('Begin Eternal Blessing clicked - starting Sarvada properly');
-          
-          // ⭐ ADD THIS LINE - Critical for making Sarvada visible!
+          console.log('Begin Eternal Blessing clicked - showing Sarvada mode selection');
           setSarvakaryeshuPowerGained(true);
-          
-          setIsTransitioning(true);
           setShowSarvadaStory(false);
-          
-          setTimeout(() => {
-            sceneActions.updateState({ 
-              phase: PHASES.SARVADA_GAME_ACTIVE,
-              currentPopup: null,
-              sarvakaryeshuGameState: null
-            });
-            
-            setTimeout(() => {
-              if (window.sarvakaryeshuSarvadaGame?.startSarvadaPhase) {
-                window.sarvakaryeshuSarvadaGame.startSarvadaPhase();
-              }
-            }, 200);
-            
-            setTimeout(() => {
-              setIsTransitioning(false);
-            }, 400);
-          }, 100);
+          setShowSarvadaModeModal(true);
         }}
       >
         Start Learning
@@ -1236,6 +1211,148 @@ const combinedGameReloadProps = sceneState.combinedGameState ? {
   </div>
 )}
 
+{/* ⭐ MODE SELECTION MODAL - SARVAKARYESHU */}
+{showSarvakaryeshuModeModal && (
+  <div className="mode-selection-overlay">
+    <div className="mode-selection-modal">
+      <h2 className="mode-selection-title">Choose Your Learning Style</h2>
+      <p className="mode-selection-subtitle">How would you like to learn Sarvakaryeshu?</p>
+
+      <div className="mode-selection-buttons">
+        <button
+          className="mode-selection-btn mode-auto"
+          onClick={() => {
+            console.log('Auto mode selected for Sarvakaryeshu');
+            setSarvakaryeshuMode('auto');
+            setShowSarvakaryeshuModeModal(false);
+            sceneActions.updateState({ phase: PHASES.SARVAKARYESHU_GAME_ACTIVE });
+          }}
+        >
+          <div className="mode-icon">🎵</div>
+          <div className="mode-name">Auto Play</div>
+          <div className="mode-description">Watch and learn each syllable automatically</div>
+        </button>
+
+        <button
+          className="mode-selection-btn mode-manual"
+          onClick={() => {
+            console.log('Manual mode selected for Sarvakaryeshu');
+            setSarvakaryeshuMode('manual');
+            setShowSarvakaryeshuModeModal(false);
+            sceneActions.updateState({ phase: PHASES.SARVAKARYESHU_GAME_ACTIVE });
+          }}
+        >
+          <div className="mode-icon">🎯</div>
+          <div className="mode-name">Choose Rounds</div>
+          <div className="mode-description">Pick which syllables you want to practice</div>
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ⭐ MODE SELECTION MODAL - SARVADA */}
+{showSarvadaModeModal && (
+  <div className="mode-selection-overlay">
+    <div className="mode-selection-modal">
+      <h2 className="mode-selection-title">Choose Your Learning Style</h2>
+      <p className="mode-selection-subtitle">How would you like to learn Sarvada?</p>
+
+      <div className="mode-selection-buttons">
+        <button
+          className="mode-selection-btn mode-auto"
+          onClick={() => {
+            console.log('Auto mode selected for Sarvada');
+            setSarvadaMode('auto');
+            setShowSarvadaModeModal(false);
+            sceneActions.updateState({ phase: PHASES.SARVADA_GAME_ACTIVE });
+          }}
+        >
+          <div className="mode-icon">🎵</div>
+          <div className="mode-name">Auto Play</div>
+          <div className="mode-description">Watch and learn each syllable automatically</div>
+        </button>
+
+        <button
+          className="mode-selection-btn mode-manual"
+          onClick={() => {
+            console.log('Manual mode selected for Sarvada');
+            setSarvadaMode('manual');
+            setShowSarvadaModeModal(false);
+            sceneActions.updateState({ phase: PHASES.SARVADA_GAME_ACTIVE });
+          }}
+        >
+          <div className="mode-icon">🎯</div>
+          <div className="mode-name">Choose Rounds</div>
+          <div className="mode-description">Pick which syllables you want to practice</div>
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ⭐ SARVAKARYESHU GAME - Scene-controlled mode */}
+<SarvakaryeshuGame
+  isActive={sceneState.phase === PHASES.SARVAKARYESHU_GAME_ACTIVE}
+  hideElements={isTransitioning ||
+    showGaneshaBlessing ||
+    sceneState.phase === PHASES.SARVAKARYESHU_COMPLETE ||
+    sceneState.phase === PHASES.SCENE_COMPLETE}
+  onPhaseComplete={handlePhaseComplete}
+  profileName={profileName}
+
+  // Sarvakaryeshu asset functions
+  getSarSquirrelHelperImage={() => sarSquirrelHelper}
+  getVaBirdHelperImage={() => vaBirdHelper}
+  getKarDuckHelperImage={() => karDuckHelper}
+  getYeshuRabbitHelperImage={() => yeshuRabbitHelper}
+  getSarSquirrelSadImage={() => sarSquirrelSad}
+  getVaBirdSadImage={() => vaBirdSad}
+  getKarDuckSadImage={() => karDuckSad}
+  getYeshuRabbitSadImage={() => yeshuRabbitSad}
+  getSarSquirrelHappyImage={() => sarSquirrelHappy}
+  getVaBirdHappyImage={() => vaBirdHappy}
+  getKarDuckHappyImage={() => karDuckHappy}
+  getYeshuRabbitHappyImage={() => yeshuRabbitHappy}
+
+  // ⭐ Mode control - scene manages the modal, game gets the selection
+  selectedMode={sarvakaryeshuMode}
+  skipModeSelection={true}
+
+  isAudioOn={isAudioOn}
+  playAudio={playAudio}
+/>
+
+{/* ⭐ SARVADA GAME - Scene-controlled mode */}
+<SarvadaGame
+  isActive={sceneState.phase === PHASES.SARVADA_GAME_ACTIVE}
+  hideElements={isTransitioning ||
+    showGaneshaBlessing || showSarvadaStory ||
+    sceneState.phase === PHASES.SARVADA_COMPLETE ||
+    sceneState.phase === PHASES.SCENE_COMPLETE}
+  onPhaseComplete={handlePhaseComplete}
+  profileName={profileName}
+
+  // Sarvada asset functions
+  getSavButterflyHelperImage={() => savButterflyHelper}
+  getVaFawnHelperImage={() => vaFawnHelper}
+  getDaHedgehogHelperImage={() => daHedgehogHelper}
+  getSavButterflySadImage={() => savButterflySad}
+  getVaFawnSadImage={() => vaFawnSad}
+  getDaHedgehogSadImage={() => daHedgehogSad}
+  getSavButterflyHappyImage={() => savButterflyHappy}
+  getVaFawnHappyImage={() => vaFawnHappy}
+  getDaHedgehogHappyImage={() => daHedgehogHappy}
+
+  // ⭐ Mode control - scene manages the modal, game gets the selection
+  selectedMode={sarvadaMode}
+  skipModeSelection={true}
+
+  isAudioOn={isAudioOn}
+  playAudio={playAudio}
+/>
+
+{/* OLD COMBINED GAME COMPONENT - REMOVED
 <SarvakaryeshuSarvadaGame
   isActive={sceneState.phase === PHASES.SARVAKARYESHU_GAME_ACTIVE || 
            sceneState.phase === PHASES.SARVADA_GAME_ACTIVE ||
@@ -1280,8 +1397,7 @@ const combinedGameReloadProps = sceneState.combinedGameState ? {
   powerGained={sarvakaryeshuPowerGained}
   {...combinedGameReloadProps}
 />
-
-         
+*/}
 
 <AppSidebar 
   unlockedApps={{

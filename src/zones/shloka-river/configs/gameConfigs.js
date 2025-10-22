@@ -392,6 +392,178 @@ export const GAME_CONFIGS = {
     }
   },
 
+  // Game 7: Sarvakaryeshu (Scene 4)
+  sarvakaryeshu: {
+    id: 'sarvakaryeshu',
+    displayName: 'Sarvakaryeshu',
+    theme: {
+      primaryColor: '#FFD700',
+      accentColor: '#FFA500',
+      backgroundColor: 'linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%)'
+    },
+
+    syllables: {
+      1: ['sar', 'va'],
+      2: ['sar', 'va', 'kar'],
+      3: ['sar', 'va', 'kar', 'yeshu']
+    },
+
+    elements: {
+      // ⭐ CLICKERS = Animals (squirrel, bird, duck, rabbit) - these SING and you CLICK them
+      clicker: {
+        type: 'animals',
+        count: 4,
+        ids: ['animal-sar', 'animal-va', 'animal-kar', 'animal-yeshu'],
+        positions: [
+          { left: '70%', top: '35%' },  // Squirrel
+          { left: '15%', top: '80%' },  // Bird
+          { left: '80%', top: '75%' },  // Duck
+          { left: '35%', top: '80%' }   // Rabbit
+        ],
+        assetGetters: {
+          sar: 'getSarSquirrelHelperImage',
+          va: 'getVaBirdHelperImage',
+          kar: 'getKarDuckHelperImage',
+          yeshu: 'getYeshuRabbitHelperImage'
+        }
+      },
+      // ⭐ SINGER = Visual elements (sad → happy animals)
+      singer: {
+        type: 'animals-transformation',
+        count: 4,
+        ids: ['visual-sar', 'visual-va', 'visual-kar', 'visual-yeshu'],
+        // Initial state - sad animals
+        positions: [
+          { left: '60%', top: '35%' },
+          { left: '15%', top: '80%' },
+          { left: '80%', top: '75%' },
+          { left: '35%', top: '80%' }
+        ],
+        assetGettersInitial: {
+          sar: 'getSarSquirrelSadImage',
+          va: 'getVaBirdSadImage',
+          kar: 'getKarDuckSadImage',
+          yeshu: 'getYeshuRabbitSadImage'
+        },
+        // Reward state - happy animals (same positions)
+        positionsReward: [
+          { left: '60%', top: '35%' },
+          { left: '15%', top: '80%' },
+          { left: '80%', top: '75%' },
+          { left: '35%', top: '80%' }
+        ],
+        assetGettersReward: {
+          sar: 'getSarSquirrelHappyImage',
+          va: 'getVaBirdHappyImage',
+          kar: 'getKarDuckHappyImage',
+          yeshu: 'getYeshuRabbitHappyImage'
+        }
+      }
+    },
+
+    audio: {
+      syllableFolder: '/audio/syllables/',
+      syllableFileMap: {
+        'sar': 'sarvakaryeshu-sar',
+        'va': 'sarvakaryeshu-va',
+        'kar': 'sarvakaryeshu-kar',
+        'yeshu': 'sarvakaryeshu-yeshu'
+      },
+      completeWordFile: '/audio/words/sarvakaryeshu.mp3'
+    },
+
+    waterSpray: {
+      enabled: false  // No water spray for Scene 4
+    },
+
+    celebration: {
+      emoji: '🎉',
+      message: 'Divine action blessed!'
+    }
+  },
+
+  // Game 8: Sarvada (Scene 4)
+  sarvada: {
+    id: 'sarvada',
+    displayName: 'Sarvada',
+    theme: {
+      primaryColor: '#4B0082',
+      accentColor: '#9370DB',
+      backgroundColor: 'linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%)'
+    },
+
+    syllables: {
+      1: ['sav', 'va'],
+      2: ['sav', 'va', 'da']
+    },
+
+    elements: {
+      // ⭐ CLICKERS = Animals (butterfly, fawn, hedgehog) - these SING and you CLICK them
+      clicker: {
+        type: 'animals',
+        count: 3,
+        ids: ['animal-sav', 'animal-va', 'animal-da'],
+        positions: [
+          { left: '70%', top: '35%' },  // Butterfly
+          { left: '15%', top: '80%' },  // Fawn
+          { left: '80%', top: '75%' }   // Hedgehog
+        ],
+        assetGetters: {
+          sav: 'getSavButterflyHelperImage',
+          va: 'getVaFawnHelperImage',
+          da: 'getDaHedgehogHelperImage'
+        }
+      },
+      // ⭐ SINGER = Visual elements (sad → happy animals)
+      singer: {
+        type: 'animals-transformation',
+        count: 3,
+        ids: ['visual-sav', 'visual-va', 'visual-da'],
+        // Initial state - sad animals
+        positions: [
+          { left: '70%', top: '35%' },
+          { left: '15%', top: '80%' },
+          { left: '80%', top: '75%' }
+        ],
+        assetGettersInitial: {
+          sav: 'getSavButterflySadImage',
+          va: 'getVaFawnSadImage',
+          da: 'getDaHedgehogSadImage'
+        },
+        // Reward state - happy animals (same positions)
+        positionsReward: [
+          { left: '70%', top: '35%' },
+          { left: '15%', top: '80%' },
+          { left: '80%', top: '75%' }
+        ],
+        assetGettersReward: {
+          sav: 'getSavButterflyHappyImage',
+          va: 'getVaFawnHappyImage',
+          da: 'getDaHedgehogHappyImage'
+        }
+      }
+    },
+
+    audio: {
+      syllableFolder: '/audio/syllables/',
+      syllableFileMap: {
+        'sav': 'sarvada-sav',
+        'va': 'sarvada-va',
+        'da': 'sarvada-da'
+      },
+      completeWordFile: '/audio/words/sarvada.mp3'
+    },
+
+    waterSpray: {
+      enabled: false  // No water spray for Scene 4
+    },
+
+    celebration: {
+      emoji: '✨',
+      message: 'Eternal blessing received!'
+    }
+  },
+
   // Template for remaining games
   game4: {
     id: 'game4',
