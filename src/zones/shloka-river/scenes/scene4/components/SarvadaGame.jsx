@@ -27,6 +27,13 @@ const SarvadaGame = ({
 }) => {
   const gameConfig = getGameConfig('sarvada');
 
+  // ⭐ DEBUG: Check if config was found
+  if (!gameConfig) {
+    console.error('❌ SarvadaGame: Config not found for "sarvada"');
+    console.log('Available configs:', Object.keys(require('../../../configs/gameConfigs').GAME_CONFIGS || {}));
+    return <div style={{color: 'red', padding: '20px'}}>Error: Game config not found for sarvada</div>;
+  }
+
   const assetGetters = {
     // Clickers (animals that sing and you click)
     getSavButterflyHelperImage,

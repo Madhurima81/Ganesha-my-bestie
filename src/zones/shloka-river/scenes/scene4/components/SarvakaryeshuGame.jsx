@@ -30,6 +30,13 @@ const SarvakaryeshuGame = ({
 }) => {
   const gameConfig = getGameConfig('sarvakaryeshu');
 
+  // ⭐ DEBUG: Check if config was found
+  if (!gameConfig) {
+    console.error('❌ SarvakaryeshuGame: Config not found for "sarvakaryeshu"');
+    console.log('Available configs:', Object.keys(require('../../../configs/gameConfigs').GAME_CONFIGS || {}));
+    return <div style={{color: 'red', padding: '20px'}}>Error: Game config not found for sarvakaryeshu</div>;
+  }
+
   const assetGetters = {
     // Clickers (animals that sing and you click)
     getSarSquirrelHelperImage,
