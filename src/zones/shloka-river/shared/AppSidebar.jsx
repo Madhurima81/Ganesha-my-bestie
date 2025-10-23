@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './AppSidebar.css';
+import SanskritVoiceRecorder from '../../../lib/components/audio/SanskritVoiceRecorder';
 
 // Import gray and colored app icons
 import appVakratundaGray from '../scenes/assets/images/apps/app-gray-vakratunda.png';
@@ -88,86 +89,51 @@ const appInfo = {
 };
 
 const AppSidebar = ({ unlockedApps = {}, onAppClick, className = '' }) => {
-  const [showPopup, setShowPopup] = useState(false);
-  const [selectedApp, setSelectedApp] = useState(null);
   const [animatingApp, setAnimatingApp] = useState(null);
+
+  // Voice Recorder state
+  const [showRecorder, setShowRecorder] = useState(false);
+  const [recordingWord, setRecordingWord] = useState('');
+  const [savedRecordings, setSavedRecordings] = useState({});
 
   // App order for display (matching scene progression)
   const appOrder = ['vakratunda', 'mahakaya', 'suryakoti', 'samaprabha', 'nirvighnam', 'kurumedeva','sarvakaryeshu', 'sarvada'];
 
 const handleAppClick = (appId) => {
   if (unlockedApps[appId]) {
-    setSelectedApp(appId);
-    setShowPopup(true);
-    // Remove onAppClick to prevent second popup
+    setRecordingWord(appId);
+    setShowRecorder(true);
+    console.log(`Opening SanskritVoiceRecorder for: ${appId}`);
   }
 };
 
-// Add these new functions (replace the placeholder ones):
-const handleSyllableClick = (syllable, appId) => {
-  console.log(`Playing syllable: ${syllable} for app: ${appId}`);
-  
-  // Use the same audio logic as VakratundaGrove
-  const syllableFileMap = {
-    'VA': 'vakratunda-va',
-    'KRA': 'vakratunda-kra', 
-    'TUN': 'vakratunda-tun',
-    'DA': 'vakratunda-da',
-    'MA': 'mahakaya-ma',
-    'HA': 'mahakaya-ha',
-    'KA': 'mahakaya-ka',
-    'YA': 'mahakaya-ya',
-    'SUR': 'suryakoti-sur',
-    'YA': 'suryakoti-ya',
-    'KO': 'suryakoti-ko',
-    'TI': 'suryakoti-ti',
-    'SA': 'samaprabha-sa',
-    'MA': 'samaprabha-ma',
-    'PRA': 'samaprabha-pra',
-    'BHA': 'samaprabha-bha',
-    'NIR': 'nirvighnam-nir',
-    'VIGH': 'nirvighnam-vigh',
-    'NAM': 'nirvighnam-nam',
-    'KU': 'kurumedeva-ku',
-    'RU': 'kurumedeva-ru',
-    'ME': 'kurumedeva-me',
-    'DEVA': 'kurumedeva-deva',
-    'SAR': 'sarvada-sar',
-    'VA': 'sarvada-va',
-    'DA': 'sarvada-da',
-    'KAR': 'sarvakaryeshu-kar',
-    'YE': 'sarvakaryeshu-ye',
-    'SHU': 'sarvakaryeshu-shu'
-  };
-  
-  const fileName = syllableFileMap[syllable] || `${appId}-${syllable.toLowerCase()}`;
-  playAudio(`/audio/syllables/${fileName}.mp3`);
+// Voice Recorder handlers
+const handleRecordingComplete = (data) => {
+  console.log('Recording completed:', data);
+  setShowRecorder(false);
+  setRecordingWord('');
 };
 
-const handleWordPlay = (appId) => {
-  console.log(`Playing word: ${appId}`);
-  playAudio(`/audio/words/${appId}.mp3`);
+const handleRecordingSkip = () => {
+  console.log('Recording skipped');
+  setShowRecorder(false);
+  setRecordingWord('');
 };
 
-// Add the playAudio function (copy from VakratundaGrove):
-const playAudio = (audioPath, volume = 1.0) => {
-  try {
-    const audio = new Audio(audioPath);
-    audio.volume = volume;
-    return audio.play().catch(e => {
-      console.log(`Audio not found: ${audioPath}`);
-      return Promise.resolve();
-    });
-  } catch (error) {
-    console.log(`Audio error: ${error.message}`);
-    return Promise.resolve();
-  }
+const handleSaveRecording = (recordingData) => {
+  console.log('Saving recording:', recordingData);
+
+  setSavedRecordings(prev => {
+    const wordKey = recordingData.word.toLowerCase();
+    const existingRecordings = prev[wordKey] || [];
+
+    return {
+      ...prev,
+      [wordKey]: [...existingRecordings, recordingData]
+    };
+  });
 };
 
-  const closePopup = () => {
-    setShowPopup(false);
-    setSelectedApp(null);
-  };
 
   // Trigger animation when an app is newly unlocked
   useEffect(() => {
@@ -206,51 +172,21 @@ const playAudio = (audioPath, volume = 1.0) => {
         })}
       </div>
 
-      {/* App Information Popup (like SymbolSidebar popup) */}
-      {showPopup && selectedApp && (
-        <div className="app-popup-overlay" onClick={closePopup}>
-          <div className="app-popup-content" onClick={(e) => e.stopPropagation()}>
-            <button className="popup-close-btn" onClick={closePopup}>×</button>
-            
-            <div className="popup-app-icon">
-              <img 
-                src={appInfo[selectedApp].colorIcon} 
-                alt={appInfo[selectedApp].title}
-                className="popup-app-image"
-              />
-            </div>
-            
-            <h2 className="popup-title">{appInfo[selectedApp].title}</h2>
-            <p className="popup-description">{appInfo[selectedApp].description}</p>
-            
-{/* Syllable Practice Buttons */}
-<div className="syllable-practice">
-  {appInfo[selectedApp].syllables.map(syllable => (
-    <button 
-      key={syllable} 
-      className="syllable-btn"
-      onClick={() => handleSyllableClick(syllable, selectedApp)}
-    >
-      {syllable}
-    </button>
-  ))}
-</div>
-
-{/* Add Word Practice Button */}
-<button 
-  className="word-practice-btn"
-  onClick={() => handleWordPlay(selectedApp)}
->
-  🎵 {selectedApp.toUpperCase()}
-</button>
-            
-       <button className="popup-continue-btn" onClick={closePopup}>
-  Close
-</button>
-          </div>
-        </div>
+      {/* Sanskrit Voice Recorder Modal */}
+      {showRecorder && recordingWord && (
+        <SanskritVoiceRecorder
+          show={showRecorder}
+          word={recordingWord}
+          prompt={`Practice saying the sacred word`}
+          title={`Practice: ${appInfo[recordingWord]?.title || recordingWord.toUpperCase()}`}
+          onComplete={handleRecordingComplete}
+          onSkip={handleRecordingSkip}
+          savedRecordings={savedRecordings}
+          onSaveRecording={handleSaveRecording}
+          allowSkip={true}
+          theme="sanskrit"
+        />
       )}
-
 
     </>
   );
