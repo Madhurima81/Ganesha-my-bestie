@@ -1501,14 +1501,6 @@ setTimeout(() => {
     samaprabha: true,      // From Scene 2
     ...(sceneState.unlockedApps || {})  // nirvighnam, kurumedeva
   }}
-  onAppClick={(app) => {
-    setCurrentPracticeWord(app.id);
-    setShowAudioPractice(true);
-  }}
-  isReload={isReload}
-  onSaveAppState={(appState) => {
-    sceneActions.updateState({ unlockedApps: appState });
-  }}
 />
 
 

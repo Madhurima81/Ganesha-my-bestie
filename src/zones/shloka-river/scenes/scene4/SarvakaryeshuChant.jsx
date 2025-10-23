@@ -1461,14 +1461,6 @@ if (window.sarvakaryeshuSarvadaGame?.startSarvadaPhase) {
     kurumedeva: true,      // From Scene 3
     ...(sceneState.unlockedApps || {})  // sarvakaryeshu, sarvada
   }}
-  onAppClick={(app) => {
-    setCurrentPracticeWord(app.id);
-    setShowAudioPractice(true);
-  }}
-  isReload={isReload}
-  onSaveAppState={(appState) => {
-    sceneActions.updateState({ unlockedApps: appState });
-  }}
 />
 
 

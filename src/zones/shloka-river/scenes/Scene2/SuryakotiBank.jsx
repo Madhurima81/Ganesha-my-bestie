@@ -1440,14 +1440,6 @@ getHappyAnimalImage={(index) => getAnimalImage(index, 1)}   // Happy animals
     mahakaya: true,        // From Scene 1
     ...(sceneState.unlockedApps || {})  // suryakoti, samaprabha
   }}
-  onAppClick={(app) => {
-    setCurrentPracticeWord(app.id);
-    setShowAudioPractice(true);
-  }}
-  isReload={isReload}
-  onSaveAppState={(appState) => {
-    sceneActions.updateState({ unlockedApps: appState });
-  }}
 />
 
 

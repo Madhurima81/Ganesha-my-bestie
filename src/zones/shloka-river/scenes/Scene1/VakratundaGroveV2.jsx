@@ -1593,16 +1593,8 @@ onClick={() => {
               </div>
             )}
 
-<AppSidebar 
+<AppSidebar
   unlockedApps={sceneState.unlockedApps || {}}
-  onAppClick={(app) => {
-    setCurrentPracticeWord(app.id);
-    setShowAudioPractice(true);
-  }}
-  isReload={isReload}
-  onSaveAppState={(appState) => {
-    sceneActions.updateState({ unlockedApps: appState });
-  }}
 />
 
 
