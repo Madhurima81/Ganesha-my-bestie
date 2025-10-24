@@ -235,7 +235,7 @@ export const GAME_CONFIGS = {
           { left: '60%', top: '50%' }
         ],
         assetGetters: {
-          nir: 'getLeafRirImage',
+          nir: 'getLeafNirImage',
           vigh: 'getDrumVighImage',
           nam: 'getFeatherNamImage'
         }
